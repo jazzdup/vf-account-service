@@ -52,7 +52,8 @@ public class AccountValidationIT {
         final String accountId = new Random().nextInt() + "";
 
         mockMvc.perform(post("/accounts/" + accountId + "/validation")
-                .contentType(contentType)).andExpect(MockMvcResultMatchers.status().isOk());
+                .contentType(contentType))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
 }

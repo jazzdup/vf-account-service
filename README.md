@@ -10,6 +10,7 @@ mvn clean install
 
 This should build, run unit tests and integrataion tests
 
-Run the server for dev:
+Run the application in an embedded server for dev:
 
 mvn spring-boot:run
+
