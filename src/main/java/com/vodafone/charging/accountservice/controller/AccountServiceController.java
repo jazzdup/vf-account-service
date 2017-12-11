@@ -18,7 +18,9 @@ public class AccountServiceController {
     @RequestMapping(path = "/validation", method = POST)
     public ResponseEntity<?> validate(@PathVariable String accountId) {
         //TODO call to get account info from ER IF
-        log.error("CALLING VALIDATE WITH ACCOUNTID: {}", accountId);
+        log.debug("CALLING VALIDATE WITH ACCOUNTID: {}", accountId);
         return ResponseEntity.ok().build();
     }
+
+
 }
