@@ -1,4 +1,4 @@
-package com.vodafone.charging.vfaccountservice;
+package com.vodafone.charging.accountservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
