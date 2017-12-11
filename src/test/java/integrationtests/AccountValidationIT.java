@@ -10,13 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -44,22 +42,17 @@ public class AccountValidationIT {
     @Test
     public void pathNotFound() throws Exception {
         final String accountId = new Random().nextInt() + "";
-
-        ResultActions actions = mockMvc.perform(post("/account/" + accountId + "/validation")
+     mockMvc.perform(post("/account/" + accountId + "/validation")
                 .contentType(contentType)).andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        assertNotNull(actions);
     }
-
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
         final String accountId = new Random().nextInt() + "";
 
-        ResultActions actions = mockMvc.perform(post("/accounts/" + accountId + "/validation")
+        mockMvc.perform(post("/accounts/" + accountId + "/validation")
                 .contentType(contentType)).andExpect(MockMvcResultMatchers.status().isOk());
-
-        assertNotNull(actions);
     }
 
 }
