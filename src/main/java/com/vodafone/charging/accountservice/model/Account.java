@@ -1,6 +1,5 @@
 package com.vodafone.charging.accountservice.model;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Locale;
@@ -10,17 +9,15 @@ public class Account {
 
     private String id;
     private Locale locale;
-
-    @Autowired
-    private Validation validation;
+    //TODO add ChargingId in here
+    //ChargingId chargingId
 
     public Account() {
     }
 
-    private Account(final String id, final Locale locale, final Validation validation) {
+    private Account(final String id, final Locale locale) {
         this.id = id;
         this.locale = locale;
-        this.validation = validation;
     }
 
     public String getId() {
@@ -31,16 +28,11 @@ public class Account {
         return locale;
     }
 
-    public Validation getValidation() {
-        return validation;
-    }
-
     public static class Builder {
         private String accountId;
         private Locale locale;
-        private Validation validation;
 
-        public Builder msisdn(final String accountId) {
+        public Builder accountId(final String accountId) {
             this.accountId = accountId;
             return this;
         }
@@ -48,13 +40,9 @@ public class Account {
             this.locale = locale;
             return this;
         }
-        public Builder locale(final Validation validation) {
-            this.validation = validation;
-            return this;
-        }
 
         public Account build() {
-            return new Account(accountId, locale, validation);
+            return new Account(accountId, locale);
         }
     }
 

@@ -1,18 +1,23 @@
 package integrationtests;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.model.Account;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
+import java.util.Locale;
 import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,8 +33,9 @@ public class AccountValidationIT {
                     MediaType.APPLICATION_JSON_UTF8.getSubtype());
 
     private MockMvc mockMvc;
-    //TODO probably need this when we are mapping objects
-//    private HttpMessageConverter mappingJackson2HttpMessageConverter;
+
+    @Autowired
+    private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -42,18 +48,28 @@ public class AccountValidationIT {
     @Test
     public void pathNotFound() throws Exception {
         final String accountId = new Random().nextInt() + "";
-     mockMvc.perform(post("/account/" + accountId + "/validation")
-                .contentType(contentType)).andExpect(MockMvcResultMatchers.status().isNotFound());
+        mockMvc.perform(post("/account/" + accountId + "/validation")
+                .contentType(contentType))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
         final String accountId = new Random().nextInt() + "";
+        String accountJson = json(new Account.Builder().locale(Locale.UK).accountId(accountId)
+                .build());
 
         mockMvc.perform(post("/accounts/" + accountId + "/validation")
-                .contentType(contentType))
+                .contentType(contentType)
+                .content(accountJson))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    protected String json(Object o) throws IOException {
+        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+        this.mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
+        return outputMessage.getBodyAsString();
     }
 
 }
