@@ -1,6 +1,8 @@
 package com.vodafone.charging.accountservice.controller;
 
+import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.model.Account;
+import com.vodafone.charging.accountservice.model.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,17 @@ public class AccountServiceController {
     private static final Logger log = LoggerFactory.getLogger(AccountServiceController.class);
 
     @RequestMapping(path = "/validation", method = POST)
-    public ResponseEntity<?> validate(@PathVariable String accountId, @RequestBody Account account) {
+    public ResponseEntity<Validation> validate(@PathVariable String accountId, @RequestBody Account account) {
+
+
         //TODO call to get account info from ER IF
         log.debug("CALLING VALIDATE WITH ACCOUNTID: {}", accountId);
-//        new Validation.Builder().accountId(accountId).build();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(getValidation());
     }
 
+
+    private Validation getValidation() {
+        return new Validation.Builder().usergroups(Lists.newArrayList("test-usergroup")).result(true).build();
+    }
 
 }
