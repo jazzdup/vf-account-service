@@ -1,7 +1,7 @@
 package com.vodafone.charging.accountservice.service;
 
-import com.vodafone.charging.accountservice.model.Account;
-import com.vodafone.charging.accountservice.model.Validation;
+import com.vodafone.charging.accountservice.domain.Account;
+import com.vodafone.charging.accountservice.domain.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

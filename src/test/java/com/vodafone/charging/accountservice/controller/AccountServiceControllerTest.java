@@ -1,7 +1,7 @@
 package com.vodafone.charging.accountservice.controller;
 
 import com.vodafone.charging.accountservice.exception.BadRequestException;
-import com.vodafone.charging.accountservice.model.Validation;
+import com.vodafone.charging.accountservice.domain.Validation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -31,7 +31,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
 //        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
 //        builder.serializationInclusion(JsonInclude.Include.NON_EMPTY);
-//        builder.indentOutput(true);
+        builder.indentOutput(true);
         builder.dateFormat(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss"));
 
         ObjectMapper objectMapper = new ObjectMapper();

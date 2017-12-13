@@ -1,12 +1,12 @@
 package com.vodafone.charging.data.builder;
 
-import com.vodafone.charging.accountservice.model.Account;
-import com.vodafone.charging.accountservice.model.ChargingId;
+import com.vodafone.charging.accountservice.domain.Account;
+import com.vodafone.charging.accountservice.domain.ChargingId;
 
 import java.util.Locale;
 import java.util.Random;
 
-import static com.vodafone.charging.accountservice.model.ChargingId.Type;
+import static com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.*;
 
 /**

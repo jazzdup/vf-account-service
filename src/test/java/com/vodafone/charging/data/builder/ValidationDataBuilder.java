@@ -1,6 +1,6 @@
 package com.vodafone.charging.data.builder;
 
-import com.vodafone.charging.accountservice.model.Validation;
+import com.vodafone.charging.accountservice.domain.Validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 

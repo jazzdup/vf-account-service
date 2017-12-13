@@ -1,6 +1,6 @@
 package com.vodafone.charging.data.builder;
 
-import com.vodafone.charging.accountservice.model.ChargingId;
+import com.vodafone.charging.accountservice.domain.ChargingId;
 
 import java.util.Random;
 

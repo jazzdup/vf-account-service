@@ -2,8 +2,8 @@ package com.vodafone.charging.accountservice.controller;
 
 import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.exception.BadRequestException;
-import com.vodafone.charging.accountservice.model.Account;
-import com.vodafone.charging.accountservice.model.Validation;
+import com.vodafone.charging.accountservice.domain.Account;
+import com.vodafone.charging.accountservice.domain.Validation;
 import com.vodafone.charging.accountservice.service.AccountValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

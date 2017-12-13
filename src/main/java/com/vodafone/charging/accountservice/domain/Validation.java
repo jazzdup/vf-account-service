@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.model;
+package com.vodafone.charging.accountservice.domain;
 
 import org.springframework.stereotype.Component;
 

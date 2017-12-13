@@ -39,7 +39,7 @@ public class AccountValidationIT {
     @Autowired
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
-    public String toJson(Object o) throws IOException {
+    private String toJson(Object o) throws IOException {
         MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
         mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
         return outputMessage.getBodyAsString();
