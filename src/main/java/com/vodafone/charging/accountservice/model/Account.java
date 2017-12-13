@@ -1,23 +1,23 @@
 package com.vodafone.charging.accountservice.model;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-@Repository
+@Component
 public class Account {
 
     private String id;
     private Locale locale;
-    //TODO add ChargingId in here
-    //ChargingId chargingId
+    private ChargingId chargingId;
 
-    public Account() {
+    private Account() {
     }
 
-    private Account(final String id, final Locale locale) {
+    public Account(final String id, final Locale locale, final ChargingId chargingId) {
         this.id = id;
         this.locale = locale;
+        this.chargingId = chargingId;
     }
 
     public String getId() {
@@ -28,22 +28,16 @@ public class Account {
         return locale;
     }
 
-    public static class Builder {
-        private String accountId;
-        private Locale locale;
-
-        public Builder accountId(final String accountId) {
-            this.accountId = accountId;
-            return this;
-        }
-        public Builder locale(final Locale locale) {
-            this.locale = locale;
-            return this;
-        }
-
-        public Account build() {
-            return new Account(accountId, locale);
-        }
+    public ChargingId getChargingId() {
+        return chargingId;
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id='" + id + '\'' +
+                ", locale=" + locale +
+                ", chargingId=" + chargingId +
+                '}';
+    }
 }

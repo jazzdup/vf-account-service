@@ -1,5 +1,6 @@
-package com.vodafone.charging.accountservice.configuration;
+package com.vodafone.charging.spring.configuration;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,16 +14,16 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 @Configuration
 @ComponentScan
-public class BeanConfiguration extends WebMvcConfigurerAdapter {
+@WebAppConfiguration
+public class BeanConfiguration  extends WebMvcConfigurerAdapter {
 
     @Bean
     @Primary
@@ -44,7 +45,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         //required for date formatting to follow annotations on class in Java 8
         objectMapper.findAndRegisterModules();
         //required to see private members for serialisation (e.g. in 3rd party apps)
-        objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         return objectMapper;

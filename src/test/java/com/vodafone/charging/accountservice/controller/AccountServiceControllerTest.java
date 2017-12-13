@@ -1,7 +1,6 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.google.common.collect.Lists;
-import com.vodafone.charging.accountservice.model.Account;
+import com.vodafone.charging.accountservice.exception.BadRequestException;
 import com.vodafone.charging.accountservice.model.Validation;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Locale;
-import java.util.Random;
-
+import static com.vodafone.charging.data.builder.AccountDataBuilder.aAccount;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.aAccountWithNullAccountId;
+import static com.vodafone.charging.data.builder.ValidationDataBuilder.aValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -29,25 +28,22 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldReturnOk() {
+        ResponseEntity<Validation> validationResponse = accountServiceController
+                .validate(aAccount());
 
-        String accountId = String.valueOf(new Random().nextInt());
-
-        ResponseEntity<Validation> result = accountServiceController
-                .validate(accountId,
-                        new Account.Builder()
-                        .locale(Locale.UK)
-                        .accountId(new Random().nextInt() + "")
-                        .build());
-
-        assertThat(ResponseEntity.ok(getValidation()))
-                .isEqualToIgnoringGivenFields(result, "body") ;
-        assertThat(getValidation()).isEqualToIgnoringGivenFields(result.getBody(),
+        assertThat(ResponseEntity.ok(aValidation()))
+                .isEqualToIgnoringGivenFields(validationResponse, "body");
+        assertThat(aValidation()).isEqualToIgnoringGivenFields(validationResponse.getBody(),
                 "id");
     }
 
-    private Validation getValidation() {
-        return new Validation.Builder().usergroups(Lists.newArrayList("test-usergroup")).result(true).build();
+    @Test(expected = BadRequestException.class)
+    public void shouldHandleNullBody() {
+        accountServiceController.validate(null);
     }
 
-
+    @Test(expected = BadRequestException.class)
+    public void shouldHandleNullValue() {
+        accountServiceController.validate(aAccountWithNullAccountId());
+    }
 }

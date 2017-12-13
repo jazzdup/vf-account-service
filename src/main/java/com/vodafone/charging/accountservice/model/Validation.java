@@ -1,16 +1,16 @@
 package com.vodafone.charging.accountservice.model;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
-@Repository
+@Component
 public class Validation {
 
     private UUID id;
     private boolean isSuccess;
-    private String accountId; //Could change to the Account obj
+    private String accountId;
     private List<String> usergroups;
 
     public Validation() {

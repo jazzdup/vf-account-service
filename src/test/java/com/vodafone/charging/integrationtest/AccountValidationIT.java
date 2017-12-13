@@ -1,7 +1,6 @@
-package integrationtests;
+package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.model.Account;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,9 +16,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Random;
 
+import static com.vodafone.charging.data.builder.AccountDataBuilder.aAccount;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -35,10 +34,16 @@ public class AccountValidationIT {
     private MockMvc mockMvc;
 
     @Autowired
-    private HttpMessageConverter mappingJackson2HttpMessageConverter;
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private HttpMessageConverter mappingJackson2HttpMessageConverter;
+
+    public String toJson(Object o) throws IOException {
+        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+        mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
+        return outputMessage.getBodyAsString();
+    }
 
     @Before
     public void setUp() {
@@ -48,6 +53,7 @@ public class AccountValidationIT {
     @Test
     public void pathNotFound() throws Exception {
         final String accountId = new Random().nextInt() + "";
+
         mockMvc.perform(post("/account/" + accountId + "/validation")
                 .contentType(contentType))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -56,20 +62,15 @@ public class AccountValidationIT {
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
+        //given
         final String accountId = new Random().nextInt() + "";
-        String accountJson = json(new Account.Builder().locale(Locale.UK).accountId(accountId)
-                .build());
+        String accountJson = toJson(aAccount());
 
+        //when
         mockMvc.perform(post("/accounts/" + accountId + "/validation")
                 .contentType(contentType)
                 .content(accountJson))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    protected String json(Object o) throws IOException {
-        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
-        this.mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
-        return outputMessage.getBodyAsString();
     }
 
 }
