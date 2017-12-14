@@ -23,7 +23,7 @@ public class ContextDataDataBuilder {
     }
 
     public static ContextData aContextDataWithNullContextName() {
-        return new ContextData.Builder(null, Locale.UK, aChargingId())
+        return new ContextData.Builder("", Locale.UK, aChargingId())
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")

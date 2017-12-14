@@ -2,7 +2,7 @@ package com.vodafone.charging.accountservice.domain;
 
 import org.springframework.stereotype.Component;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 /**
@@ -81,9 +81,9 @@ public class ContextData {
         private String clientId;
         private boolean kycCheck; //optional
 
-        public Builder(@CheckForNull String contextName,
-                       @CheckForNull Locale locale,
-                       @CheckForNull ChargingId chargingId) {
+        public Builder(@Nonnull String contextName,
+                       @Nonnull Locale locale,
+                       @Nonnull ChargingId chargingId) {
             this.contextName = contextName;
             this.locale = locale;
             this.chargingId = chargingId;
