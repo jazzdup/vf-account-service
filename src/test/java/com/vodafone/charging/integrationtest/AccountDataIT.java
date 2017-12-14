@@ -17,13 +17,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.util.Random;
 
-import static com.vodafone.charging.data.builder.AccountSummaryDataBuilder.aAccount;
+import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aAccount;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
-public class AccountDataEnrichmentIT {
+public class AccountDataIT {
 
     private MediaType contentType =
             new MediaType(MediaType.APPLICATION_JSON_UTF8.getType(),

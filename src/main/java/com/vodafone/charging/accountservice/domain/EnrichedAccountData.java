@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents the response to the client after external calls have completed
+ */
 @Component
 public class EnrichedAccountData {
 

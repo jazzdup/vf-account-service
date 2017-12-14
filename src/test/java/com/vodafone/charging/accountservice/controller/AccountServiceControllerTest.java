@@ -9,8 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
-import static com.vodafone.charging.data.builder.AccountSummaryDataBuilder.aAccount;
-import static com.vodafone.charging.data.builder.AccountSummaryDataBuilder.aAccountWithNullAccountId;
+import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aAccount;
+import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aAccountWithNullAccountId;
 import static com.vodafone.charging.data.builder.ValidationDataBuilder.aValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;

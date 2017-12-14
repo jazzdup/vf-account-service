@@ -2,7 +2,7 @@ package com.vodafone.charging.accountservice.controller;
 
 import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.exception.BadRequestException;
-import com.vodafone.charging.accountservice.domain.AccountSummary;
+import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountData;
 import com.vodafone.charging.accountservice.service.AccountValidationService;
 import org.slf4j.Logger;
@@ -25,8 +25,8 @@ public class AccountServiceController {
     private AccountValidationService accountValidationService;
 
     @RequestMapping(method = POST)
-    public ResponseEntity<EnrichedAccountData> enrichAccountData(@RequestBody AccountSummary accountSummary) {
-        checkAccountInfo(accountSummary);
+    public ResponseEntity<EnrichedAccountData> enrichAccountData(@RequestBody ContextData contextData) {
+        checkAccountInfo(contextData);
 //        accountValidationService.validateChargingId(account);
 
         return ResponseEntity.ok(getCustomerInfo());
@@ -36,8 +36,8 @@ public class AccountServiceController {
         return new EnrichedAccountData.Builder().usergroups(Lists.newArrayList("test-usergroup")).result(true).build();
     }
 
-    private void checkAccountInfo(AccountSummary accountSummary) {
-        if(accountSummary == null || accountSummary.getId() == null || accountSummary.getLocale() == null) {
+    private void checkAccountInfo(ContextData contextData) {
+        if(contextData == null || contextData.getId() == null || contextData.getLocale() == null) {
             throw new BadRequestException("Incorrect Body provided in request");
         }
     }
