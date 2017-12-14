@@ -1,6 +1,6 @@
 package com.vodafone.charging.data.builder;
 
-import com.vodafone.charging.accountservice.domain.Account;
+import com.vodafone.charging.accountservice.domain.AccountSummary;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 
 import java.util.Locale;
@@ -10,20 +10,20 @@ import static com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.*;
 
 /**
- * Represents a Vodafone customer account
+ * Convenient way to build an AccountSummary for tests
  */
-public class AccountDataBuilder {
+public class AccountSummaryDataBuilder {
 
-    public static Account aAccount() {
-        return new Account(generateAccountId(),
+    public static AccountSummary aAccount() {
+        return new AccountSummary(generateAccountId(),
                 Locale.UK,
                 new ChargingId.Builder()
                         .type(Type.MSISDN)
                         .value(generateChargingId()).build());
     }
 
-    public static Account aAccountWithNullAccountId() {
-        return new Account(null,
+    public static AccountSummary aAccountWithNullAccountId() {
+        return new AccountSummary(null,
                 Locale.UK,
                 new ChargingId.Builder()
                         .type(Type.MSISDN)

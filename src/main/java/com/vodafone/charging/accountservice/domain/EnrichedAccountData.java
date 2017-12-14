@@ -6,17 +6,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class Validation {
+public class EnrichedAccountData {
 
     private UUID id;
     private boolean isSuccess;
     private String accountId;
     private List<String> usergroups;
 
-    public Validation() {
+    public EnrichedAccountData() {
     }
 
-    public Validation(boolean isSuccess, String accountId, List<String> usergroups) {
+    public EnrichedAccountData(boolean isSuccess, String accountId, List<String> usergroups) {
         this.id = UUID.randomUUID();
         this.isSuccess = isSuccess;
         this.accountId = accountId;
@@ -50,8 +50,8 @@ public class Validation {
             return this;
         }
 
-        public Validation build() {
-            return new Validation(this.isSuccess, this.accountId, this.usergroups);
+        public EnrichedAccountData build() {
+            return new EnrichedAccountData(this.isSuccess, this.accountId, this.usergroups);
         }
 
     }

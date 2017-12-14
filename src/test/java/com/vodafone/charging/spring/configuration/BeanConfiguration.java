@@ -1,6 +1,5 @@
 package com.vodafone.charging.spring.configuration;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @Configuration
 @ComponentScan
@@ -45,7 +46,7 @@ public class BeanConfiguration  extends WebMvcConfigurerAdapter {
         //required for date formatting to follow annotations on class in Java 8
         objectMapper.findAndRegisterModules();
         //required to see private members for serialisation (e.g. in 3rd party apps)
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         return objectMapper;
@@ -55,6 +56,11 @@ public class BeanConfiguration  extends WebMvcConfigurerAdapter {
     public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
         messageConverters.add(new MappingJackson2HttpMessageConverter());
         super.configureMessageConverters(messageConverters);
+    }
+
+    @Bean
+    public HttpMessageConverter mappingJackson2HttpMessageConverter() {
+        return new MappingJackson2HttpMessageConverter();
     }
 
 }
