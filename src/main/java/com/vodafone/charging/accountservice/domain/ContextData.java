@@ -2,17 +2,17 @@ package com.vodafone.charging.accountservice.domain;
 
 import org.springframework.stereotype.Component;
 
+import javax.annotation.CheckForNull;
 import java.util.Locale;
 
 /**
  * Represents operation context
+ * Could rename it RequestProperties
  */
 @Component
 public class ContextData {
 
-//    "chargingId", "ban", "userGroups", "serviceId", "partnerId", "packageType", "vendorId", "clientId", "kycCheck"
-
-    private String id;
+    private String contextName;
     private Locale locale;
     private ChargingId chargingId;
     private String serviceId; //should be an optional
@@ -20,29 +20,26 @@ public class ContextData {
     private String vendorId;
     private String clientId;
     private boolean kycCheck;
-    //TODO Do we require the below in the request?
+    //TODO Do we require the below in the request?  Unlikely.
 //    private String ban;
 //    private List<String> userGroups;
 
     private ContextData() {
     }
 
-    public ContextData(final String id, final Locale locale, final ChargingId chargingId,
-                       final String serviceId, final String packageType, final String vendorId, final String clientId,
-                       final boolean kycCheck) {
-        this.id = id;
-        this.locale = locale;
-        this.chargingId = chargingId;
-        this.serviceId = serviceId;
-        this.packageType = packageType;
-        this.vendorId = vendorId;
-        this.clientId = clientId;
-        this.kycCheck = kycCheck;
-
+    private ContextData(ContextData.Builder builder) {
+        this.contextName = builder.contextName;
+        this.locale = builder.locale;
+        this.chargingId = builder.chargingId;
+        this.serviceId = builder.serviceId;
+        this.packageType = builder.packageType;
+        this.vendorId = builder.vendorId;
+        this.clientId = builder.clientId;
+        this.kycCheck = builder.kycCheck;
     }
 
-    public String getId() {
-        return id;
+    public String getContextName() {
+        return contextName;
     }
 
     public Locale getLocale() {
@@ -72,4 +69,51 @@ public class ContextData {
     public boolean isKycCheck() {
         return kycCheck;
     }
+
+    public static class Builder {
+
+        private String contextName;
+        private final Locale locale;
+        private final ChargingId chargingId;
+        private String serviceId; //should be optional
+        private String packageType;
+        private String vendorId; //optional
+        private String clientId;
+        private boolean kycCheck; //optional
+
+        public Builder(@CheckForNull String contextName,
+                       @CheckForNull Locale locale,
+                       @CheckForNull ChargingId chargingId) {
+            this.contextName = contextName;
+            this.locale = locale;
+            this.chargingId = chargingId;
+        }
+
+        public ContextData.Builder serviceId(final String serviceId) {
+            this.serviceId = serviceId;
+            return this;
+        }
+        public ContextData.Builder packageType(final String packageType) {
+            this.packageType = packageType;
+            return this;
+        }
+        public ContextData.Builder vendorId(final String vendorId) {
+            this.vendorId = vendorId;
+            return this;
+        }
+        public ContextData.Builder clientId(final String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+        public ContextData.Builder kycCheck(final boolean kycCheck) {
+            this.kycCheck = kycCheck;
+            return this;
+        }
+
+        public ContextData build() {
+            return new ContextData(this);
+        }
+
+    }
+
 }

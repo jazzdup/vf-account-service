@@ -1,9 +1,9 @@
 package com.vodafone.charging.accountservice.controller;
 
 import com.google.common.collect.Lists;
-import com.vodafone.charging.accountservice.exception.BadRequestException;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountData;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.exception.BadRequestException;
 import com.vodafone.charging.accountservice.service.AccountValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +25,32 @@ public class AccountServiceController {
     private AccountValidationService accountValidationService;
 
     @RequestMapping(method = POST)
-    public ResponseEntity<EnrichedAccountData> enrichAccountData(@RequestBody ContextData contextData) {
+    public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
         checkAccountInfo(contextData);
 //        accountValidationService.validateChargingId(account);
 
-        return ResponseEntity.ok(getCustomerInfo());
+        return ResponseEntity.ok(getAccountInfo());
     }
 
-    private EnrichedAccountData getCustomerInfo() {
-        return new EnrichedAccountData.Builder().usergroups(Lists.newArrayList("test-usergroup")).result(true).build();
+    //TODO Get a mock to return this!
+    private EnrichedAccountInfo getAccountInfo() {
+        return new EnrichedAccountInfo.Builder()
+                .validationStatus("OK")
+                .usergroups(Lists.newArrayList("user-group1", "user-group2"))
+                .ban("123456_ban")
+                .billingCycleDay(1)
+                .serviceProviderId("serviceProviderId")
+                .childServiceProviderId("childServiceProviderId")
+                .serviceProviderType("serviceProviderType")
+                .errorId("test-error-id")
+                .errorDescription("test-error-description")
+                .build();
     }
 
-    private void checkAccountInfo(ContextData contextData) {
-        if(contextData == null || contextData.getId() == null || contextData.getLocale() == null) {
-            throw new BadRequestException("Incorrect Body provided in request");
+    private void checkAccountInfo(ContextData contextInfo) {
+        if(contextInfo == null || contextInfo.getContextName() == null || contextInfo.getChargingId() == null || contextInfo.getLocale() == null) {
+            log.error("Mandatory Content is not provided in request body");
+            throw new BadRequestException("Mandatory Content is not provided in request body");
         }
     }
 

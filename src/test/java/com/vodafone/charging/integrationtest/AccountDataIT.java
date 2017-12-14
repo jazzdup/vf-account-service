@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.util.Random;
 
-import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aAccount;
+import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -59,7 +59,7 @@ public class AccountDataIT {
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
-        String accountJson = toJson(aAccount());
+        String accountJson = toJson(aContextData());
 
         mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
