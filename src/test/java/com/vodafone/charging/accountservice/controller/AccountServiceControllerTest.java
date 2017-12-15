@@ -1,6 +1,5 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.exception.BadRequestException;
 import org.junit.Before;
@@ -14,6 +13,7 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContext
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextDataWithNullContextName;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -29,14 +29,17 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldReturnOk() {
-        ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse = accountServiceController
-                .enrichAccountData(aContextData());
-        EnrichedAccountInfo expectedAccountInfo = aEnrichedAccountInfo();
+        //given
+        final EnrichedAccountInfo expectedAccountInfo = aEnrichedAccountInfo();
 
+        //when
+        final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
+                accountServiceController.enrichAccountData(aContextData());
+
+        //then
         assertThat(ResponseEntity.ok(expectedAccountInfo))
                 .isEqualToIgnoringGivenFields(enrichedAccountInfoResponse, "body");
-        assertThat(expectedAccountInfo).isEqualToIgnoringGivenFields(enrichedAccountInfoResponse.getBody(),
-                "id");
+        assertThat(expectedAccountInfo).isEqualToComparingFieldByField(enrichedAccountInfoResponse.getBody());
     }
 
     @Test(expected = BadRequestException.class)
@@ -46,19 +49,9 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldHandleEmptyMandatoryValue() {
-        accountServiceController.enrichAccountData(aContextDataWithNullContextName());
+        assertThatThrownBy(() -> accountServiceController.enrichAccountData(aContextDataWithNullContextName()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Mandatory Content is not provided in request body")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldNotAllowNullMandatory() {
-        new ContextData.Builder(null, null, null)
-                .clientId("clientId")
-                .serviceId("serviceId")
-                .vendorId("vendor")
-                .packageType("packageType")
-                .kycCheck(false)
-                .build();
-    }
-
-
 }

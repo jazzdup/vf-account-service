@@ -1,8 +1,9 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.PackageType;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
 import java.util.Locale;
 
 /**
@@ -15,8 +16,8 @@ public class ContextData {
     private String contextName;
     private Locale locale;
     private ChargingId chargingId;
-    private String serviceId; //should be an optional
-    private String packageType;
+    private String serviceId;
+    private PackageType packageType;
     private String vendorId;
     private String clientId;
     private boolean kycCheck;
@@ -54,7 +55,7 @@ public class ContextData {
         return serviceId;
     }
 
-    public String getPackageType() {
+    public PackageType getPackageType() {
         return packageType;
     }
 
@@ -76,14 +77,14 @@ public class ContextData {
         private final Locale locale;
         private final ChargingId chargingId;
         private String serviceId; //should be optional
-        private String packageType;
+        private PackageType packageType;
         private String vendorId; //optional
         private String clientId;
         private boolean kycCheck; //optional
 
-        public Builder(@Nonnull String contextName,
-                       @Nonnull Locale locale,
-                       @Nonnull ChargingId chargingId) {
+        public Builder(@NonNull String contextName,
+                       @NonNull Locale locale,
+                       @NonNull ChargingId chargingId) {
             this.contextName = contextName;
             this.locale = locale;
             this.chargingId = chargingId;
@@ -93,7 +94,7 @@ public class ContextData {
             this.serviceId = serviceId;
             return this;
         }
-        public ContextData.Builder packageType(final String packageType) {
+        public ContextData.Builder packageType(final PackageType packageType) {
             this.packageType = packageType;
             return this;
         }

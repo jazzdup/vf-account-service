@@ -3,8 +3,8 @@ package com.vodafone.charging.data.builder;
 import com.vodafone.charging.accountservice.domain.ContextData;
 
 import java.util.Locale;
-import java.util.Random;
 
+import static com.vodafone.charging.accountservice.domain.enums.PackageType.CALENDAR_PACKAGE_TYPE;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 
 /**
@@ -15,9 +15,9 @@ public class ContextDataDataBuilder {
     public static ContextData aContextData() {
         return new ContextData.Builder("contextName", Locale.UK, aChargingId())
                 .clientId("clientId")
-                .serviceId("serviceId")
-                .vendorId("vendor")
-                .packageType("packageType")
+                .serviceId("sAlt")
+                .vendorId("vendorId")
+                .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
                 .build();
     }
@@ -27,13 +27,9 @@ public class ContextDataDataBuilder {
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")
-                .packageType("packageType")
+                .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
                 .build();
-    }
-
-    private static String generateAccountId() {
-        return String.valueOf(new Random().nextInt());
     }
 
 }
