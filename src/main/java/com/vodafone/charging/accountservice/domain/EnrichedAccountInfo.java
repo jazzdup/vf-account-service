@@ -89,6 +89,10 @@ public class EnrichedAccountInfo {
         private String errorId;
         private String errorDescription;
 
+        public Builder(String validationStatus) {
+            this.validationStatus = validationStatus;
+        }
+
         public Builder validationStatus(final String validationStatus) {
             this.validationStatus = validationStatus;
             return this;

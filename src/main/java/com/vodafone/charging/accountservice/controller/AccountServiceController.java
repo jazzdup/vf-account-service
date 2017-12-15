@@ -36,8 +36,7 @@ public class AccountServiceController {
 
     //TODO Get a mock to return this!
     private EnrichedAccountInfo getAccountInfo() {
-        return new EnrichedAccountInfo.Builder()
-                .validationStatus("OK")
+        return new EnrichedAccountInfo.Builder("OK")
                 .usergroups(Lists.newArrayList("user-group1", "user-group2"))
                 .ban("123456_ban")
                 .billingCycleDay(1)
