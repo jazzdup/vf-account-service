@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.exception.BadRequestException;
-import com.vodafone.charging.accountservice.service.AccountValidationService;
+import com.vodafone.charging.accountservice.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,14 @@ public class AccountServiceController {
     private static final Logger log = LoggerFactory.getLogger(AccountServiceController.class);
 
     @Autowired
-    private AccountValidationService accountValidationService;
+    private AccountService accountService;
 
     @RequestMapping(method = POST)
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
         checkContextData(contextData);
-//        accountValidationService.validateChargingId(contextData);
+        EnrichedAccountInfo accountInfo = accountService.enrichAccountData(contextData);
 
-        return ResponseEntity.ok(getAccountInfo());
+        return ResponseEntity.ok(accountInfo);
     }
 
     //TODO Get a mock to return this!

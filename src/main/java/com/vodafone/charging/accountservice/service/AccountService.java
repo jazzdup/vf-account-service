@@ -7,13 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AccountValidationService {
+public class AccountService {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountValidationService.class);
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
-    public EnrichedAccountInfo validateChargingId(ContextData contextData) {
+    public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 
-        //TODO call IF api to call ER IF
+        //TODO call IF api to call ER IF and anywhere else required.
+
         throw new UnsupportedOperationException();
     }
 }

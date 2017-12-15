@@ -1,23 +1,31 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.service.AccountService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
-import java.util.Random;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
+import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -37,20 +45,27 @@ public class AccountDataIT {
     @Autowired
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
+    @MockBean
+    private AccountService accountService;
+
     private String toJson(Object o) throws IOException {
         MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
         mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
         return outputMessage.getBodyAsString();
     }
+    private Object fromJson(Class<?> clazz, String json) throws IOException {
+        MockHttpInputMessage input = new MockHttpInputMessage(json.getBytes());
+        return mappingJackson2HttpMessageConverter.read(clazz, input);
+    }
 
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
+//        this.mockMvc = standaloneSetup(webApplicationContext).build();
     }
 
     @Test
     public void pathNotFound() throws Exception {
-        final String accountId = new Random().nextInt() + "";
 
         mockMvc.perform(post("/account")
                 .contentType(contentType))
@@ -59,12 +74,22 @@ public class AccountDataIT {
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
         String accountJson = toJson(aContextData());
 
-        mockMvc.perform(post("/accounts/")
+        given(accountService.enrichAccountData(any()))
+                .willReturn(expectedInfo);
+
+        MvcResult result = mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
                 .content(accountJson))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        final EnrichedAccountInfo info =
+                (EnrichedAccountInfo) fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
+        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+
     }
 
 }
