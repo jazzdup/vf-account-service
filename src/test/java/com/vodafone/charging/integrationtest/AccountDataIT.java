@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 
+import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +54,7 @@ public class AccountDataIT {
         mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON_UTF8, outputMessage);
         return outputMessage.getBodyAsString();
     }
+
     private Object fromJson(Class<?> clazz, String json) throws IOException {
         MockHttpInputMessage input = new MockHttpInputMessage(json.getBytes());
         return mappingJackson2HttpMessageConverter.read(clazz, input);
@@ -89,7 +91,25 @@ public class AccountDataIT {
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+    }
 
+    @Test
+    public void shouldThrowInternalExceptionAndReturnHttp500() throws Exception {
+        final String accountJson = toJson(aContextData());
+
+        given(accountService.enrichAccountData(any()))
+                .willThrow(new RuntimeException("This is a test exception, please ignore."));
+
+        MvcResult result = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andReturn();
+
+        final EnrichedAccountInfo info =
+                (EnrichedAccountInfo) fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
+        assertThat(info.getErrorId()).isEqualTo(VAS_INTERNAL_SERVER_ERROR.errorId());
+        assertThat(info.getErrorDescription()).isEqualTo(VAS_INTERNAL_SERVER_ERROR.errorDescription());
     }
 
 }
