@@ -45,14 +45,14 @@ public class AccountServiceController {
         return ResponseEntity.ok(accountInfo);
     }
 
-    private void checkContextData(ContextData contextInfo) {
+    public void checkContextData(final ContextData contextInfo) {
         checkArgument(contextInfo != null, "value contextName was expected but was empty.");
         checkArgument(isNotEmpty(contextInfo.getContextName()), "value contextName was expected but was empty.");
         checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "value chargingId.value was expected but was empty.");
         checkArgument(isNotEmpty(contextInfo.getChargingId().getType().type()), "value chargingId.type was expected but was empty");
     }
 
-    private ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
+    public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(new EnrichedAccountInfo.Builder("fail")

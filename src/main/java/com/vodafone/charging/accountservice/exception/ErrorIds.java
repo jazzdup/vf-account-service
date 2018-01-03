@@ -1,7 +1,7 @@
 package com.vodafone.charging.accountservice.exception;
 
 /**
- * Represents an internal application ErrorId and ErrorDescription
+ * Represents an internal application ErrorId and ErrorDescription which can be passed back to the client.
  */
 public enum ErrorIds {
 

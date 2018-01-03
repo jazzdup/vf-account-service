@@ -1,5 +1,6 @@
 package com.vodafone.charging.data.builder;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 
 import java.util.Locale;
@@ -22,8 +23,8 @@ public class ContextDataDataBuilder {
                 .build();
     }
 
-    public static ContextData aContextDataWithNullContextName() {
-        return new ContextData.Builder("", Locale.UK, aChargingId())
+    public static ContextData aContextData(String contextName, Locale locale, ChargingId chargingId) {
+        return new ContextData.Builder(contextName, locale, chargingId)
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")

@@ -12,10 +12,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Locale;
+
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextDataWithNullContextName;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -55,14 +58,31 @@ public class AccountServiceControllerTest {
     public void shouldReturnHttpBadRequest() {
         final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
                 accountServiceController.enrichAccountData(null);
-
         assertThat(enrichedAccountInfoResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void shouldReturnHttpBadRequest2() {
-        final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
-                accountServiceController.enrichAccountData(aContextDataWithNullContextName());
-        assertThat(enrichedAccountInfoResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    public void shouldThrowIllegalArgumentExceptionWhenNullContextName() {
+        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(null, Locale.UK, aChargingId())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("contextName");
+
     }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenNullLocale() {
+        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(
+                        "test-context-name",
+                        null,
+                        aChargingId())));
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenNullChargingId() {
+        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(
+                "test-context-name",
+                Locale.UK,
+                null)));
+    }
+
 }
