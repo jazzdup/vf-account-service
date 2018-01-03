@@ -3,7 +3,7 @@ package com.vodafone.charging.integrationtest;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
-import com.vodafone.charging.data.message.JsonMessageConverter;
+import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,11 +40,10 @@ public class AccountDataIT {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private JsonMessageConverter converter;
+    private JsonConverter converter;
 
     @MockBean
     private AccountService accountService;
-
 
     @Before
     public void setUp() {

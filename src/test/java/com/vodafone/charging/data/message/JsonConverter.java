@@ -14,12 +14,12 @@ import java.io.IOException;
 //@SpringBootTest(classes = AccountServiceApplication.class)
 @Component("converter")
 @ContextConfiguration(classes = AccountServiceApplication.class)
-public class JsonMessageConverter {
+public class JsonConverter {
 
     @Autowired
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
-    public JsonMessageConverter() {
+    public JsonConverter() {
     }
 
     public String toJson(Object o) throws IOException {
