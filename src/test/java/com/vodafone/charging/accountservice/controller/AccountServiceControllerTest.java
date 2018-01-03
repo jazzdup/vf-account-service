@@ -17,6 +17,7 @@ import java.util.Locale;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfoWhen500Response;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -83,6 +84,14 @@ public class AccountServiceControllerTest {
                 "test-context-name",
                 Locale.UK,
                 null)));
+    }
+    @Test
+    public void shouldCreateA500Response() {
+        EnrichedAccountInfo expected = aEnrichedAccountInfoWhen500Response();
+        ResponseEntity<EnrichedAccountInfo> entity =
+                accountServiceController.createResponse(new IllegalArgumentException("This is a test exception"));
+        assertThat(entity.getStatusCode()).isEqualToComparingFieldByField(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(entity.getBody()).isEqualToComparingFieldByField(expected);
     }
 
 }

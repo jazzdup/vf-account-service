@@ -5,6 +5,7 @@ import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
 import static java.lang.String.valueOf;
 
 /**
@@ -28,5 +29,12 @@ public class EnrichedAccountInfoDataBuilder {
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
                 .build();
+    }
+
+    public static EnrichedAccountInfo aEnrichedAccountInfoWhen500Response() {
+        return new EnrichedAccountInfo.Builder("fail")
+                .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
+                .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build();
+
     }
 }
