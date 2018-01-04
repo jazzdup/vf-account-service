@@ -30,7 +30,7 @@ public class VfAccountServiceHttpTest {
 
     @MockBean
     private AccountService accountService;
-
+    
     private String url = "http://localhost:8080/accounts";
 
     private RestTemplate restTemplate;
