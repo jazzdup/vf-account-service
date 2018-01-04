@@ -13,7 +13,7 @@ public class AccountService {
 
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 
-        //TODO call IF api to call ER IF and anywhere else required.
+        log.debug("AccountService.enrichAccountData, contextData={}", contextData );
 
         throw new UnsupportedOperationException();
     }

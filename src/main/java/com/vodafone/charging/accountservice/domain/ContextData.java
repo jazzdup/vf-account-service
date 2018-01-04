@@ -117,4 +117,17 @@ public class ContextData {
 
     }
 
+    @Override
+    public String toString() {
+        return "ContextData{" +
+                "contextName='" + contextName + '\'' +
+                ", locale=" + locale +
+                ", chargingId=" + chargingId +
+                ", serviceId='" + serviceId + '\'' +
+                ", packageType=" + packageType +
+                ", vendorId='" + vendorId + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", kycCheck=" + kycCheck +
+                '}';
+    }
 }
