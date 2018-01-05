@@ -18,7 +18,6 @@ public class EnrichedAccountInfoDataBuilder {
         Random random = new Random();
 
         return new EnrichedAccountInfo.Builder("OK")
-                .validationStatus("OK")
                 .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))
                 .ban(random.nextInt() + "_ban")
                 .billingCycleDay(random.nextInt())

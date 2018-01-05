@@ -90,7 +90,7 @@ public class AccountServiceControllerTest {
         EnrichedAccountInfo expected = aEnrichedAccountInfoWhen500Response();
         ResponseEntity<EnrichedAccountInfo> entity =
                 accountServiceController.createResponse(new IllegalArgumentException("This is a test exception"));
-        assertThat(entity.getStatusCode()).isEqualToComparingFieldByField(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(entity.getBody()).isEqualToComparingFieldByField(expected);
     }
 

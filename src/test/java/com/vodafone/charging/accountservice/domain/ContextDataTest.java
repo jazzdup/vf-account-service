@@ -4,13 +4,14 @@ import org.junit.Test;
 
 import java.util.Locale;
 
+import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT;
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT_CALENDAR_PACKAGE_TYPE;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ContextDataBuilderTest {
+public class ContextDataTest {
 
     @Test
     public void shouldNotAllowNullContextName() {
@@ -35,7 +36,6 @@ public class ContextDataBuilderTest {
 
     @Test
     public void checkGetters() {
-
         ChargingId chargingId = aChargingId();
         ContextData contextData = new ContextData.Builder("test-context-name", Locale.UK, chargingId)
                 .clientId("clientId")
@@ -54,6 +54,28 @@ public class ContextDataBuilderTest {
         assertThat(contextData.getPackageType()).isEqualTo(EVENT_CALENDAR_PACKAGE_TYPE);
         assertThat(contextData.isKycCheck()).isEqualTo(false);
 
+    }
+
+    @Test
+    public void checkToString() {
+        ChargingId chargingId = aChargingId();
+        ContextData contextData = new ContextData.Builder("test-context-name", Locale.UK, chargingId)
+                .clientId("test-clientId")
+                .serviceId("test-serviceId")
+                .vendorId("test-vendor")
+                .packageType(EVENT)
+                .kycCheck(false)
+                .build();
+
+        final String contextDataStr = contextData.toString();
+        System.out.println("String value:\n\n " + contextDataStr);
+        assertThat(contextDataStr).contains("test-context-name");
+        assertThat(contextDataStr).contains(Locale.UK.toString());
+        assertThat(contextDataStr).contains(chargingId.toString());
+        assertThat(contextDataStr).contains("test-serviceId");
+        assertThat(contextDataStr).contains("test-vendor");
+        assertThat(contextDataStr).contains(EVENT.toString());
+        assertThat(contextDataStr).contains("kycCheck=false");
     }
 
 }

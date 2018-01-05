@@ -27,6 +27,7 @@ public class EnrichedAccountInfo {
     private EnrichedAccountInfo(EnrichedAccountInfo.Builder builder) {
         this.validationStatus = builder.validationStatus;
         this.ban = builder.ban;
+        this.usergroups = builder.usergroups;
         this.billingCycleDay = builder.billingCycleDay;
         this.serviceProviderId = builder.serviceProviderId;
         this.childServiceProviderId = builder.childServiceProviderId;
@@ -93,10 +94,6 @@ public class EnrichedAccountInfo {
             this.validationStatus = validationStatus;
         }
 
-        public Builder validationStatus(final String validationStatus) {
-            this.validationStatus = validationStatus;
-            return this;
-        }
         public Builder ban(final String ban) {
             this.ban = ban;
             return this;

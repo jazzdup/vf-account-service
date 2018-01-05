@@ -21,9 +21,6 @@ public class ContextData {
     private String vendorId;
     private String clientId;
     private boolean kycCheck;
-    //TODO Do we require the below in the request?  Unlikely.
-//    private String ban;
-//    private List<String> userGroups;
 
     private ContextData() {
     }
@@ -71,6 +68,20 @@ public class ContextData {
         return kycCheck;
     }
 
+    @Override
+    public String toString() {
+        return "ContextData{" +
+                "contextName='" + contextName + '\'' +
+                ", locale=" + locale +
+                ", chargingId=" + chargingId +
+                ", serviceId='" + serviceId + '\'' +
+                ", packageType=" + packageType +
+                ", vendorId='" + vendorId + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", kycCheck=" + kycCheck +
+                '}';
+    }
+
     public static class Builder {
 
         private String contextName;
@@ -115,19 +126,5 @@ public class ContextData {
             return new ContextData(this);
         }
 
-    }
-
-    @Override
-    public String toString() {
-        return "ContextData{" +
-                "contextName='" + contextName + '\'' +
-                ", locale=" + locale +
-                ", chargingId=" + chargingId +
-                ", serviceId='" + serviceId + '\'' +
-                ", packageType=" + packageType +
-                ", vendorId='" + vendorId + '\'' +
-                ", clientId='" + clientId + '\'' +
-                ", kycCheck=" + kycCheck +
-                '}';
     }
 }

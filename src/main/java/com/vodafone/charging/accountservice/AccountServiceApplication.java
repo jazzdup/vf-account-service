@@ -4,7 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-//@Configuration
 @ComponentScan(basePackages = "com.vodafone.charging")
 @SpringBootApplication
 public class AccountServiceApplication {

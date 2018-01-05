@@ -57,4 +57,12 @@ public class ChargingId {
             return new ChargingId(type, value);
         }
     }
+
+    @Override
+    public String toString() {
+        return "ChargingId{" +
+                "type=" + type +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
