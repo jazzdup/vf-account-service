@@ -20,6 +20,9 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+/**
+ * Spring Bean configuration file
+ */
 @Configuration
 @ComponentScan
 public class BeanConfiguration extends WebMvcConfigurerAdapter {

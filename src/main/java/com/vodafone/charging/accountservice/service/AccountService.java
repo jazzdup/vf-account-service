@@ -6,6 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * The main service object which routes logic
+ * to more specific application services.
+ */
 @Service
 public class AccountService {
 

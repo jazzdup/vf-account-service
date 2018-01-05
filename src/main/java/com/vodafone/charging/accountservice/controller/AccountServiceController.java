@@ -18,6 +18,9 @@ import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERN
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+/**
+ * Spring Rest Controller to glue rest calls to the application logic.
+ */
 @RestController
 @RequestMapping("/accounts")
 public class AccountServiceController {

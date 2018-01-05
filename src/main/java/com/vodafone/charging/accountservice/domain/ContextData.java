@@ -25,7 +25,7 @@ public class ContextData {
     private ContextData() {
     }
 
-    private ContextData(ContextData.Builder builder) {
+    private ContextData(final Builder builder) {
         this.contextName = builder.contextName;
         this.locale = builder.locale;
         this.chargingId = builder.chargingId;
@@ -101,23 +101,23 @@ public class ContextData {
             this.chargingId = chargingId;
         }
 
-        public ContextData.Builder serviceId(final String serviceId) {
+        public Builder serviceId(final String serviceId) {
             this.serviceId = serviceId;
             return this;
         }
-        public ContextData.Builder packageType(final PackageType packageType) {
+        public Builder packageType(final PackageType packageType) {
             this.packageType = packageType;
             return this;
         }
-        public ContextData.Builder vendorId(final String vendorId) {
+        public Builder vendorId(final String vendorId) {
             this.vendorId = vendorId;
             return this;
         }
-        public ContextData.Builder clientId(final String clientId) {
+        public Builder clientId(final String clientId) {
             this.clientId = clientId;
             return this;
         }
-        public ContextData.Builder kycCheck(final boolean kycCheck) {
+        public Builder kycCheck(final boolean kycCheck) {
             this.kycCheck = kycCheck;
             return this;
         }

@@ -24,7 +24,7 @@ public class EnrichedAccountInfo {
     public EnrichedAccountInfo() {
     }
 
-    private EnrichedAccountInfo(EnrichedAccountInfo.Builder builder) {
+    private EnrichedAccountInfo(final Builder builder) {
         this.validationStatus = builder.validationStatus;
         this.ban = builder.ban;
         this.usergroups = builder.usergroups;

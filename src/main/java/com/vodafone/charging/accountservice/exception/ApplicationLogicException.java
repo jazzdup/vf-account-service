@@ -6,10 +6,10 @@ package com.vodafone.charging.accountservice.exception;
 
 public class ApplicationLogicException extends RuntimeException {
 
-    public ApplicationLogicException(String message) {
+    public ApplicationLogicException(final String message) {
         super(message);
     }
-    public ApplicationLogicException(String message, Throwable cause) {
+    public ApplicationLogicException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

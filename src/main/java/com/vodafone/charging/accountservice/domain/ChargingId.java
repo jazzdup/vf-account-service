@@ -27,7 +27,7 @@ public class ChargingId {
     public ChargingId() {
     }
 
-    public ChargingId(Type type, String value) {
+    public ChargingId(final Type type, final String value) {
         this.type = type;
         this.value = value;
     }
