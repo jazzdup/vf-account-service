@@ -28,7 +28,7 @@ pipeline {
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-                sh 'mvn test'
+                sh 'mvn failsafe:integration-test'
             }
             post {
                 always {
