@@ -17,7 +17,23 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn -B verify'
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Integration Test') {
+            steps {
+                echo 'Integration Test..'
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/failsafe-reports/*.xml'
+                }
             }
         }
         stage('Deploy') {
