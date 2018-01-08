@@ -8,7 +8,7 @@ pipeline {
     }
 
     stages {
-        stage('Build and unit test') {
+        stage('Build..') {
             steps {
                 echo 'Building..'
                 sh 'mvn -B -DskipTests clean package'
@@ -17,6 +17,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
+                sh 'mvn -B verify'
             }
         }
         stage('Deploy') {
