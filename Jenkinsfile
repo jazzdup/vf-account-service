@@ -6,11 +6,13 @@ pipeline {
             args '-v /root/.m2:/root/.m2'
         }
     }
+    environment {
+        env.APP_VERSION = '0.0.2'
+    }
 
     stages {
         stage('Prepare Build') {
             steps {
-                env.APP_VERSION='0.0.2'
                 echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
             }
         }
