@@ -1,6 +1,9 @@
 #!/usr/bin/env groovy
 pipeline {
 
+    node {
+        env.APP_VERSION = '0.0.2'
+
         agent {
             docker {
                 image 'maven:3-alpine'
@@ -8,9 +11,10 @@ pipeline {
             }
         }
 
+
         stages {
             stage('Prepare Build') {
-                env.APP_VERSION = '0.0.2'
+
                 steps {
                     echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
                 }
@@ -49,4 +53,5 @@ pipeline {
                 }
             }
         }
+    }
 }
