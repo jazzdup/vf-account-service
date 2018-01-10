@@ -8,6 +8,11 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Build') {
+            steps {
+                echo 'Creating new artifact.  POM VERSION=' + $POM_VERSION
+            }
+        }
         stage('Build..') {
             steps {
                 echo 'Building..'
