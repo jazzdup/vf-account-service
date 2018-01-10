@@ -14,6 +14,8 @@ pipeline {
         stage('Prepare Build') {
             steps {
                 echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
+                echo "Jenkins BUILD_TAG= $BUILD_TAG"
+                echo "Jenkins BUILD_TAG= $currentBuild.number"
             }
         }
         stage('Build..') {
