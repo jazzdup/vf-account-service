@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+                env.APP_VERSION='0.0.2'
                 echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
             }
         }
