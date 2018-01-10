@@ -54,7 +54,7 @@ pipeline {
                         packages: [[$class         : 'MavenPackage',
                                     mavenAssetList : [[classifier: '',
                                                        extension : '',
-                                                       filePath  : 'target/vf-account-service-${APP_VERSION}']],
+                                                       filePath  : "target/vf-account-service-${APP_VERSION}"]],
                                     mavenCoordinate: [artifactId: 'vf-account-service',
                                                       groupId   : 'com.vodafone.charging',
                                                       packaging : 'jar',
