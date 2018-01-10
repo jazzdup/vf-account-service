@@ -49,21 +49,9 @@ pipeline {
         }
         stage('Publish') {
             steps {
-                nexusPublisher nexusInstanceId: 'localNexus',
-                        nexusRepositoryId: 'releases',
-                        packages: [[$class: 'MavenPackage', mavenAssetList: [], mavenCoordinate:
-                                [artifactId: 'vf-account-service',
-                                 groupId   : 'com.vodafone.charging',
-                                 packaging : 'jar',
-                                 version   : '0.0.1']]]
-            }
-        }
-        stage('Deploy to Development') {
-            steps {
-                echo 'Deploying....'
-            }
-        }
+                nexusPublisher nexusInstanceId: 'localNexus', nexusRepositoryId: 'releases', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: 'target/vf-account-service-0.0.1.jar']], mavenCoordinate: [artifactId: 'vf-account-service', groupId: 'com.vodafone.charging', packaging: 'jar', version: '0.0.1']]]
 
+            }
+        }
     }
-
 }
