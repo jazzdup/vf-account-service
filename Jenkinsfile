@@ -7,7 +7,7 @@ pipeline {
         }
     }
     environment {
-        APP_VERSION='0.0.2'
+        APP_VERSION = '0.0.2'
     }
 
     stages {
@@ -47,7 +47,18 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Publish') {
+
+            nexusPublisher nexusInstanceId: 'localNexus',
+                    nexusRepositoryId: 'releases',
+                    packages: [[$class: 'MavenPackage', mavenAssetList: [], mavenCoordinate:
+                            [artifactId: 'vf-account-service',
+                             groupId   : 'com.vodafone.charging',
+                             packaging : 'jar',
+                             version   : '0.0.1']]]
+
+        }
+        stage('Deploy to Development') {
             steps {
                 echo 'Deploying....'
             }
