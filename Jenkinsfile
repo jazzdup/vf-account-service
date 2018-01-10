@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                echo 'Creating new artifact.  APPLICATION_VERSION=' + $APP_VERSION
+                echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
             }
         }
         stage('Build..') {
