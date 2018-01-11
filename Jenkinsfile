@@ -7,15 +7,15 @@ pipeline {
         }
     }
     environment {
-        APP_VERSION = '0.0.2'
+        APP_VERSION = updatePomVersion("$POM_APP_VERSION")
         POM_APP_VERSION = getAppPomVersion()
     }
 
     stages {
         stage('Prepare Build') {
             steps {
-                env.APP_VERSION = updatePomVersion("$POM_APP_VERSION")
                 echo "CURRENT APP VERSION=$APP_VERSION"
+
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
