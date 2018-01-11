@@ -87,11 +87,11 @@ String getAppPomVersion() {
 
 def updatePomVersion(String versionStr) {
 
-    echo "Bump version:" + versionStr
-    echo "versions size:" + versionStr.length()
+    echo "Bump versionStr=" + versionStr
+    echo "versionsStr size=" + versionStr.length()
 
-    String[] versions = versionStr.split(".")
-    echo "versions size:" + versions
+    String[] versions = versionStr.split('.')
+    println "versions size:" + versions.length
 
 
     for (int i = 0; i < versions.length; i++) {
