@@ -9,7 +9,6 @@ pipeline {
     environment {
         APP_VERSION = '0.0.2'
         POM_APP_VERSION = getAppPomVersion()
-        echo "POM VERSION=$POM_APP_VERSION"
     }
 
     stages {
@@ -17,7 +16,7 @@ pipeline {
             steps {
                 echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
-                echo "Call: mvn versions:set "
+                echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
 
             }
