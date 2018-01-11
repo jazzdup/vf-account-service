@@ -74,7 +74,7 @@ pipeline {
     }
 }
 
-String getAppPomVersion(String message) {
+String getAppPomVersion() {
     pom = readMavenPom file: 'pom.xml'
     pom.version
 
