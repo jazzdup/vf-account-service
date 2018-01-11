@@ -76,8 +76,8 @@ pipeline {
 
 String getAppPomVersion() {
     pom = readMavenPom file: 'pom.xml'
-    pom.version
+    def version = pom.version
 
-    return pom
+    return version
 
 }
