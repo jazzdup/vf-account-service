@@ -14,7 +14,9 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
+                echo "CURRING APP VERSION=$APP_VERSION"
+                echo "Bump version"
+                sh 'mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}'
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
