@@ -87,10 +87,16 @@ String getAppPomVersion() {
 
 def updatePomVersion(String versionStr) {
 
-    echo "Bump version"
+    echo "Bump version:" + versionStr
+    echo "versions size:" + versionStr.length()
 
-    String [] versions = versionStr.split(".")
-    echo "CURRENT APP MAJOR VERSION=" + versions[0]
+    String[] versions = versionStr.split(".")
+    
+    for (Sting i = 0; i < versions.length; i++) {
+
+        echo "CURRENT APP MAJOR VERSION=" + versions[i]
+    }
+}
     echo "CURRENT APP MINOR VERSION=versions[1]"
     echo "CURRENT APP INCR VERSION=versions[2]"
 
