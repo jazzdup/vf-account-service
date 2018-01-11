@@ -16,8 +16,6 @@ pipeline {
             steps {
                 updatePomVersion("$POM_APP_VERSION")
                 echo "CURRENT APP VERSION=$APP_VERSION"
-//                sh 'mvn build-helper:parse-version versions:set'
-//                        "-DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
@@ -93,9 +91,9 @@ def updatePomVersion(String versionStr) {
     int major = versions[0]
     int minor = versions[1]
 
-    println "Previous inc number: versions[2]"
+    println "Previous inc number: $versions[2]"
     int inc = Integer.parseInt(versions[2]) + 1
-    println "Previous inc number: $inc"
+    println "New inc number: $inc"
 
     for (int i = 0; i < versions.length; i++) {
         echo "CURRENT APP MAJOR VERSION=" + versions[i]
