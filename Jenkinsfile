@@ -14,6 +14,7 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+                updatePomVersion()
                 echo "CURRENT APP VERSION=$APP_VERSION"
 //                sh 'mvn build-helper:parse-version versions:set'
 //                        "-DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
@@ -84,7 +85,7 @@ String getAppPomVersion() {
 
 }
 
-String updatePomVersion() {
+def updatePomVersion() {
 
     echo "Bump version"
 
