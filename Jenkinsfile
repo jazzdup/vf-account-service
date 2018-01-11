@@ -8,6 +8,8 @@ pipeline {
     }
     environment {
         APP_VERSION = '0.0.2'
+        POM_APP_VERSION = getAppPomVersion()
+        echo "POM VERSION=$POM_APP_VERSION"
     }
 
     stages {
@@ -17,6 +19,7 @@ pipeline {
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Call: mvn versions:set "
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
+
             }
         }
         stage('Build..') {
@@ -40,7 +43,6 @@ pipeline {
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-                testMessage("....... THIS IS A TEST MESSAGE ...... ")
                 sh 'mvn failsafe:integration-test'
             }
             post {
@@ -64,9 +66,16 @@ pipeline {
                                                       version   : "${APP_VERSION}"]]]
             }
         }
+        stage('Deploy to Dev environment') {
+
+        }
     }
 }
 
-def testMessage(String message) {
-    echo message
+def getAppPomVersion(String message) {
+    pom = readMavenPom file: 'pom.xml'
+    pom.version
+
+    return pom
+
 }
