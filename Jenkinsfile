@@ -94,7 +94,7 @@ def updatePomVersion(String versionStr) {
     int minor = versions[1]
 
     println "Previous inc number: versions[2]"
-    int inc = ++Integer.parseInt(versions[2])
+    int inc = Integer.parseInt(versions[2]) + 1
     println "Previous inc number: $inc"
 
     for (int i = 0; i < versions.length; i++) {
