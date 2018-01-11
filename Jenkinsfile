@@ -40,6 +40,7 @@ pipeline {
             steps {
                 echo 'Integration Test..'
                 sh 'mvn failsafe:integration-test'
+                test("....... THIS IS A TEST MESSAGE ...... ")
             }
             post {
                 always {
@@ -58,8 +59,12 @@ pipeline {
                                     mavenCoordinate: [artifactId: 'vf-account-service',
                                                       groupId   : 'com.vodafone.charging',
                                                       packaging : 'jar',
-                                                      version   : '0.0.2']]]
+                                                      version   : "${APP_VERSION}"]]]
             }
         }
     }
+}
+
+def test(String message) {
+    echo message
 }
