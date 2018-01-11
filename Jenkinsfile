@@ -87,16 +87,22 @@ String getAppPomVersion() {
 
 def updatePomVersion(String versionStr) {
 
-    echo "Bump versionStr=" + versionStr
-    echo "versionsStr size=" + versionStr.length()
-
     String[] versions = versionStr.split('\\.')
-    println "versions size:" + versions.length
+    assert versions.length == 3
 
+    int major = versions[0]
+    int minor = versions[1]
+
+    println "Previous inc number: versions[2]"
+    int inc = ++Integer.parseInt(versions[2])
+    println "Previous inc number: $inc"
 
     for (int i = 0; i < versions.length; i++) {
         echo "CURRENT APP MAJOR VERSION=" + versions[i]
     }
+
+//    sh 'mvn build-helper:parse-version versions:set' +
+//                        "-DnewVersion=$major.$minor.$inc"
 
     return version
 }
