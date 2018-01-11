@@ -92,7 +92,7 @@ def updatePomVersion(String versionStr) {
 
     String[] versions = versionStr.split(".")
 
-    for (Sting i = 0; i < versions.length; i++) {
+    for (int i = 0; i < versions.length; i++) {
 
         echo "CURRENT APP MAJOR VERSION=" + versions[i]
     }
