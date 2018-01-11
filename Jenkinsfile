@@ -91,6 +91,8 @@ def updatePomVersion(String versionStr) {
     echo "versions size:" + versionStr.length()
 
     String[] versions = versionStr.split(".")
+    echo "versions size:" + versions
+
 
     for (int i = 0; i < versions.length; i++) {
 
