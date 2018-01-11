@@ -14,10 +14,16 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                echo "CURRING APP VERSION=$APP_VERSION"
+                def versions = $POM_APP_VERSION.split(".")
+                versions
+                echo "CURRENT APP VERSION=$APP_VERSION"
+                echo "CURRENT APP MAJOR VERSION=" + versions[0]
+                echo "CURRENT APP MINOR VERSION=versions[1]"
+                echo "CURRENT APP INCR VERSION=versions[2]"
                 echo "Bump version"
-                sh "mvn build-helper:parse-version versions:set " +
-                        "-DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
+                sh 'mvn build-helper:parse-version versions:set'
+                sh
+//                        "-DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
