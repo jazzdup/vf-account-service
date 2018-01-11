@@ -15,6 +15,7 @@ pipeline {
             steps {
                 echo "Creating new artifact.  APPLICATION_VERSION= $APP_VERSION"
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
+                echo "Call: mvn versions:set "
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
             }
         }
@@ -40,7 +41,7 @@ pipeline {
             steps {
                 echo 'Integration Test..'
                 sh 'mvn failsafe:integration-test'
-                test("....... THIS IS A TEST MESSAGE ...... ")
+//                test("....... THIS IS A TEST MESSAGE ...... ")
             }
             post {
                 always {
@@ -48,6 +49,7 @@ pipeline {
                 }
             }
         }
+        //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
                 nexusPublisher nexusInstanceId: 'localNexus',
@@ -65,6 +67,6 @@ pipeline {
     }
 }
 
-def test(String message) {
-    echo message
-}
+//def test(String message) {
+//    echo message
+//}
