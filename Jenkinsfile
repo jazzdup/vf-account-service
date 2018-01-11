@@ -66,6 +66,9 @@ pipeline {
             }
         }
         stage('Deploy to Dev environment') {
+            steps {
+                echo "deploy to development"
+            }
 
         }
     }
