@@ -61,7 +61,7 @@ pipeline {
                                     mavenCoordinate: [artifactId: 'vf-account-service',
                                                       groupId   : 'com.vodafone.charging',
                                                       packaging : 'jar',
-                                                      version   : "${APP_VERSION}"]]]
+                                                      version   : '0.0.2']]]
             }
         }
     }
