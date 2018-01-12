@@ -104,7 +104,7 @@ String updatePomVersion(String versionStr) {
 //    sh 'mvn build-helper:parse-version versions:set ' +
 //                        "-DnewVersion=$major.$minor.$inc"
 
-    mvn 'build-helper:parse-version versions:set ' +
+    'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=\${parsedVersion.majorVersion}\\' +
             '.\\${parsedVersion.nextMinorVersion}\\' +
             '.\\${parsedVersion.incrementalVersion}'
