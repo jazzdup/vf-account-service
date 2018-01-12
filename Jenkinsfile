@@ -6,83 +6,81 @@ pipeline {
             args '-v /root/.m2:/root/.m2'
         }
     }
-    node {
-        environment {
-            APP_VERSION = updatePomVersion()
-            GIT_GROUP_ID = 'charging-platform'
-            GIT_PROJECT_ID = 'vf-account-service'
-            GIT_USER = 'jenkins'
-            GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
-            GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" +
-                    "ci2.vfpartnerservices.com/" + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+    environment {
+        APP_VERSION = updatePomVersion()
+        GIT_GROUP_ID = 'charging-platform'
+        GIT_PROJECT_ID = 'vf-account-service'
+        GIT_USER = 'jenkins'
+        GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" +
+                "ci2.vfpartnerservices.com/" + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
 
-            JENKINS_BUILD_BRANCH_NAME = buildBranchName()
+        JENKINS_BUILD_BRANCH_NAME = buildBranchName()
+    }
+
+    stages {
+        stage('Prepare Build') {
+            steps {
+                checkout changelog: true, poll: true, scm: [$class: 'GitSCM', branches: [[name: '*/develop']], browser: [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: 10.3], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch', localBranch: 'jenkins-develop']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+
+
+                echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
+                echo "GIT_PROJECT_URL=$JENKINS_BUILD_BRANCH_NAME"
+                echo "NEW APP VERSION=$APP_VERSION"
+                echo "Jenkins BUILD_TAG= $BUILD_TAG"
+                echo "Jenkins BUILD_TAG= $currentBuild.number"
+
+            }
+        }
+        stage('Build..') {
+            steps {
+                echo 'Building..'
+                sh 'mvn -B -DskipTests clean package'
+            }
         }
 
-        stages {
-            stage('Prepare Build') {
-                steps {
-                    checkout changelog: true, poll: true, scm: [$class: 'GitSCM', branches: [[name: '*/develop']], browser: [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: 10.3], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch', localBranch: 'jenkins-develop']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Integration Test') {
+            steps {
+                echo 'Integration Test..'
+                sh 'mvn failsafe:integration-test'
+            }
+            post {
+                always {
+                    junit 'target/failsafe-reports/*.xml'
+                }
+            }
+        }
+        //Relies on Nexus being configured on Jenkins correctly
+        stage('Publish') {
+            steps {
+                nexusPublisher nexusInstanceId: 'localNexus',
+                        nexusRepositoryId: 'releases',
+                        packages: [[$class         : 'MavenPackage',
+                                    mavenAssetList : [[classifier: '',
+                                                       extension : '',
+                                                       filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
+                                    mavenCoordinate: [artifactId: 'vf-account-service',
+                                                      groupId   : 'com.vodafone.charging',
+                                                      packaging : 'jar',
+                                                      version   : "${APP_VERSION}"]]]
+            }
+        }
+        stage('Deploy to Dev environment') {
+            steps {
+                echo "deploy to development"
+            }
 
-
-                    echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
-                    echo "GIT_PROJECT_URL=$JENKINS_BUILD_BRANCH_NAME"
-                    echo "NEW APP VERSION=$APP_VERSION"
-                    echo "Jenkins BUILD_TAG= $BUILD_TAG"
-                    echo "Jenkins BUILD_TAG= $currentBuild.number"
-
-                }
-            }
-            stage('Build..') {
-                steps {
-                    echo 'Building..'
-                    sh 'mvn -B -DskipTests clean package'
-                }
-            }
-
-            stage('Test') {
-                steps {
-                    echo 'Testing..'
-                    sh 'mvn test'
-                }
-                post {
-                    always {
-                        junit 'target/surefire-reports/*.xml'
-                    }
-                }
-            }
-            stage('Integration Test') {
-                steps {
-                    echo 'Integration Test..'
-                    sh 'mvn failsafe:integration-test'
-                }
-                post {
-                    always {
-                        junit 'target/failsafe-reports/*.xml'
-                    }
-                }
-            }
-            //Relies on Nexus being configured on Jenkins correctly
-            stage('Publish') {
-                steps {
-                    nexusPublisher nexusInstanceId: 'localNexus',
-                            nexusRepositoryId: 'releases',
-                            packages: [[$class         : 'MavenPackage',
-                                        mavenAssetList : [[classifier: '',
-                                                           extension : '',
-                                                           filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
-                                        mavenCoordinate: [artifactId: 'vf-account-service',
-                                                          groupId   : 'com.vodafone.charging',
-                                                          packaging : 'jar',
-                                                          version   : "${APP_VERSION}"]]]
-                }
-            }
-            stage('Deploy to Dev environment') {
-                steps {
-                    echo "deploy to development"
-                }
-
-            }
         }
     }
 }
