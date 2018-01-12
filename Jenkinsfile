@@ -83,6 +83,10 @@ String getAppPomVersion() {
 
 }
 
+String getCurrentAppVersion() {
+
+}
+
 String updatePomVersion(String versionStr) {
 
 //    String[] versions = versionStr.split('\\.')
@@ -101,13 +105,17 @@ String updatePomVersion(String versionStr) {
 //
 //    println "New version to be updated: $major.$minor.$inc"
 //
-//    sh 'mvn build-helper:parse-version versions:set ' +
-//                        "-DnewVersion=$major.$minor.$inc"
+    println 'This is the OLD pom version ' +  getAppPomVersion()
 
     'mvn build-helper:parse-version versions:set ' +
-            '-DnewVersion=\${parsedVersion.majorVersion}\\' +
+            '-DnewVersion=\\' +
+            '\\${parsedVersion.majorVersion}\\' +
             '.\\${parsedVersion.nextMinorVersion}\\' +
-            '.\\${parsedVersion.incrementalVersion}'
+            '.\\${parsedVersion.incrementalVersion} versions:commit'
+
+    println 'This is the NEW pom version ' +  getAppPomVersion()
+
+    return getAppPomVersion()
 
 //    return "$major.$minor.$inc"
 }
