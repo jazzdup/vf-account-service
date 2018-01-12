@@ -21,7 +21,15 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                checkout changelog: true, poll: true, scm: [$class: 'GitSCM', branches: [[name: '*/develop']], browser: [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: 10.3], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch', localBranch: 'jenkins-develop']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+                checkout changelog: true, poll: true,
+                        scm: [$class                           : 'GitSCM',
+                              branches                         : [[name: '*/develop']],
+                              browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions                       : [[$class: 'LocalBranch', localBranch: 'jenkins-develop']],
+                              submoduleCfg                     : [],
+                              userRemoteConfigs                :
+                                      [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
