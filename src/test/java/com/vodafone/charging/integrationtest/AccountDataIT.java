@@ -4,6 +4,7 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.data.message.JsonConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
+@Slf4j
 public class AccountDataIT {
 
     private MediaType contentType =
@@ -61,6 +63,29 @@ public class AccountDataIT {
 
     @Test
     public void shouldValidateAccountAndReturnOK() throws Exception {
+        //given
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
+        String accountJson = converter.toJson(aContextData());
+
+        given(accountService.enrichAccountData(any()))
+                .willReturn(expectedInfo);
+
+        //when
+        MvcResult result = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        //then
+        final EnrichedAccountInfo info =
+                (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
+        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+    }
+
+    @Test
+    public void shouldValidateAccountAndReturnOKAgainstRealERIF() throws Exception {
+        log.debug("xxxxxxxxxxx");
         //given
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
         String accountJson = converter.toJson(aContextData());
