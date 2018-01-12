@@ -15,7 +15,6 @@ pipeline {
         stage('Prepare Build') {
             steps {
                 echo "NEW APP VERSION=$APP_VERSION"
-
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
 
@@ -51,20 +50,20 @@ pipeline {
             }
         }
         //Relies on Nexus being configured on Jenkins correctly
-        stage('Publish') {
-            steps {
-                nexusPublisher nexusInstanceId: 'localNexus',
-                        nexusRepositoryId: 'releases',
-                        packages: [[$class         : 'MavenPackage',
-                                    mavenAssetList : [[classifier: '',
-                                                       extension : '',
-                                                       filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
-                                    mavenCoordinate: [artifactId: 'vf-account-service',
-                                                      groupId   : 'com.vodafone.charging',
-                                                      packaging : 'jar',
-                                                      version   : "${APP_VERSION}"]]]
-            }
-        }
+//        stage('Publish') {
+//            steps {
+//                nexusPublisher nexusInstanceId: 'localNexus',
+//                        nexusRepositoryId: 'releases',
+//                        packages: [[$class         : 'MavenPackage',
+//                                    mavenAssetList : [[classifier: '',
+//                                                       extension : '',
+//                                                       filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
+//                                    mavenCoordinate: [artifactId: 'vf-account-service',
+//                                                      groupId   : 'com.vodafone.charging',
+//                                                      packaging : 'jar',
+//                                                      version   : "${APP_VERSION}"]]]
+//            }
+//        }
         stage('Deploy to Dev environment') {
             steps {
                 echo "deploy to development"
@@ -106,18 +105,24 @@ String updatePomVersion(String versionStr) {
 //
     println 'This is the OLD pom version ' +  getAppPomVersion()
 
-    'mvn build-helper:parse-version versions:set ' +
+    sh 'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=\\' +
             '\\${parsedVersion.majorVersion}\\' +
             '.\\${parsedVersion.minorVersion}\\' +
             '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
-
-
-    Thread.sleep(5000)
 
     println 'This is the NEW pom version ' +  getAppPomVersion()
 
     return getAppPomVersion()
 
 //    return "$major.$minor.$inc"
+}
+
+def executShellCommand(String command) {
+    def cmd = command
+    def sout = new StringBuffer(), serr = new StringBuffer()
+    def proc = cmd.execute()
+    proc.consumeProcessOutput(sout, serr)
+    proc.waitForOrKill(1000)
+    println sout
 }
