@@ -13,7 +13,7 @@ pipeline {
         GIT_USER = 'jenkins'
         GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
         GIT_URL = "ci2.vfpartnerservices.com/"
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" + $GIT_URL + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
