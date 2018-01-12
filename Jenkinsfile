@@ -106,9 +106,9 @@ String updatePomVersion(String versionStr) {
     println 'This is the OLD pom version ' + getAppPomVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
-            '-DnewVersion=\\' +
-            '\\${parsedVersion.majorVersion}\\' +
-            '.\\${parsedVersion.minorVersion}\\' +
+            '-DnewVersion=' +
+            '\\${parsedVersion.majorVersion}' +
+            '.\\${parsedVersion.minorVersion}' +
             '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
 
     println "SHELL COMMAND: $command"
