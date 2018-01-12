@@ -1,7 +1,9 @@
 package com.vodafone.charging.data.builder;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 
+import java.util.Calendar;
 import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -27,6 +29,21 @@ public class EnrichedAccountInfoDataBuilder {
                 .isPrepay(false)
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
+                .build();
+    }
+
+    public static EnrichedAccountInfo aEnrichedAccountInfo(ChargingId chargingId) {
+        Random random = new Random();
+        return new EnrichedAccountInfo.Builder("ACCEPTED")
+//                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO
+                .ban("BAN_" + chargingId.getValue())
+                .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
+//                .serviceProviderId("serviceProviderId")
+//                .childServiceProviderId("childServiceProviderId")
+//                .serviceProviderType("serviceProviderType")
+//                .isPrepay(false)
+                .errorId("OK")
+//                .errorDescription("test-error-description")
                 .build();
     }
 

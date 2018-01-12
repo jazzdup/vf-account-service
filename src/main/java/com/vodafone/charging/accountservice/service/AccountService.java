@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+
 /**
  * The main service object which routes logic
  * to more specific application services.
@@ -41,11 +43,20 @@ public class AccountService {
         HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), httpHeaders);
 
         log.debug(request.toString());
-        ResponseEntity<ERIFResponse> response = restTemplate.postForEntity(url, request, ERIFResponse.class);
-        log.debug(response.toString());
-
-        throw new UnsupportedOperationException();
-
+        ResponseEntity<ERIFResponse> responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);
+        log.debug(responseEntity.toString());
+        
+        ERIFResponse responseBody = responseEntity.getBody();
+        EnrichedAccountInfo.Builder builder = new EnrichedAccountInfo.Builder(responseBody.getStatus());
+        builder.errorId(responseBody.getErrId())
+                .errorDescription(responseBody.getErrDescription())
+                .ban(responseBody.getBan())
+                .billingCycleDay(responseBody.getBillingCycleDay())
+                .serviceProviderId(responseBody.getServiceProviderId())
+                .serviceProviderType(responseBody.getServiceProviderType())
+                .childServiceProviderId(responseBody.getChildServiceProviderId())
+                .usergroups(responseBody.getUsergroups());
+        return builder.build();
 
     }
 }

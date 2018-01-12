@@ -1,6 +1,7 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.data.message.JsonConverter;
@@ -87,9 +88,9 @@ public class AccountDataIT {
     public void shouldValidateAccountAndReturnOKAgainstRealERIF() throws Exception {
         log.debug("in shouldValidateAccountAndReturnOKAgainstRealERIF");
         //given
-        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
-        String accountJson = converter.toJson(aContextData());
-
+        final ContextData contextData = aContextData();
+        String accountJson = converter.toJson(contextData);
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(contextData.getChargingId());
 //        given(accountService.enrichAccountData(any())).willReturn(expectedInfo);
 
         //when
