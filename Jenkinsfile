@@ -12,8 +12,8 @@ pipeline {
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER = 'jenkins'
         GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" +
-                "ci2.vfpartnerservices.com/" + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+        GIT_URL = "ci2.vfpartnerservices.com/"
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" + $GIT_URL + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
@@ -21,16 +21,6 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                checkout changelog: true, poll: true,
-                        scm: [$class                           : 'GitSCM',
-                              branches                         : [[name: '*/develop']],
-                              browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
-                              doGenerateSubmoduleConfigurations: false,
-                              extensions                       : [[$class: 'LocalBranch', localBranch: 'jenkins-develop']],
-                              submoduleCfg                     : [],
-                              userRemoteConfigs                :
-                                      [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
-
 
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "GIT_PROJECT_URL=$JENKINS_BUILD_BRANCH_NAME"
@@ -104,6 +94,8 @@ String getAppPomVersion() {
 
 String updatePomVersion() {
 
+    checkoutCode("jenkins-develop")
+
     println 'OLD pom version ' + getAppPomVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
@@ -126,6 +118,20 @@ String updatePomVersion() {
 def checkInCodeToGit(String url, String branchName) {
 
     println "running a sh command to check into git"
+
+}
+
+def checkoutCode(String localBranchName) {
+
+    checkout changelog: true, poll: true,
+            scm: [$class                           : 'GitSCM',
+                  branches                         : [[name: '*/develop']],
+                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions                       : [[$class: 'LocalBranch', localBranch: 'jenkins-develop']],
+                  submoduleCfg                     : [],
+                  userRemoteConfigs                :
+                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 }
 
