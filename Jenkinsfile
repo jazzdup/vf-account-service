@@ -12,8 +12,8 @@ pipeline {
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER = 'jenkins'
         GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN\\.vfpartnerservices.com/$GIT_GROUP_ID/$GIT_PROJECT_ID"
-
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@ci2\\.vfpartnerservices.com/" +
+                "$GIT_GROUP_ID/$GIT_PROJECT_ID\\.git"
 
 //        JENKINS_BUILD_NUMBER = env.BUILD_NUMBER
     }
@@ -112,7 +112,6 @@ String updatePomVersion() {
 }
 
 def checkInCodeToGit() {
-
 
 
 }
