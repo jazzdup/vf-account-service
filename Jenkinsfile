@@ -7,8 +7,14 @@ pipeline {
         }
     }
     environment {
-        POM_APP_VERSION = getAppPomVersion()
-        APP_VERSION = updatePomVersion("$POM_APP_VERSION")
+        APP_VERSION = updatePomVersion()
+        GIT_GROUP_ID = 'charging-platform'
+        GIT_PROJECT_ID = 'vf-account-service'
+        GIT_USER = 'jenkins'
+        GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN.vfpartnerservices.com/$GIT_GROUP_ID/$GIT_PROJECT_ID"
+
+//        JENKINS_BUILD_NUMBER = env.BUILD_NUMBER
     }
 
     stages {
@@ -81,29 +87,10 @@ String getAppPomVersion() {
 
 }
 
-String getCurrentAppVersion() {
 
-}
+String updatePomVersion() {
 
-String updatePomVersion(String versionStr) {
-
-//    String[] versions = versionStr.split('\\.')
-//    assert versions.length == 3
-//
-//    int major = Integer.parseInt(versions[0])
-//    int minor = Integer.parseInt(versions[1])
-//
-//    println "Previous inc number: " + versions[2]
-//    int inc = Integer.parseInt(versions[2]) + 1
-//    println "New inc number: $inc"
-//
-//    for (int i = 0; i < versions.length; i++) {
-//        println "CURRENT APP MAJOR VERSION=" + versions[i]
-//    }
-//
-//    println "New version to be updated: $major.$minor.$inc"
-//
-    println 'This is the OLD pom version ' + getAppPomVersion()
+    println 'OLD pom version ' + getAppPomVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=' +
@@ -111,15 +98,21 @@ String updatePomVersion(String versionStr) {
             '.\\${parsedVersion.minorVersion}' +
             '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
 
-    println "SHELL COMMAND: $command"
+    println "Running shell command: $command"
 
     sh command
 
-    println 'This is the NEW pom version ' + getAppPomVersion()
+    println 'NEW pom version ' + getAppPomVersion()
+
+    checkInCodeToGit()
 
     return getAppPomVersion()
+}
 
-//    return "$major.$minor.$inc"
+def checkInCodeToGit() {
+
+
+
 }
 
 def executShellCommand(String command) {
