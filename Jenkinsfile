@@ -1,6 +1,4 @@
 #!/usr/bin/env groovy
-import static java.util.concurrent.TimeUnit.MILLISECONDS
-
 pipeline {
     agent {
         docker {
@@ -115,7 +113,7 @@ String updatePomVersion(String versionStr) {
             '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
 
 
-    MILLISECONDS(5)
+    Thread.sleep(5000)
 
     println 'This is the NEW pom version ' +  getAppPomVersion()
 
