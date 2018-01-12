@@ -1,4 +1,6 @@
 #!/usr/bin/env groovy
+import static java.util.concurrent.TimeUnit.MILLISECONDS
+
 pipeline {
     agent {
         docker {
@@ -14,10 +16,9 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-                echo "CURRENT APP VERSION=$APP_VERSION"
+                echo "NEW APP VERSION=$APP_VERSION"
 
                 echo "Jenkins BUILD_TAG= $BUILD_TAG"
-                echo "Call: mvn versions:set POM VERSION=$POM_APP_VERSION"
                 echo "Jenkins BUILD_TAG= $currentBuild.number"
 
             }
@@ -110,8 +111,11 @@ String updatePomVersion(String versionStr) {
     'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=\\' +
             '\\${parsedVersion.majorVersion}\\' +
-            '.\\${parsedVersion.nextMinorVersion}\\' +
-            '.\\${parsedVersion.incrementalVersion} versions:commit'
+            '.\\${parsedVersion.minorVersion}\\' +
+            '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
+
+
+    MILLISECONDS(5)
 
     println 'This is the NEW pom version ' +  getAppPomVersion()
 
