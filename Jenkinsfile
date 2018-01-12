@@ -7,8 +7,8 @@ pipeline {
         }
     }
     environment {
-        APP_VERSION = updatePomVersion("$POM_APP_VERSION")
         POM_APP_VERSION = getAppPomVersion()
+        APP_VERSION = updatePomVersion("$POM_APP_VERSION")
     }
 
     stages {
@@ -85,24 +85,29 @@ String getAppPomVersion() {
 
 String updatePomVersion(String versionStr) {
 
-    String[] versions = versionStr.split('\\.')
-    assert versions.length == 3
+//    String[] versions = versionStr.split('\\.')
+//    assert versions.length == 3
+//
+//    int major = Integer.parseInt(versions[0])
+//    int minor = Integer.parseInt(versions[1])
+//
+//    println "Previous inc number: " + versions[2]
+//    int inc = Integer.parseInt(versions[2]) + 1
+//    println "New inc number: $inc"
+//
+//    for (int i = 0; i < versions.length; i++) {
+//        println "CURRENT APP MAJOR VERSION=" + versions[i]
+//    }
+//
+//    println "New version to be updated: $major.$minor.$inc"
+//
+//    sh 'mvn build-helper:parse-version versions:set ' +
+//                        "-DnewVersion=$major.$minor.$inc"
 
-    int major = versions[0]
-    int minor = versions[1]
+    mvn 'build-helper:parse-version versions:set ' +
+            '-DnewVersion=\${parsedVersion.majorVersion}\\' +
+            '.\\${parsedVersion.nextMinorVersion}\\' +
+            '.\\${parsedVersion.incrementalVersion}'
 
-    println "Previous inc number: " + versions[2]
-    int inc = Integer.parseInt(versions[2]) + 1
-    println "New inc number: $inc"
-
-    for (int i = 0; i < versions.length; i++) {
-        println "CURRENT APP MAJOR VERSION=" + versions[i]
-    }
-
-    println "New version to be updated: $major.$minor.$inc"
-
-    sh 'mvn build-helper:parse-version versions:set ' +
-                        "-DnewVersion=$major.$minor.$inc"
-
-    return "$major.$minor.$inc"
+//    return "$major.$minor.$inc"
 }
