@@ -44,7 +44,7 @@ public class AccountDataIT {
     @Autowired
     private JsonConverter converter;
 
-    @MockBean
+//    @MockBean
     private AccountService accountService;
 
     @Before
@@ -85,13 +85,12 @@ public class AccountDataIT {
 
     @Test
     public void shouldValidateAccountAndReturnOKAgainstRealERIF() throws Exception {
-        log.debug("xxxxxxxxxxx");
+        log.debug("in shouldValidateAccountAndReturnOKAgainstRealERIF");
         //given
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
         String accountJson = converter.toJson(aContextData());
 
-        given(accountService.enrichAccountData(any()))
-                .willReturn(expectedInfo);
+//        given(accountService.enrichAccountData(any())).willReturn(expectedInfo);
 
         //when
         MvcResult result = mockMvc.perform(post("/accounts/")
