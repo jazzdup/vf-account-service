@@ -103,15 +103,19 @@ String updatePomVersion(String versionStr) {
 //
 //    println "New version to be updated: $major.$minor.$inc"
 //
-    println 'This is the OLD pom version ' +  getAppPomVersion()
+    println 'This is the OLD pom version ' + getAppPomVersion()
 
-    sh 'mvn build-helper:parse-version versions:set ' +
+    def command = 'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=\\' +
             '\\${parsedVersion.majorVersion}\\' +
             '.\\${parsedVersion.minorVersion}\\' +
             '.\\${parsedVersion.nextIncrementalVersion} versions:commit'
 
-    println 'This is the NEW pom version ' +  getAppPomVersion()
+    println "SHELL COMMAND: $command"
+
+    sh command
+
+    println 'This is the NEW pom version ' + getAppPomVersion()
 
     return getAppPomVersion()
 
