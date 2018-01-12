@@ -107,7 +107,7 @@ String updatePomVersion() {
 
     println 'NEW pom version ' + getAppPomVersion()
 
-    checkInCodeToGit()
+//    checkInCodeToGit()
 
     return getAppPomVersion()
 }
