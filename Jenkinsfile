@@ -141,21 +141,28 @@ def gitCodecheckIn() {
               git config user.email \"jenkins@example.com\""
 
         sh "git commit -am 'Jenkins commit of new version '"
-        sh "git push -u origin develop"
+        sh "git push -u origin refs/remotes/origin/develop"
     }
 }
 
 def checkoutCode(String localBranchName) {
 
-    checkout changelog: true, poll: true,
-            scm: [$class                           : 'GitSCM',
-                  branches                         : [[name: '*/develop']],
-                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
-                  doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
-                  submoduleCfg                     : [],
-                  userRemoteConfigs                :
-                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+//    checkout changelog: true, poll: true,
+//            scm: [$class                           : 'GitSCM',
+//                  branches                         : [[name: '*/develop']],
+//                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
+//                  doGenerateSubmoduleConfigurations: false,
+//                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
+//                  submoduleCfg                     : [],
+//                  userRemoteConfigs                :
+//                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+
+    withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                      credentialsId: 'ravi-mac',
+                      usernameVariable: 'GIT_USERNAME',
+                      passwordVariable: 'GIT_PASSWORD']]) {
+        sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
+    }
 
 //    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
 
