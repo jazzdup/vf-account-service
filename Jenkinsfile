@@ -152,10 +152,12 @@ def checkoutCode(String localBranchName) {
                   branches                         : [[name: '*/develop']],
                   browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
                   doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [[$class: 'LocalBranch', localBranch: localBranchName]],
+//                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
                   submoduleCfg                     : [],
                   userRemoteConfigs                :
                           [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+
+    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
 
     updatePomVersion()
     gitCodecheckIn()
