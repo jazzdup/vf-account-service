@@ -67,9 +67,10 @@ pipeline {
 //                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
 //                echo command
 
+                gitCodecheckIn()
                 //Update pom.xml version and checking to version control
-                sh '/usr/bin/git commit -am "JENKINS: new application version "'
-                sh 'git push'
+//                sh '/usr/bin/git commit -am "JENKINS: new application version "'
+//                sh 'git push'
 
                 echo "NEW APP VERSION=$APP_VERSION"
 
@@ -125,7 +126,7 @@ String updatePomVersion() {
     return getAppPomVersion()
 }
 
-def gitCodecheckIn(String url, String branchName) {
+def gitCodecheckIn() {
 
     println "running a sh command to check into git"
 
