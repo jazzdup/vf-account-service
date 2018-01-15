@@ -123,6 +123,7 @@
                     </includes>
                     <excludes>
                         <exclude>**/*HttpTest.java</exclude>
+                        <exclude>**/AccountDataConnectedIT.java</exclude><!--doesn't exclude test-->
                     </excludes>
                 </configuration>
             </plugin>

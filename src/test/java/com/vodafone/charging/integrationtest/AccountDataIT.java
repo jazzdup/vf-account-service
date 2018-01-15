@@ -1,7 +1,6 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.data.message.JsonConverter;
@@ -45,7 +44,7 @@ public class AccountDataIT {
     @Autowired
     private JsonConverter converter;
 
-//    @MockBean
+    @MockBean
     private AccountService accountService;
 
     @Before
@@ -85,13 +84,13 @@ public class AccountDataIT {
     }
 
     @Test
-    public void shouldValidateAccountAndReturnOKAgainstRealERIF() throws Exception {
-        log.debug("in shouldValidateAccountAndReturnOKAgainstRealERIF");
+    public void shouldValidateAccountAndReturnOKAgainstMockedERIF() throws Exception {
         //given
-        final ContextData contextData = aContextData();
-        String accountJson = converter.toJson(contextData);
-        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(contextData.getChargingId());
-//        given(accountService.enrichAccountData(any())).willReturn(expectedInfo);
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
+        String accountJson = converter.toJson(aContextData());
+
+        given(accountService.enrichAccountData(any()))
+                .willReturn(expectedInfo);
 
         //when
         MvcResult result = mockMvc.perform(post("/accounts/")
