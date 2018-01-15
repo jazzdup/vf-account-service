@@ -156,7 +156,7 @@ def checkoutCode(String localBranchName) {
 //                  userRemoteConfigs                :
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-    sh 'rm -r vf-account-service'
+//    sh 'rm -r vf-account-service'
 
     sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
@@ -166,6 +166,7 @@ def checkoutCode(String localBranchName) {
 //                      usernameVariable: 'ravi-mac',
 //                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 //    }
+
     sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
     sh "git checkout develop"
 
