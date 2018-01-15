@@ -130,11 +130,13 @@ def gitCodecheckIn() {
 
     println "running a sh command to check into git"
 
-    sh "git config user.name \"jenkins\" && \
+    dir('/var/jenkins_home/workspace/example-pipeline') {
+
+        sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
 
-    sh "git commit -am 'Jenkins commit of new version ' && git push origin"
-
+        sh "git commit -am 'Jenkins commit of new version ' && git push origin"
+    }
 }
 
 def checkoutCode(String localBranchName) {
