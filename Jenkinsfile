@@ -135,14 +135,13 @@ def gitCodecheckIn() {
 
     println "running a sh command to check into git"
 
-    dir('/var/jenkins_home/workspace/example-pipeline') {
+//    dir('/var/jenkins_home/workspace/example-pipeline') {
 
-        sh "git config user.name \"jenkins\" && \
-              git config user.email \"jenkins@example.com\""
-
-        sh "git commit -am 'Jenkins commit of new version '"
-        sh "git push -u origin develop"
-    }
+//        sh "git config user.name \"jenkins\" && \
+//              git config user.email \"jenkins@example.com\""
+    sh "git commit -am 'Jenkins commit of new version '"
+    sh "git push -u origin develop"
+//    }
 }
 
 def checkoutCode(String localBranchName) {
@@ -162,13 +161,12 @@ def checkoutCode(String localBranchName) {
     sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
 
-
 //    withCredentials([[$class: 'UsernamePasswordMultiBinding',
 //                      credentialsId: 'ravi-mac',
 //                      usernameVariable: 'ravi-mac',
 //                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 //    }
-    sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git ."
+    sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
     sh "git checkout develop"
 
 //    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
