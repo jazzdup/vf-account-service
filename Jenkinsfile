@@ -2,9 +2,14 @@
 pipeline {
     agent {
         docker {
-            image 'maven:3-alpine'
+//            image 'maven:3-alpine'
+            image 'buildpack-deps:xenial'
             args '-v /root/.m2:/root/.m2'
         }
+    }
+    tools {
+        maven 'apache-maven-3.3.3'
+        jdk 'jdk8'
     }
     environment {
         APP_VERSION = updatePomVersion()
@@ -21,6 +26,8 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+                sh 'echo "PATH = ${PATH}" ' +
+                        'echo "M2_HOME = ${M2_HOME}" '
                 checkoutCode('jenkins-develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
