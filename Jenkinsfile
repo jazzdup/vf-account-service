@@ -21,6 +21,7 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+                checkoutCode('jenkins-develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -64,8 +65,12 @@ pipeline {
             }
             steps {
 
+
+                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
+                echo command
+
                 //Update pom.xml version and checking to version control
-                sh 'git commit -am \"JENKINS: new application version \" '
+                sh command
                 sh 'git push'
 
                 echo "NEW APP VERSION=$APP_VERSION"
@@ -135,11 +140,10 @@ def checkoutCode(String localBranchName) {
                   branches                         : [[name: '*/develop']],
                   browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
                   doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [[$class: 'LocalBranch', localBranch: 'jenkins-develop']],
+                  extensions                       : [[$class: 'LocalBranch', localBranch: localBranchName]],
                   submoduleCfg                     : [],
                   userRemoteConfigs                :
                           [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
-
 }
 
 def executShellCommand(String command) {
