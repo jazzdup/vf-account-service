@@ -26,7 +26,7 @@ pipeline {
             steps {
 //                sh 'echo "PATH = ${PATH}" ' +
 //                        'echo "M2_HOME = ${M2_HOME}" '
-                checkoutCode('jenkins-develop')
+                checkoutCode('develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -156,7 +156,7 @@ def checkoutCode(String localBranchName) {
 //                  userRemoteConfigs                :
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-//    sh 'rm -r vf-account-service'
+    sh 'rm -r vf-account-service'
 
     sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
