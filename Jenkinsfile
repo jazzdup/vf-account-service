@@ -3,11 +3,12 @@ pipeline {
     agent {
         docker {
 //            image 'maven:3-alpine'
-            image 'java8-maven3-git-versioned'
+//            image 'raghera/java8-maven3-git-versioned'
+            image 'paasmule/java-maven-git-alpine'
             args '-v /root/.m2:/root/.m2'
         }
     }
-    
+
     environment {
         APP_VERSION = updatePomVersion()
         GIT_GROUP_ID = 'charging-platform'
