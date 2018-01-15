@@ -64,13 +64,11 @@ pipeline {
                 APP_VERSION = updatePomVersion()
             }
             steps {
-
-
-                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
-                echo command
+//                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
+//                echo command
 
                 //Update pom.xml version and checking to version control
-                sh command
+                sh '/usr/bin/git commit -am "JENKINS: new application version "'
                 sh 'git push'
 
                 echo "NEW APP VERSION=$APP_VERSION"
