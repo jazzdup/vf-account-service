@@ -21,13 +21,11 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
-                echo "GIT_PROJECT_URL=$JENKINS_BUILD_BRANCH_NAME"
-                echo "NEW APP VERSION=$APP_VERSION"
-                echo "Jenkins BUILD_TAG= $BUILD_TAG"
-                echo "Jenkins BUILD_TAG= $currentBuild.number"
-
+                echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
+                echo "CURRENT APP VERSION=$APP_VERSION"
+                echo "Jenkins BUILD_TAG=$BUILD_TAG"
+                echo "Jenkins BUILD_NUMBER=$currentBuild.number"
             }
         }
         stage('Build..') {
@@ -62,6 +60,14 @@ pipeline {
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
+
+                //Update pom.xml version and checking to version control
+                APP_VERSION = updatePomVersion()
+                sh 'git commit -am \"JENKINS: new application version \" '
+                sh 'git push'
+
+                echo "NEW APP VERSION=$APP_VERSION"
+
                 nexusPublisher nexusInstanceId: 'localNexus',
                         nexusRepositoryId: 'releases',
                         packages: [[$class         : 'MavenPackage',
@@ -76,7 +82,7 @@ pipeline {
         }
         stage('Deploy to Dev environment') {
             steps {
-                echo "deploy to development"
+                echo "deploy to development ..."
             }
 
         }
@@ -86,7 +92,6 @@ pipeline {
 String getAppPomVersion() {
     pom = readMavenPom file: 'pom.xml'
     def version = pom.version
-
     return version
 
 }
@@ -94,7 +99,7 @@ String getAppPomVersion() {
 
 String updatePomVersion() {
 
-    checkoutCode("jenkins-develop")
+//    checkoutCode("jenkins-develop")
 
     println 'OLD pom version ' + getAppPomVersion()
 
