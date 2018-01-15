@@ -157,7 +157,7 @@ def checkoutCode(String localBranchName) {
                   userRemoteConfigs                :
                           [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
+//    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
 
     updatePomVersion()
     gitCodecheckIn()
