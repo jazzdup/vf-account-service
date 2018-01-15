@@ -140,7 +140,8 @@ def gitCodecheckIn() {
         sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
 
-        sh "git commit -am 'Jenkins commit of new version ' sh git push --set-upstream origin develop"
+        sh "git commit -am 'Jenkins commit of new version '"
+        sh "git push --set-upstream origin develop"
     }
 }
 
