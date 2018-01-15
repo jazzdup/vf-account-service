@@ -125,9 +125,14 @@ String updatePomVersion() {
     return getAppPomVersion()
 }
 
-def checkInCodeToGit(String url, String branchName) {
+def gitCodecheckIn(String url, String branchName) {
 
     println "running a sh command to check into git"
+
+    sh "git config user.name \"jenkins\" && \
+              git config user.email \"jenkins@example.com\""
+
+    sh "git commit -am 'Jenkins commit of new version ' && git push origin"
 
 }
 
