@@ -12,8 +12,8 @@ pipeline {
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER = 'jenkins'
         GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@" +
-                "ci2.vfpartnerservices.com/" + "$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+        GIT_URL = "ci2.vfpartnerservices.com/"
+        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
@@ -21,12 +21,12 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+                checkoutCode('jenkins-develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
-                echo "GIT_PROJECT_URL=$JENKINS_BUILD_BRANCH_NAME"
-                echo "NEW APP VERSION=$APP_VERSION"
-                echo "Jenkins BUILD_TAG= $BUILD_TAG"
-                echo "Jenkins BUILD_TAG= $currentBuild.number"
-
+                echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
+                echo "CURRENT APP VERSION=$APP_VERSION"
+                echo "Jenkins BUILD_TAG=$BUILD_TAG"
+                echo "Jenkins BUILD_NUMBER=$currentBuild.number"
             }
         }
         stage('Build..') {
@@ -60,7 +60,20 @@ pipeline {
         }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
+            environment {
+                APP_VERSION = updatePomVersion()
+            }
             steps {
+//                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
+//                echo command
+
+//                gitCodecheckIn()
+                //Update pom.xml version and checking to version control
+//                sh '/usr/bin/git commit -am "JENKINS: new application version "'
+//                sh 'git push'
+
+                echo "NEW APP VERSION=$APP_VERSION"
+
                 nexusPublisher nexusInstanceId: 'localNexus',
                         nexusRepositoryId: 'releases',
                         packages: [[$class         : 'MavenPackage',
@@ -75,7 +88,7 @@ pipeline {
         }
         stage('Deploy to Dev environment') {
             steps {
-                echo "deploy to development"
+                echo "deploy to development ..."
             }
 
         }
@@ -85,13 +98,14 @@ pipeline {
 String getAppPomVersion() {
     pom = readMavenPom file: 'pom.xml'
     def version = pom.version
-
     return version
 
 }
 
 
 String updatePomVersion() {
+
+//    checkoutCode("jenkins-develop")
 
     println 'OLD pom version ' + getAppPomVersion()
 
@@ -112,10 +126,33 @@ String updatePomVersion() {
     return getAppPomVersion()
 }
 
-def checkInCodeToGit(String url, String branchName) {
+def gitCodecheckIn() {
 
     println "running a sh command to check into git"
 
+    dir('/var/jenkins_home/workspace/example-pipeline') {
+
+        sh "git config user.name \"jenkins\" && \
+              git config user.email \"jenkins@example.com\""
+
+        sh "git commit -am 'Jenkins commit of new version ' && git push origin"
+    }
+}
+
+def checkoutCode(String localBranchName) {
+
+    checkout changelog: true, poll: true,
+            scm: [$class                           : 'GitSCM',
+                  branches                         : [[name: '*/develop']],
+                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions                       : [[$class: 'LocalBranch', localBranch: localBranchName]],
+                  submoduleCfg                     : [],
+                  userRemoteConfigs                :
+                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+
+    updatePomVersion()
+    gitCodecheckIn()
 }
 
 def executShellCommand(String command) {
