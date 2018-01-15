@@ -159,9 +159,9 @@ def checkoutCode(String localBranchName) {
 
     withCredentials([[$class: 'UsernamePasswordMultiBinding',
                       credentialsId: 'ravi-mac',
-                      usernameVariable: 'GIT_USERNAME',
-                      passwordVariable: 'GIT_PASSWORD']]) {
-        sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
+                      usernameVariable: 'ravi-mac',
+                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
+        sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
     }
 
 //    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
