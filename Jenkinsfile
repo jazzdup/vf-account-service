@@ -67,7 +67,7 @@ pipeline {
 //                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
 //                echo command
 
-                gitCodecheckIn()
+//                gitCodecheckIn()
                 //Update pom.xml version and checking to version control
 //                sh '/usr/bin/git commit -am "JENKINS: new application version "'
 //                sh 'git push'
@@ -150,6 +150,9 @@ def checkoutCode(String localBranchName) {
                   submoduleCfg                     : [],
                   userRemoteConfigs                :
                           [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
+
+    updatePomVersion()
+    gitCodecheckIn()
 }
 
 def executShellCommand(String command) {
