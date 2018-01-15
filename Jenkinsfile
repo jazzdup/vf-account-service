@@ -141,7 +141,7 @@ def gitCodecheckIn() {
               git config user.email \"jenkins@example.com\""
 
         sh "git commit -am 'Jenkins commit of new version '"
-        sh "git push --set-upstream origin develop"
+        sh "git push -u origin develop"
     }
 }
 
@@ -152,7 +152,7 @@ def checkoutCode(String localBranchName) {
                   branches                         : [[name: '*/develop']],
                   browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
                   doGenerateSubmoduleConfigurations: false,
-//                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
+                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
                   submoduleCfg                     : [],
                   userRemoteConfigs                :
                           [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
