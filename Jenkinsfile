@@ -157,6 +157,8 @@ def checkoutCode(String localBranchName) {
 //                  userRemoteConfigs                :
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
+    sh 'rm -r vf-account-service'
+
     withCredentials([[$class: 'UsernamePasswordMultiBinding',
                       credentialsId: 'ravi-mac',
                       usernameVariable: 'ravi-mac',
