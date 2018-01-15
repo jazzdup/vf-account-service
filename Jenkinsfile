@@ -59,10 +59,12 @@ pipeline {
         }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
+            environment {
+                APP_VERSION = updatePomVersion()
+            }
             steps {
 
                 //Update pom.xml version and checking to version control
-                APP_VERSION = updatePomVersion()
                 sh 'git commit -am \"JENKINS: new application version \" '
                 sh 'git push'
 
