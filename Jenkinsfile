@@ -159,12 +159,12 @@ def checkoutCode(String localBranchName) {
 
     sh 'rm -r vf-account-service'
 
-    withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                      credentialsId: 'ravi-mac',
-                      usernameVariable: 'ravi-mac',
-                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
-        sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
-    }
+//    withCredentials([[$class: 'UsernamePasswordMultiBinding',
+//                      credentialsId: 'ravi-mac',
+//                      usernameVariable: 'ravi-mac',
+//                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
+//    }
+    sh "git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git"
 
 //    sh  'git clone https://ravi-mac:https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
 
