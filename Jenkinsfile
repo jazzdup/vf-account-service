@@ -32,8 +32,9 @@ pipeline {
             steps {
 
                 println('Clean previous workspace')
-                dir "$env.WORKSPACE"
+//                dir "$env.WORKSPACE"
                 deleteDir()
+                println('Clean previous workspace')
                 incrementApplicationVersion()
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
