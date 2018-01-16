@@ -166,7 +166,7 @@ def checkoutCode(String localBranchName) {
                           usernameVariable: 'ravi-mac',
                           passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 
-            sh "git config user.name \"jenkins\" git config user.email \"jenkins@example.com\""
+            sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
 
             sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
             sh 'git checkout develop'
