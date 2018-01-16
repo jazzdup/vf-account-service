@@ -14,6 +14,8 @@ pipeline {
 
     environment {
         APP_VERSION = '0.0.0'
+        DEVELOPMENT_BRANCH_NAME = 'develop'
+
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER_NAME = 'jenkins'
@@ -33,7 +35,7 @@ pipeline {
                 dir $env.WORKSPACE
                 deleteDir()
 
-                incrementApplicationVersion('develop')
+                incrementApplicationVersion()
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -123,28 +125,18 @@ String updatePomVersion() {
 
     println 'NEW pom version ' + getAppPomVersion()
 
-//    checkInCodeToGit()
-
     return getAppPomVersion()
 }
 
 def gitCodecheckIn() {
-    sh "git push -u origin develop"
+    sh "git push -u origin $DEVELOPMENT_BRANCH_NAME"
 }
 
-def incrementApplicationVersion(String localBranchName) {
+def incrementApplicationVersion() {
 
     println "incrementing application version"
     print "Jenkins jobName $env.JOB_NAME"
     print "Jenkins workspace $env.WORKSPACE"
-
-//    if (fileExists("$env.WORKSPACE")) {
-//        println "Removing project dir and recreating it "
-//        sh "rm -r $env.WORKSPACE && mkdir $env.WORKSPACE"
-//    } else {
-//        println "Creating project dir"
-//        sh "mkdir $env.JOB_NAME"
-//    }
 
     deleteDir()
 
@@ -157,9 +149,9 @@ def incrementApplicationVersion(String localBranchName) {
 
 //            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
 //            sh "git clone $GIT_PROJECT_URL_WITHOUT_USER_PASS /var/jenkins_home/workspace/example-pipeline"
-            sh git clone "https://$GIT_USER:$GIT_ACC_TOKEN" + ".vfpartnerservices.com/charging-platform/vf-account-service.git"
+            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + ".vfpartnerservices.com/charging-platform/vf-account-service.git"
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
-            sh 'git checkout develop'
+            sh "git checkout $DEVELOPMENT_BRANCH_NAME"
 
             APP_VERSION = updatePomVersion()
 
