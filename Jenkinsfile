@@ -18,7 +18,6 @@ pipeline {
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_URL = "ci2.vfpartnerservices.com/"
-        def POM_VALUES_MAP = [:]
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
 
@@ -29,7 +28,6 @@ pipeline {
                 println('Clean workspace')
                 deleteDir()
                 incrementApplicationVersion()
-                populatePomValuesMap()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
@@ -74,14 +72,15 @@ pipeline {
         stage('Publish') {
             steps {
                 println "Publishing artifact to Nexus version: $APP_VERSION"
+                Map pomInfo =  populatePomValuesMap()
                 nexusPublisher nexusInstanceId: 'localNexus',
                         nexusRepositoryId: 'releases',
                         packages: [[$class         : 'MavenPackage',
                                     mavenAssetList : [[classifier: '',
                                                        extension : '',
                                                        filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
-                                    mavenCoordinate: [artifactId: 'vf-account-service',
-                                                      groupId   : 'com.vodafone.charging',
+                                    mavenCoordinate: [artifactId: pomInfo.get('artifactId'),
+                                                      groupId   : pomInfo.get('groupId'),
                                                       packaging : 'jar',
                                                       version   : "${APP_VERSION}"]]]
             }
@@ -166,8 +165,7 @@ def incrementApplicationVersion() {
 }
 
 String buildBranchName() {
-    int buildNumber = env.BUILD_NUMBER
     def now = new Date()
     def timestamp = now.format("yyyyMMdd-HH:mm:ss.SSS", TimeZone.getTimeZone('UTC'))
-    return "build-$buildNumber-$timestamp"
+    return "-$timestamp"
 }
