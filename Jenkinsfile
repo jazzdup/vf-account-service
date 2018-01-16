@@ -167,8 +167,9 @@ def checkoutCode(String localBranchName) {
     }
 
     if (fileExists ('/var/jenkins_home/workspace/example-pipeline')) {
-        println "removing old project folder"
-        sh 'rm -r /var/jenkins_home/workspace/example-pipeline'
+        println "removing old project folder contents"
+        sh 'rm /var/jenkins_home/workspace/example-pipeline'
+        sh 'mkdir /var/jenkins_home/workspace/example-pipeline'
     }
 
     dir('/var/jenkins_home/workspace/example-pipeline') {
