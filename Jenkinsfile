@@ -2,8 +2,7 @@
 pipeline {
     agent {
         docker {
-//            image 'maven:3-alpine'
-//            image 'raghera/java8-maven3-git-versioned'
+            //image 'raghera/java8-maven3-git-versioned'
             image 'paasmule/java-maven-git-alpine'
             args '-v /root/.m2:/root/.m2'
         }
@@ -13,26 +12,23 @@ pipeline {
     }
 
     environment {
-        APP_VERSION = '0.0.0'
+        APP_VERSION = ''
         DEVELOPMENT_BRANCH_NAME = 'develop'
 
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_URL = "ci2.vfpartnerservices.com/"
-//        GIT_PROJECT_URL = "https://$GIT_USER_NAME:$GIT_ACCESS_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
-//        GIT_USER_NAME = 'jenkins'
-//        GIT_ACCESS_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
 
     stages {
-        stage('Prepare Build') {
+        stage('Prepare Workspace') {
             steps {
 
-                println('Clean previous workspace')
+                println('Clean workspace')
                 deleteDir()
-                println('Clean previous workspace')
+                populatePomValuesMap()
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -98,17 +94,36 @@ pipeline {
     }
 }
 
-String getAppPomVersion() {
+String getPomAppVersion() {
     pom = readMavenPom file: 'pom.xml'
     def version = pom.version
     return version
 
 }
 
+String getPomAppName() {
+    pom = readMavenPom file: 'pom.xml'
+    def name = pom.name
+    return name
+
+}
+
+def populatePomValuesMap() {
+
+    pom = readMavenPom file: 'pom.xml'
+    echo "Populate Map values !!!"
+    POM_VALUES_MAP.put('name', getPomAppName())
+    POM_VALUES_MAP.put('version', getPomAppVersion())
+
+    println "The color is: ${POM_VALUES_MAP.get('name')}"
+    println "The color is: ${POM_VALUES_MAP.get('version')}"
+
+}
+
 
 String updatePomVersion() {
 
-    println 'OLD pom version ' + getAppPomVersion()
+    println 'OLD pom version ' + getPomAppVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=' +
@@ -120,9 +135,9 @@ String updatePomVersion() {
 
     sh command
 
-    println 'NEW pom version ' + getAppPomVersion()
+    println 'NEW pom version ' + getPomAppVersion()
 
-    return getAppPomVersion()
+    return getPomAppVersion()
 }
 
 def gitCodecheckIn() {
@@ -132,29 +147,22 @@ def gitCodecheckIn() {
 def incrementApplicationVersion() {
 
     println "incrementing application version"
-    print "Jenkins jobName $env.JOB_NAME"
-    print "Jenkins workspace $env.WORKSPACE"
 
-    deleteDir()
+    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                      credentialsId   : 'jenkins',
+                      usernameVariable: "GIT_USER",
+                      passwordVariable: "GIT_ACC_TOKEN"]]) {
 
-//    dir('/var/jenkins_home/workspace/example-pipeline') {
+        //These credentials need to be bound in the Jenkins credentials configuration
+        //Otherwise the full string would have to be hardcoded here.
+        sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git $env.WORKSPACE"
 
-        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                          credentialsId   : 'jenkins',
-                          usernameVariable: "GIT_USER",
-                          passwordVariable: "GIT_ACC_TOKEN"]]) {
+        sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
+        sh "git checkout $DEVELOPMENT_BRANCH_NAME"
 
-            //These credentials need to be bound in the Jenkins credentials configuration
-            //Otherwise the fill string would have to be hardcoded here.
-            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git $env.WORKSPACE"
+        APP_VERSION = updatePomVersion()
 
-            sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
-            sh "git checkout $DEVELOPMENT_BRANCH_NAME"
-
-            APP_VERSION = updatePomVersion()
-
-            sh "git commit -am 'Jenkins commit of new version ' "
-//        }
+        sh "git commit -am 'Jenkins commit of new version ' "
 
     }
 
