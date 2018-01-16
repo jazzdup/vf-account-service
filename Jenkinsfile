@@ -33,9 +33,6 @@ pipeline {
                 dir $env.WORKSPACE
                 deleteDir()
 
-                echo "GIT_USER: $env.GIT_USER"
-                echo "GIt_PASS: $env.GIT_ACC_TOKEN"
-
                 incrementApplicationVersion('develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
@@ -158,8 +155,9 @@ def incrementApplicationVersion(String localBranchName) {
                           usernameVariable: "GIT_USER",
                           passwordVariable: "GIT_ACC_TOKEN"]]) {
 
-            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
+//            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
 //            sh "git clone $GIT_PROJECT_URL_WITHOUT_USER_PASS /var/jenkins_home/workspace/example-pipeline"
+            sh git clone "https://$GIT_USER:$GIT_ACC_TOKEN" + ".vfpartnerservices.com/charging-platform/vf-account-service.git"
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh 'git checkout develop'
 
