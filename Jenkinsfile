@@ -34,7 +34,6 @@ pipeline {
                 deleteDir()
                 println('Clean previous workspace')
                 incrementApplicationVersion()
-                echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
