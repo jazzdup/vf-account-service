@@ -158,7 +158,7 @@ def checkoutCode(String localBranchName) {
 
 
     def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
-    if (folder.exists) {
+    if (folder) {
         println "removing old project folder"
         sh 'rm -r vf-account-service'
     }
