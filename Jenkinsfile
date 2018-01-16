@@ -7,9 +7,9 @@ pipeline {
             image 'paasmule/java-maven-git-alpine'
             args '-v /root/.m2:/root/.m2'
         }
-        options {
-            skipDefaultCheckout true
-        }
+    }
+    options {
+        skipDefaultCheckout true
     }
 
     environment {
