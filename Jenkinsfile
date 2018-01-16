@@ -108,7 +108,7 @@ String getPomAppName() {
 
 }
 
-def populatePomValuesMap() {
+Map populatePomValuesMap() {
 
     pom = readMavenPom file: 'pom.xml'
     echo "Populate Map values !!!"
