@@ -30,27 +30,20 @@ public class AccountServiceTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(ERIFClient.class);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void shouldCallIFServiceAndCachingService() throws Exception {
         //given
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
-
-//        given(accountService.enrichAccountData(any()))
-//                .willReturn(expectedInfo);
-
         given(erifClient.validate(any(), any()))
                 .willReturn(expectedInfo);
-
+        //when
         EnrichedAccountInfo info = accountService.enrichAccountData(aContextData());
+        //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
 
-
-//        assertThatThrownBy(() -> accountService.enrichAccountData
-//                (aContextData("contextName", Locale.UK, aChargingId())))
-//                .isInstanceOf(UnsupportedOperationException.class);
     }
 
 }

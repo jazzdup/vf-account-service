@@ -84,28 +84,6 @@ public class AccountDataIT {
     }
 
     @Test
-    public void shouldValidateAccountAndReturnOKAgainstMockedERIF() throws Exception {
-        //given
-        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
-        String accountJson = converter.toJson(aContextData());
-
-        given(accountService.enrichAccountData(any()))
-                .willReturn(expectedInfo);
-
-        //when
-        MvcResult result = mockMvc.perform(post("/accounts/")
-                .contentType(contentType)
-                .content(accountJson))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-
-        //then
-        final EnrichedAccountInfo info =
-                (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
-    }
-
-    @Test
     public void shouldThrowInternalExceptionAndReturnHttp500() throws Exception {
         final String accountJson = converter.toJson(aContextData());
 

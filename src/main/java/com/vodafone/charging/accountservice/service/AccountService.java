@@ -27,8 +27,10 @@ public class AccountService {
         log.debug("AccountService.enrichAccountData, contextData={}", contextData );
 
         //convert context data to msgcontrol and routable objects
+//        MessageControl messageControl = new MessageControl(contextData.getLocale());
         MessageControl messageControl = new MessageControl();
         messageControl.setLocale(contextData.getLocale());
+
 //        log.debug(messageControl.toString());
         Routable routable = new Routable();
         routable.setType(RoutableType.validate.name());

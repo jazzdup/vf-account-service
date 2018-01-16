@@ -19,15 +19,8 @@ public class ERIFRequest {
         return messageControl;
     }
 
-    public void setMessageControl(MessageControl messageControl) {
-        this.messageControl = messageControl;
-    }
-
     public Routable getRoutable() {
         return routable;
     }
 
-    public void setRoutable(Routable routable) {
-        this.routable = routable;
-    }
 }

@@ -15,9 +15,11 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 public class ERIFClient {
+    //@TODO: use generic property provider
+    public static final String url = "http://localhost:8458/broker/router.jsp";
+
     public EnrichedAccountInfo validate(MessageControl messageControl, Routable routable) {
         //call ERIF using json
-        String url = "http://localhost:8458/broker/router.jsp";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         RestTemplate restTemplate = new RestTemplate();

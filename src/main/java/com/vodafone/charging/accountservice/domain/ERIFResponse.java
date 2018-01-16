@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import lombok.Builder;
 import lombok.ToString;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
  * Created by al on 12/01/18.
  */
 @ToString
+@Builder
 public class ERIFResponse {
     private String status;
     private String ban;
