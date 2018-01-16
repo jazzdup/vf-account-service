@@ -71,18 +71,7 @@ pipeline {
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
-                println "Publishing artifact to Nexus version: $APP_VERSION"
-                Map pomInfo =  populatePomValuesMap()
-                nexusPublisher nexusInstanceId: 'localNexus',
-                        nexusRepositoryId: 'releases',
-                        packages: [[$class         : 'MavenPackage',
-                                    mavenAssetList : [[classifier: '',
-                                                       extension : '',
-                                                       filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
-                                    mavenCoordinate: [artifactId: pomInfo.get('artifactId'),
-                                                      groupId   : pomInfo.get('groupId'),
-                                                      packaging : 'jar',
-                                                      version   : "${APP_VERSION}"]]]
+                publishToNexus()
             }
         }
         stage('Deploy to Dev') {
@@ -162,6 +151,21 @@ def incrementApplicationVersion() {
 
     }
 
+}
+
+def publishToNexus() {
+    println "Publishing artifact to Nexus version: $APP_VERSION"
+    Map pomInfo = populatePomValuesMap()
+    nexusPublisher nexusInstanceId: 'localNexus',
+            nexusRepositoryId: 'releases',
+            packages: [[$class         : 'MavenPackage',
+                        mavenAssetList : [[classifier: '',
+                                           extension : '',
+                                           filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
+                        mavenCoordinate: [artifactId: pomInfo.get('artifactId'),
+                                          groupId   : pomInfo.get('groupId'),
+                                          packaging : 'jar',
+                                          version   : "${APP_VERSION}"]]]
 }
 
 String buildBranchName() {
