@@ -147,7 +147,7 @@ def incrementApplicationVersion() {
 
             //These credentials need to be bound in the Jenkins credentials configuration
             //Otherwise the fill string would have to be hardcoded here.
-            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git $env.WORKSPACE"
 
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh "git checkout $DEVELOPMENT_BRANCH_NAME"
