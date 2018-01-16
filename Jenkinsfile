@@ -152,7 +152,7 @@ def incrementApplicationVersion(String localBranchName) {
                               [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 
-        sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
+//        sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
         sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
         sh 'git checkout develop'
 
