@@ -1,5 +1,19 @@
 #!/usr/bin/env groovy
 /**
+ * Jenkinsfile script to implement a pipeline for build, test, publish and deploy steps.
+ *
+ * Some set up is required in the running Jenkins instance:
+ * Add variable Bindings to hold credentials to access Git called $GIT_USER and $GIT_ACC_TOKEN
+ * Nexus Publisher plugin
+ * Git Plugin
+ * GitLab Plugin
+ *
+ * Jenkins Project Configuration:
+ *
+ * Pipeline -> Pipeline script from SCM: Add valid user credentials and specify branch as develop.
+ *
+ * Docker Image
+ * paasmule/java-maven-git-alpine is used simply since it has java8, maven and git installed.
  *
  */
 pipeline {
