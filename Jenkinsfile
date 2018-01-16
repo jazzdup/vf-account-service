@@ -166,7 +166,7 @@ def checkoutCode(String localBranchName) {
         sh 'rm -r vf-account-service'
     }
 
-    dir('/var/jenkins_home/workspace/example-pipeline/vf-account-service') {
+    dir('/var/jenkins_home/workspace/example-pipeline') {
 
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'ravi-mac',
@@ -175,7 +175,7 @@ def checkoutCode(String localBranchName) {
 
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
 
-            sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
+            sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git /var/jenkins_home/workspace/example-pipeline'
             sh 'git checkout develop'
 
             updatePomVersion()
