@@ -27,17 +27,8 @@ public class AccountService {
         log.debug("AccountService.enrichAccountData, contextData={}", contextData );
 
         //convert context data to msgcontrol and routable objects
-//        MessageControl messageControl = new MessageControl(contextData.getLocale());
-        MessageControl messageControl = new MessageControl();
-        messageControl.setLocale(contextData.getLocale());
-
-//        log.debug(messageControl.toString());
-        Routable routable = new Routable();
-        routable.setType(RoutableType.validate.name());
-        routable.setChargingId(contextData.getChargingId());
-        routable.setClientId(contextData.getClientId());
-        routable.setKycCheck(contextData.isKycCheck());
-//        log.debug(routable.toString());
+        MessageControl messageControl = new MessageControl(contextData.getLocale());
+        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
 
         EnrichedAccountInfo enrichedAccountInfo = erifClient.validate(messageControl, routable);
 
