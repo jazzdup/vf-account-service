@@ -30,7 +30,7 @@ pipeline {
             steps {
 
                 println('Clean previous workspace')
-                dir env.WORKSPACE
+                dir $env.WORKSPACE
                 deleteDir()
 
                 echo "GIT_USER: $env.GIT_USER"
