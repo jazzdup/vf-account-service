@@ -157,8 +157,11 @@ def checkoutCode(String localBranchName) {
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 
-    sh 'rm -r vf-account-service'
-
+    def folder = new file('/var/jenkins_home/workspace/example-pipeline/vf-account-service')
+    if (folder.exists) {
+        println "removing old project folder"
+        sh 'rm -r vf-account-service'
+    }
 
     dir('/var/jenkins_home/workspace/example-pipeline/vf-account-service') {
 
@@ -174,8 +177,8 @@ def checkoutCode(String localBranchName) {
 
             updatePomVersion()
 
-            sh "git commit -am 'Jenkins commit of new version ' "
-            sh 'git push -u origin develop'
+            sh "git commit -am 'Jenkins commit of new version ' && git push -u origin develop "
+//            sh 'git push -u origin develop'
 
 
         }
