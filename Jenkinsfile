@@ -128,22 +128,6 @@ def gitCodecheckIn() {
 
 def incrementApplicationVersion(String localBranchName) {
 
-//    checkout changelog: true, poll: true,
-//            scm: [$class                           : 'GitSCM',
-//                  branches                         : [[name: '*/develop']],
-//                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
-//                  doGenerateSubmoduleConfigurations: false,
-//                  extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
-//                  submoduleCfg                     : [],
-//                  userRemoteConfigs                :
-//                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
-
-//    def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
-//    if (folder) {
-//        println "removing old project folder"
-//        sh 'rm -r vf-account-service'
-//    }
-
     println "incrementing application version"
 
     if (fileExists('/var/jenkins_home/workspace/example-pipeline')) {
@@ -152,19 +136,30 @@ def incrementApplicationVersion(String localBranchName) {
 
     dir('/var/jenkins_home/workspace/example-pipeline') {
 
-        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                          credentialsId   : 'jenkins',
-                          usernameVariable: "$GIT_USER",
-                          passwordVariable: "$GIT_ACC_TOKEN"]]) {
+//        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+//                          credentialsId   : 'jenkins',
+//                          usernameVariable: "$GIT_USER",
+//                          passwordVariable: "$GIT_ACC_TOKEN"]]) {
 
-            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
-            sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
-            sh 'git checkout develop'
+        checkout changelog: true, poll: true,
+                scm: [$class                           : 'GitSCM',
+                      branches                         : [[name: '*/develop']],
+                      browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
+                      doGenerateSubmoduleConfigurations: false,
+                      extensions                       : [[$class: 'LocalBranch', localBranch: 'develop']],
+                      submoduleCfg                     : [],
+                      userRemoteConfigs                :
+                              [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-            APP_VERSION = updatePomVersion()
 
-            sh "git commit -am 'Jenkins commit of new version ' "
-        }
+        sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
+        sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
+        sh 'git checkout develop'
+
+        APP_VERSION = updatePomVersion()
+
+        sh "git commit -am 'Jenkins commit of new version ' "
+//    }
 
     }
 
