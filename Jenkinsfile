@@ -28,8 +28,8 @@ pipeline {
 
                 println('Clean workspace')
                 deleteDir()
-                populatePomValuesMap()
                 incrementApplicationVersion()
+                populatePomValuesMap()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
