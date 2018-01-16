@@ -153,11 +153,10 @@ def incrementApplicationVersion(String localBranchName) {
     dir('/var/jenkins_home/workspace/example-pipeline') {
 
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                          credentialsId   : 'ravi-mac',
-                          usernameVariable: 'ravi-mac',
-                          passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
+                          credentialsId   : 'jenkins',
+                          usernameVariable: "$GIT_USER",
+                          passwordVariable: "$GIT_ACC_TOKEN"]]) {
 
-//            sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git /var/jenkins_home/workspace/example-pipeline'
             sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh 'git checkout develop'
