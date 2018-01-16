@@ -159,28 +159,27 @@ def checkoutCode(String localBranchName) {
 //    sh 'rm -r vf-account-service'
 
 
-        dir('/var/jenkins_home/workspace/example-pipeline') {
+    dir('/var/jenkins_home/workspace/example-pipeline') {
 
-            withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                              credentialsId   : 'ravi-mac',
-                              usernameVariable: 'ravi-mac',
-                              passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
+        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                          credentialsId   : 'ravi-mac',
+                          usernameVariable: 'ravi-mac',
+                          passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 
-                sh "git config user.name \"jenkins\" && \
-              git config user.email \"jenkins@example.com\""
+            sh "git config user.name \"jenkins\" git config user.email \"jenkins@example.com\""
 
-                sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
-                sh 'git checkout develop'
+            sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
+            sh 'git checkout develop'
 
-                updatePomVersion()
+            updatePomVersion()
 
-                sh "git commit -am 'Jenkins commit of new version ' "
-                sh 'git push -u origin develop'
+            sh "git commit -am 'Jenkins commit of new version ' "
+            sh 'git push -u origin develop'
 
-
-            }
 
         }
+
+    }
 
 //    gitCodecheckIn()
 }
