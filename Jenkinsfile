@@ -18,11 +18,10 @@ pipeline {
 
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
-        GIT_USER_NAME = 'jenkins'
-        GIT_ACCESS_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
         GIT_URL = "ci2.vfpartnerservices.com/"
-        GIT_PROJECT_URL = "https://$GIT_USER_NAME:$GIT_ACCESS_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
-        GIT_PROJECT_URL_WITHOUT_USER_PASS = "https://$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+//        GIT_PROJECT_URL = "https://$GIT_USER_NAME:$GIT_ACCESS_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+//        GIT_USER_NAME = 'jenkins'
+//        GIT_ACCESS_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
@@ -146,9 +145,10 @@ def incrementApplicationVersion() {
                           usernameVariable: "GIT_USER",
                           passwordVariable: "GIT_ACC_TOKEN"]]) {
 
-//            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
-//            sh "git clone $GIT_PROJECT_URL_WITHOUT_USER_PASS /var/jenkins_home/workspace/example-pipeline"
-            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git $env.WORKSPACE"
+            //These credentials need to be bound in the Jenkins credentials configuration
+            //Otherwise the fill string would have to be hardcoded here.
+            sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh "git checkout $DEVELOPMENT_BRANCH_NAME"
 
