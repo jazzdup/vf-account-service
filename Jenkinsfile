@@ -29,7 +29,7 @@ pipeline {
             steps {
 //                sh 'echo "PATH = ${PATH}" ' +
 //                        'echo "M2_HOME = ${M2_HOME}" '
-                checkoutCode('develop')
+                incrementApplicationVersion('develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -110,8 +110,6 @@ String getAppPomVersion() {
 
 String updatePomVersion() {
 
-//    checkoutCode("jenkins-develop")
-
     println 'OLD pom version ' + getAppPomVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
@@ -139,12 +137,12 @@ def gitCodecheckIn() {
 
 //        sh "git config user.name \"jenkins\" && \
 //              git config user.email \"jenkins@example.com\""
-    sh "git commit -am 'Jenkins commit of new version '"
+//    sh "git commit -am 'Jenkins commit of new version '"
     sh "git push -u origin develop"
 //    }
 }
 
-def checkoutCode(String localBranchName) {
+def incrementApplicationVersion(String localBranchName) {
 
 //    checkout changelog: true, poll: true,
 //            scm: [$class                           : 'GitSCM',
@@ -157,13 +155,13 @@ def checkoutCode(String localBranchName) {
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 
-    def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
-    if (folder) {
-        println "removing old project folder"
-        sh 'rm -r vf-account-service'
-    }
+//    def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
+//    if (folder) {
+//        println "removing old project folder"
+//        sh 'rm -r vf-account-service'
+//    }
 
-    println "removing old project folder contents"
+    println "recreating workspace folder"
 
     if (fileExists ('/var/jenkins_home/workspace/example-pipeline')) {
         sh 'rm -r /var/jenkins_home/workspace/example-pipeline && mkdir /var/jenkins_home/workspace/example-pipeline'
@@ -182,10 +180,9 @@ def checkoutCode(String localBranchName) {
 
             APP_VERSION = updatePomVersion()
 
-            sh "git commit -am 'Jenkins commit of new version ' && git push -u origin develop "
-//            sh 'git push -u origin develop'
-
-
+//            sh "git commit -am 'Jenkins commit of new version ' && git push -u origin develop "
+            sh "git commit -am 'Jenkins commit of new version ' "
+            gitCodecheckIn()
         }
 
     }
