@@ -156,28 +156,31 @@ def checkoutCode(String localBranchName) {
 //                  userRemoteConfigs                :
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-    sh 'rm -r vf-account-service'
+//    sh 'rm -r vf-account-service'
 
-    withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                      credentialsId: 'ravi-mac',
-                      usernameVariable: 'ravi-mac',
-                      passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 
-        sh "git config user.name \"jenkins\" && \
+        dir('/var/jenkins_home/workspace/example-pipeline') {
+
+            withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                              credentialsId   : 'ravi-mac',
+                              usernameVariable: 'ravi-mac',
+                              passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
+
+                sh "git config user.name \"jenkins\" && \
               git config user.email \"jenkins@example.com\""
-        
-        sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
-        sh 'git checkout develop'
 
-        updatePomVersion()
+                sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git'
+                sh 'git checkout develop'
 
-        sh "git commit -am 'Jenkins commit of new version ' "
-        sh 'git push -u origin develop'
+                updatePomVersion()
 
-
-    }
+                sh "git commit -am 'Jenkins commit of new version ' "
+                sh 'git push -u origin develop'
 
 
+            }
+
+        }
 
 //    gitCodecheckIn()
 }
