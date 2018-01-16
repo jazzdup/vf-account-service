@@ -92,7 +92,7 @@ String getPomAppVersion() {
 Map populatePomValuesMap() {
 
     pom = readMavenPom file: 'pom.xml'
-//    def POM_VALUES_MAP = [:]
+    def POM_VALUES_MAP = [:]
     POM_VALUES_MAP.put('name', pom.name)
     POM_VALUES_MAP.put('version', pom.version)
     POM_VALUES_MAP.put('artifactId', pom.artifactId)
