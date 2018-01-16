@@ -157,7 +157,7 @@ def checkoutCode(String localBranchName) {
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
 
-    def folder = new file('/var/jenkins_home/workspace/example-pipeline/vf-account-service')
+    def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
     if (folder.exists) {
         println "removing old project folder"
         sh 'rm -r vf-account-service'
