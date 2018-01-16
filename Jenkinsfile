@@ -16,10 +16,10 @@ pipeline {
         APP_VERSION = '0.0.0'
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
-        GIT_USER = 'jenkins'
-        GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
+        GIT_USER_NAME = 'jenkins'
+        GIT_ACCESS_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
         GIT_URL = "ci2.vfpartnerservices.com/"
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
+        GIT_PROJECT_URL = "https://$GIT_USER_NAME:$GIT_ACCESS_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
         GIT_PROJECT_URL_WITHOUT_USER_PASS = "https://$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
 
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
@@ -28,6 +28,14 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
+
+                println('Clean previous workspace')
+                dir env.WORKSPACE
+                deleteDir()
+
+                echo "GIT_USER: $env.GIT_USER"
+                echo "GIt_PASS: $env.GIT_ACC_TOKEN"
+
                 incrementApplicationVersion('develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
