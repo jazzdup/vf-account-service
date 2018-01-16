@@ -165,10 +165,10 @@ def checkoutCode(String localBranchName) {
         println "removing old project folder"
         sh 'rm -r vf-account-service'
     }
-    
+
     if (fileExists ('/var/jenkins_home/workspace/example-pipeline')) {
         println "removing old project folder"
-        sh 'rm -r example-pipeline'
+        sh 'rm -r /var/jenkins_home/workspace/example-pipeline'
     }
 
     dir('/var/jenkins_home/workspace/example-pipeline') {
