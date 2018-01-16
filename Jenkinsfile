@@ -131,17 +131,17 @@ def incrementApplicationVersion(String localBranchName) {
 
     println "incrementing application version"
     print "Jenkins jobName $env.JOB_NAME"
-    print "Jenkins workspaceId $env.WORKSPACE"
+    print "Jenkins workspace $env.WORKSPACE"
 
-    if (fileExists("/var/jenkins_home/workspace/$env.JOB_NAME")) {
+    if (fileExists("$env.WORKSPACE")) {
         println "Removing project dir and recreating it "
-        sh "rm -r /var/jenkins_home/workspace/$env.JOB_NAME && mkdir /var/jenkins_home/workspace/$env.JOB_NAME"
+        sh "rm -r $env.WORKSPACE && mkdir $env.WORKSPACE"
     } else {
         println "Creating project dir"
-        sh "mkdir /var/jenkins_home/workspace/$env.JOB_NAME"
+        sh "mkdir $env.JOB_NAME"
     }
 
-    dir('/var/jenkins_home/workspace/example-pipeline') {
+//    dir('/var/jenkins_home/workspace/example-pipeline') {
 
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'jenkins',
@@ -156,19 +156,10 @@ def incrementApplicationVersion(String localBranchName) {
             APP_VERSION = updatePomVersion()
 
             sh "git commit -am 'Jenkins commit of new version ' "
-        }
+//        }
 
     }
 
-}
-
-def executShellCommand(String command) {
-    def cmd = command
-    def sout = new StringBuffer(), serr = new StringBuffer()
-    def proc = cmd.execute()
-    proc.consumeProcessOutput(sout, serr)
-    proc.waitForOrKill(1000)
-    println sout
 }
 
 String buildBranchName() {
