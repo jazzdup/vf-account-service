@@ -101,23 +101,20 @@ String getPomAppVersion() {
 
 }
 
-String getPomAppName() {
-    pom = readMavenPom file: 'pom.xml'
-    def name = pom.name
-    return name
-
-}
-
 Map populatePomValuesMap() {
 
     pom = readMavenPom file: 'pom.xml'
     echo "Populate Map values !!!"
     def POM_VALUES_MAP = [:]
-    POM_VALUES_MAP.put('name', getPomAppName())
-    POM_VALUES_MAP.put('version', getPomAppVersion())
+    POM_VALUES_MAP.put('name', pom.name)
+    POM_VALUES_MAP.put('version', pom.version)
+    POM_VALUES_MAP.put('artifactId', pom.artifactId)
+    POM_VALUES_MAP.put('groupId', pom.groupId)
 
     println "The name is: ${POM_VALUES_MAP.get('name')}"
     println "The version is: ${POM_VALUES_MAP.get('version')}"
+    println "The artifactId is: ${POM_VALUES_MAP.get('artifactId')}"
+    println "The groupId is: ${POM_VALUES_MAP.get('groupId')}"
 
 }
 
