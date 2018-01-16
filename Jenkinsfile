@@ -18,7 +18,7 @@ pipeline {
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_URL = "ci2.vfpartnerservices.com/"
-
+        def POM_VALUES_MAP = [:]
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
 
@@ -65,7 +65,7 @@ pipeline {
                 }
             }
         }
-        stage('Git push') {
+        stage('Update Version') {
             steps {
                 gitCodecheckIn()
             }
@@ -104,8 +104,7 @@ String getPomAppVersion() {
 Map populatePomValuesMap() {
 
     pom = readMavenPom file: 'pom.xml'
-    echo "Populate Map values !!!"
-    def POM_VALUES_MAP = [:]
+//    def POM_VALUES_MAP = [:]
     POM_VALUES_MAP.put('name', pom.name)
     POM_VALUES_MAP.put('version', pom.version)
     POM_VALUES_MAP.put('artifactId', pom.artifactId)
