@@ -132,13 +132,13 @@ def incrementApplicationVersion(String localBranchName) {
     println "incrementing application version"
     print "Jenkins jobName $env.JOB_NAME"
 
-    if (fileExists('/var/jenkins_home/workspace/example-pipeline')) {
-        println "Removing project dir and recreating it "
-        sh 'rm -r /var/jenkins_home/workspace/example-pipeline && mkdir /var/jenkins_home/workspace/example-pipeline'
-    } else {
-        println "Creating project dir"
-        sh 'mkdir /var/jenkins_home/workspace/example-pipeline'
-    }
+//    if (fileExists('/var/jenkins_home/workspace/example-pipeline')) {
+//        println "Removing project dir and recreating it "
+//        sh 'rm -r /var/jenkins_home/workspace/example-pipeline && mkdir /var/jenkins_home/workspace/example-pipeline'
+//    } else {
+//        println "Creating project dir"
+//        sh 'mkdir /var/jenkins_home/workspace/example-pipeline'
+//    }
 
     dir('/var/jenkins_home/workspace/example-pipeline') {
 
