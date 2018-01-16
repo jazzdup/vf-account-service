@@ -13,7 +13,7 @@ pipeline {
     }
 
     environment {
-        APP_VERSION = getAppPomVersion()
+        APP_VERSION = '0.0.1'
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER = 'jenkins'
