@@ -13,7 +13,7 @@ pipeline {
     }
 
     environment {
-        APP_VERSION = '0.0.1'
+        APP_VERSION = '0.0.0'
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
         GIT_USER = 'jenkins'
@@ -27,8 +27,6 @@ pipeline {
     stages {
         stage('Prepare Build') {
             steps {
-//                sh 'echo "PATH = ${PATH}" ' +
-//                        'echo "M2_HOME = ${M2_HOME}" '
                 incrementApplicationVersion('develop')
                 echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
@@ -66,19 +64,15 @@ pipeline {
                 }
             }
         }
+        stage('Git push') {
+            steps {
+                gitCodecheckIn()
+            }
+        }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
-//                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
-//                echo command
-
-//                gitCodecheckIn()
-                //Update pom.xml version and checking to version control
-//                sh '/usr/bin/git commit -am "JENKINS: new application version "'
-//                sh 'git push'
-
-                echo "NEW APP VERSION=$APP_VERSION"
-
+                println "Publishing artifact to Nexus version: $APP_VERSION"
                 nexusPublisher nexusInstanceId: 'localNexus',
                         nexusRepositoryId: 'releases',
                         packages: [[$class         : 'MavenPackage',
@@ -91,11 +85,10 @@ pipeline {
                                                       version   : "${APP_VERSION}"]]]
             }
         }
-        stage('Deploy to Dev environment') {
+        stage('Deploy to Dev') {
             steps {
                 echo "deploy to development ..."
             }
-
         }
     }
 }
@@ -130,16 +123,7 @@ String updatePomVersion() {
 }
 
 def gitCodecheckIn() {
-
-    println "running a sh command to check into git"
-
-//    dir('/var/jenkins_home/workspace/example-pipeline') {
-
-//        sh "git config user.name \"jenkins\" && \
-//              git config user.email \"jenkins@example.com\""
-//    sh "git commit -am 'Jenkins commit of new version '"
     sh "git push -u origin develop"
-//    }
 }
 
 def incrementApplicationVersion(String localBranchName) {
@@ -154,16 +138,15 @@ def incrementApplicationVersion(String localBranchName) {
 //                  userRemoteConfigs                :
 //                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
 
-
 //    def folder = fileExists '/var/jenkins_home/workspace/example-pipeline/vf-account-service'
 //    if (folder) {
 //        println "removing old project folder"
 //        sh 'rm -r vf-account-service'
 //    }
 
-    println "recreating workspace folder"
+    println "incrementing application version"
 
-    if (fileExists ('/var/jenkins_home/workspace/example-pipeline')) {
+    if (fileExists('/var/jenkins_home/workspace/example-pipeline')) {
         sh 'rm -r /var/jenkins_home/workspace/example-pipeline && mkdir /var/jenkins_home/workspace/example-pipeline'
     }
 
@@ -180,14 +163,11 @@ def incrementApplicationVersion(String localBranchName) {
 
             APP_VERSION = updatePomVersion()
 
-//            sh "git commit -am 'Jenkins commit of new version ' && git push -u origin develop "
             sh "git commit -am 'Jenkins commit of new version ' "
-            gitCodecheckIn()
         }
 
     }
 
-//    gitCodecheckIn()
 }
 
 def executShellCommand(String command) {
