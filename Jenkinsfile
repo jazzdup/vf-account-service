@@ -112,11 +112,12 @@ def populatePomValuesMap() {
 
     pom = readMavenPom file: 'pom.xml'
     echo "Populate Map values !!!"
+    def POM_VALUES_MAP = [:]
     POM_VALUES_MAP.put('name', getPomAppName())
     POM_VALUES_MAP.put('version', getPomAppVersion())
 
-    println "The color is: ${POM_VALUES_MAP.get('name')}"
-    println "The color is: ${POM_VALUES_MAP.get('version')}"
+    println "The name is: ${POM_VALUES_MAP.get('name')}"
+    println "The version is: ${POM_VALUES_MAP.get('version')}"
 
 }
 
