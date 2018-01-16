@@ -1,4 +1,7 @@
 #!/usr/bin/env groovy
+/**
+ *
+ */
 pipeline {
     agent {
         docker {
@@ -102,6 +105,8 @@ Map populatePomValuesMap() {
     println "The version is: ${POM_VALUES_MAP.get('version')}"
     println "The artifactId is: ${POM_VALUES_MAP.get('artifactId')}"
     println "The groupId is: ${POM_VALUES_MAP.get('groupId')}"
+
+    return POM_VALUES_MAP
 
 }
 
