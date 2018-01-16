@@ -166,8 +166,9 @@ def checkoutCode(String localBranchName) {
         sh 'rm -r vf-account-service'
     }
 
+    println "removing old project folder contents"
+
     if (fileExists ('/var/jenkins_home/workspace/example-pipeline')) {
-        println "removing old project folder contents"
         sh 'rm /var/jenkins_home/workspace/example-pipeline'
         sh 'mkdir /var/jenkins_home/workspace/example-pipeline'
     }
@@ -179,9 +180,8 @@ def checkoutCode(String localBranchName) {
                           usernameVariable: 'ravi-mac',
                           passwordVariable: 'vz4pGHZW4hWswSt-o_Bi']]) {
 
-            sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
-
             sh 'git clone https://ravi-mac:vz4pGHZW4hWswSt-o_Bi@ci2.vfpartnerservices.com/charging-platform/vf-account-service.git /var/jenkins_home/workspace/example-pipeline'
+            sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh 'git checkout develop'
 
             updatePomVersion()
