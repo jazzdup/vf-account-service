@@ -147,8 +147,8 @@ def incrementApplicationVersion(String localBranchName) {
                           usernameVariable: "GIT_USER",
                           passwordVariable: "GIT_ACC_TOKEN"]]) {
 
-//            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
-            sh "git clone $GIT_PROJECT_URL_WITHOUT_USER_PASS /var/jenkins_home/workspace/example-pipeline"
+            sh "git clone $GIT_PROJECT_URL /var/jenkins_home/workspace/example-pipeline"
+//            sh "git clone $GIT_PROJECT_URL_WITHOUT_USER_PASS /var/jenkins_home/workspace/example-pipeline"
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh 'git checkout develop'
 
