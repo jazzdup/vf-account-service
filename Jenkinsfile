@@ -68,9 +68,6 @@ pipeline {
         }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
-            environment {
-                APP_VERSION = updatePomVersion()
-            }
             steps {
 //                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
 //                echo command
@@ -183,7 +180,7 @@ def checkoutCode(String localBranchName) {
             sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
             sh 'git checkout develop'
 
-            updatePomVersion()
+            APP_VERSION = updatePomVersion()
 
             sh "git commit -am 'Jenkins commit of new version ' && git push -u origin develop "
 //            sh 'git push -u origin develop'
