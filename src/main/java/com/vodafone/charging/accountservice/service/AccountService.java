@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AccountService {
 
-    //@TODO: standardise DI and make final but causes AccountServiceTest to fail
+    //@TODO: make DI consistent across classes but causes AccountServiceTest to fail
     @Autowired
     private ERIFClient erifClient;
 
