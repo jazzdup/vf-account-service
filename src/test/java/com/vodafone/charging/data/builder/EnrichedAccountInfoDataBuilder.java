@@ -35,7 +35,7 @@ public class EnrichedAccountInfoDataBuilder {
     public static EnrichedAccountInfo aEnrichedAccountInfo(ChargingId chargingId) {
         Random random = new Random();
         return new EnrichedAccountInfo.Builder("ACCEPTED")
-//                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO
+//                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO: additional fields
                 .ban("BAN_" + chargingId.getValue())
                 .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
 //                .serviceProviderId("serviceProviderId")

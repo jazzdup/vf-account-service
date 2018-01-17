@@ -57,7 +57,7 @@ public class AccountServiceController {
 
     public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
         //TODO this should be moved to an http error mapper.  502 Bad Gateway for IF being down
-        //@TODO: See RestResponseEntityExceptionHandler
+        //@TODO: See RestResponseEntityExceptionHandler to be implemented
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(new EnrichedAccountInfo.Builder("fail")

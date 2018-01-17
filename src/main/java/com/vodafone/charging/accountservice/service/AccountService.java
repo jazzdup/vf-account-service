@@ -19,8 +19,13 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AccountService {
 
+    //@TODO: standardise DI and make final but causes AccountServiceTest to fail
     @Autowired
     private ERIFClient erifClient;
+
+//    public AccountService(ERIFClient erifClient) {
+//        this.erifClient = erifClient;
+//    }
 
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 

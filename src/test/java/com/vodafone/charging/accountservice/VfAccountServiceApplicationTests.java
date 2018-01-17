@@ -9,6 +9,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class VfAccountServiceApplicationTests {
 
+	/**
+	 * @TODO: only test loading spring context correctly
+	 */
 	@Test
 	public void contextLoads() {
 	}

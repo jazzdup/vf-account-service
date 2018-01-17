@@ -2,6 +2,8 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,14 +17,19 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 public class ERIFClient {
-    //@TODO: use generic property provider
+    //@TODO: use common config element from PPE
     public static final String url = "http://localhost:8458/broker/router.jsp";
+
+    private final RestTemplate restTemplate;
+
+    public ERIFClient(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
 
     public EnrichedAccountInfo validate(MessageControl messageControl, Routable routable) {
         //call ERIF using json
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), httpHeaders);
 
         log.debug(request.toString());
