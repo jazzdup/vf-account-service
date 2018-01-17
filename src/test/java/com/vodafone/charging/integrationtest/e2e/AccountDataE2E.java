@@ -1,4 +1,4 @@
-package com.vodafone.charging.integrationtest.connected;
+package com.vodafone.charging.integrationtest.e2e;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ContextData;
@@ -21,15 +21,17 @@ import org.springframework.web.context.WebApplicationContext;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+/**
+ * can run this against an actual ERIF, it's almost e2e but uses mockMvc instead of http request
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
-public class AccountDataConnectedIT {
+public class AccountDataE2E {
 
     private MediaType contentType =
             new MediaType(MediaType.APPLICATION_JSON_UTF8.getType(),
