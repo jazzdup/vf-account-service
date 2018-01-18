@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.erifclient;
+package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
@@ -19,9 +19,15 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+
+/**
+ * Created by al on 15/01/18.
+ * TODO: dont' use springmockserver for unit test, change to use wiremock for ERIF
+ * TODO: once that works, convert to a full HTTP E2E test against wiremocked ERIF by moving to VfAccountServiceHttpTest
+ */
 @RunWith(SpringRunner.class)
 @RestClientTest(ERIFClient.class)
-public class ERIFClientTest {
+public class ERIFClientComponentT {
 
     @Autowired
     private ERIFClient erifClient;
@@ -32,47 +38,13 @@ public class ERIFClientTest {
     @Autowired
     private JsonConverter converter;
 
-    /**
-     * This test only mocks the ERIF response fields returned by the current default ERIF setup
-     * @throws Exception
-     */
     @Test
-    public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithDefaultFields() throws Exception {
+    public void shouldValidateAccountAndReturnOKAgainstMockedERIF() throws Exception {
         //given
         final ERIFResponse erifResponse = ERIFResponse.builder()
             .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
                 .build();
-        //set expectedInfo to be what we're setting in the mock
-        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
-                .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
-
-        server.expect(requestTo(ERIFClient.url)).andExpect(method(POST))
-                .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
-
-        final ContextData contextData = ContextDataDataBuilder.aContextData();
-        MessageControl messageControl = new MessageControl(contextData.getLocale());
-        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
-
-        //when
-        EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(messageControl, routable);
-
-        //then
-        assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
-
-    }
-
-
-    /**
-     * This test mocks all the possible ERIF response fields according to ERIF spec on 18/1/2018
-     * TODO implement this new method with all fields
-     * @throws Exception
-     */
-    public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithAllFields() throws Exception {
-        //given
-        final ERIFResponse erifResponse = ERIFResponse.builder()
-                .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
-                .build();
-        //set expectedInfo to be what we're setting in the mock
+        //set expectedInfo to be what we're setting in the mock @TODO expand to all fields
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
 

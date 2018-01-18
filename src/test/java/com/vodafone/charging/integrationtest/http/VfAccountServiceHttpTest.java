@@ -24,6 +24,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
+//TODO: move code from ERIFClientComponentT into here to create full E2E Http test
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
 public class VfAccountServiceHttpTest {

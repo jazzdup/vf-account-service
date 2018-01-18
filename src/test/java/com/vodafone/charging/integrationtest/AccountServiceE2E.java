@@ -25,7 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
- * can run this against an actual ERIF, it's almost e2e but uses mockMvc instead of http request
+ * This is not run during maven builds.
+ * Can run this via IDE against an actual ERIF,
+ * it's almost e2e but uses mockMvc on the front end instead of http request
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)

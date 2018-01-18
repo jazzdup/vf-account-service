@@ -27,10 +27,14 @@ import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+/**
+ * TODO: mock the ERIF call with spring mock rest server, I can't get @SpringBootTest to work with mocking the rest template
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
-public class AccountServiceIT {
+public class VfAccountServiceComponentIT {
 
     private MediaType contentType =
             new MediaType(MediaType.APPLICATION_JSON_UTF8.getType(),
@@ -83,6 +87,7 @@ public class AccountServiceIT {
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
     }
 
+    //@TODO: work out what to do about throwing exceptions for this component integration test, can start with returning 500 from ERIF mock
     @Test
     public void shouldThrowInternalExceptionAndReturnHttp500() throws Exception {
         final String accountJson = converter.toJson(aContextData());
