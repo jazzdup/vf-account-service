@@ -28,6 +28,19 @@ public class IFSoapResponseDataBuilder {
                 "</SOAP-ENV:Envelope>";
     }
 
+
+//    public static String aAccountValidationJsonResponse(){
+//        return "{
+//                "status": "ACCEPTED",
+//                "ban": "BAN_7777",
+//                "errId": "OK",
+//                "billingCycleDay": 18
+//                }""
+//
+//
+//    }
+
+
     public static String aValidateSoapResponse() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<SOAP-ENV:Envelope xmlns:v=\"http://www.vizzavi.net/chargingandpayments/message/1.0\" xmlns:SOAP-ENV=\"http://www.w3.org/2001/12/soap-envelope\">\n" +

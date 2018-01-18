@@ -3,7 +3,6 @@ package com.vodafone.charging.data.builder;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 
-import java.util.Calendar;
 import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -37,7 +36,7 @@ public class EnrichedAccountInfoDataBuilder {
         return new EnrichedAccountInfo.Builder("ACCEPTED")
 //                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO: additional fields
                 .ban("BAN_" + chargingId.getValue())
-                .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
+//                .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))//this would make it brittle
 //                .serviceProviderId("serviceProviderId")
 //                .childServiceProviderId("childServiceProviderId")
 //                .serviceProviderType("serviceProviderType")

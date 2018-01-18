@@ -1,0 +1,6 @@
+{
+    "status": "ACCEPTED",
+    "ban": "BAN_7777",
+    "errId": "OK",
+    "billingCycleDay": 8
+}

@@ -1,57 +1,57 @@
 package com.vodafone.charging.integrationtest;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
+import com.vodafone.charging.data.builder.ChargingIdDataBuilder;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
+import com.vodafone.charging.mock.WiremockPreparer;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.client.MockRestServiceServer;
 
+import static com.vodafone.charging.data.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 
 /**
  * Created by al on 15/01/18.
- * TODO: dont' use springmockserver for unit test, change to use wiremock for ERIF
- * TODO: once that works, convert to a full HTTP E2E test against wiremocked ERIF by moving to VfAccountServiceHttpTest
+ * TODO: convert to a full HTTP E2E test against wiremocked ERIF by moving to VfAccountServiceHttpTest
  */
 @RunWith(SpringRunner.class)
-@RestClientTest(ERIFClient.class)
+@SpringBootTest(classes = AccountServiceApplication.class)
 public class ERIFClientComponentT {
 
     @Autowired
     private ERIFClient erifClient;
 
     @Autowired
-    private MockRestServiceServer server;
-
-    @Autowired
     private JsonConverter converter;
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(DEFAULT_ER_IF_PORT.value());
 
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIF() throws Exception {
         //given
+
         final ERIFResponse erifResponse = ERIFResponse.builder()
-            .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
+            .status("ACCEPTED").ban("BAN_7777").errId("OK").billingCycleDay(8)
                 .build();
         //set expectedInfo to be what we're setting in the mock @TODO expand to all fields
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
+        ChargingId chargingId = ChargingIdDataBuilder.aChargingId();
 
-        server.expect(requestTo(ERIFClient.url)).andExpect(method(POST))
-                .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
+        WiremockPreparer.prepareForValidateJson(chargingId);
 
-        final ContextData contextData = ContextDataDataBuilder.aContextData();
+        final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         MessageControl messageControl = new MessageControl(contextData.getLocale());
         Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
 
