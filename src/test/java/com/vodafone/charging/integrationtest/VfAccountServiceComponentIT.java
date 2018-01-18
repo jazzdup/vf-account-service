@@ -54,7 +54,6 @@ public class VfAccountServiceComponentIT {
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-//        this.mockMvc = standaloneSetup(webApplicationContext).build();
     }
 
     @Test

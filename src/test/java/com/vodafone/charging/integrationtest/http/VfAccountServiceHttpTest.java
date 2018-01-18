@@ -2,17 +2,17 @@ package com.vodafone.charging.integrationtest.http;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.domain.*;
-import com.vodafone.charging.accountservice.domain.enums.RoutableType;
+import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.ERIFResponse;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.data.builder.ChargingIdDataBuilder;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
-import com.vodafone.charging.data.message.JsonConverter;
 import com.vodafone.charging.mock.WiremockPreparer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +33,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
 public class VfAccountServiceHttpTest {
 
-//    @Autowired
-//    private ERIFClient erifClient;
-
     private String url = "http://localhost:8080/accounts";
 
-//    @Autowired
     private RestTemplate restTemplate;
-
-    @Autowired
-    private JsonConverter converter;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(DEFAULT_ER_IF_PORT.value());
@@ -55,7 +48,6 @@ public class VfAccountServiceHttpTest {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFLimitedFields() throws Exception {
         //given
-
         final ERIFResponse erifResponse = ERIFResponse.builder()
             .status("ACCEPTED").ban("BAN_7777").errId("OK").billingCycleDay(8)
                 .build();
@@ -64,9 +56,7 @@ public class VfAccountServiceHttpTest {
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
         ChargingId chargingId = ChargingIdDataBuilder.aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
-
         WiremockPreparer.prepareForValidateJson(chargingId);
-
 
         //when
         ResponseEntity<EnrichedAccountInfo> responseEntity = restTemplate.postForEntity(url, contextData, EnrichedAccountInfo.class);
@@ -75,6 +65,5 @@ public class VfAccountServiceHttpTest {
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
-
     }
 }
