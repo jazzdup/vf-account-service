@@ -1,4 +1,4 @@
-package com.vodafone.charging.integrationtest;
+package com.vodafone.charging.integrationtest.e2e;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ContextData;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
-public class AccountServiceE2E {
+public class VfAccountServiceComponentTestNotStubbed {
 
     private MediaType contentType =
             new MediaType(MediaType.APPLICATION_JSON_UTF8.getType(),
