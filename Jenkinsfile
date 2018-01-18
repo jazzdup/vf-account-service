@@ -1,28 +1,50 @@
 #!/usr/bin/env groovy
+/**
+ * Jenkinsfile script to implement a pipeline for build, test, publish and deploy steps.
+ *
+ * Some set up is required in the running Jenkins instance:
+ * Add variable Bindings to hold credentials to access Git called $GIT_USER and $GIT_ACC_TOKEN
+ * Nexus Publisher plugin
+ * Git Plugin
+ * GitLab Plugin
+ *
+ * Jenkins Project Configuration:
+ *
+ * Pipeline -> Pipeline script from SCM: Add valid user credentials and specify branch as develop.
+ *
+ * Docker Image
+ * paasmule/java-maven-git-alpine is used simply since it has java8, maven and git installed.
+ *
+ */
 pipeline {
     agent {
         docker {
-            image 'maven:3-alpine'
+            //image 'raghera/java8-maven3-git-versioned'
+            image 'paasmule/java-maven-git-alpine'
             args '-v /root/.m2:/root/.m2'
         }
     }
+    options {
+        skipDefaultCheckout true
+    }
+
     environment {
-        APP_VERSION = updatePomVersion()
+        APP_VERSION = ''
+        DEVELOPMENT_BRANCH_NAME = 'develop'
+
         GIT_GROUP_ID = 'charging-platform'
         GIT_PROJECT_ID = 'vf-account-service'
-        GIT_USER = 'jenkins'
-        GIT_ACC_TOKEN = 'xbT-JNXwCr_de2_ESWLk'
         GIT_URL = "ci2.vfpartnerservices.com/"
-        GIT_PROJECT_URL = "https://$GIT_USER:$GIT_ACC_TOKEN@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git"
-
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
 
     stages {
-        stage('Prepare Build') {
+        stage('Prepare Workspace') {
             steps {
-                checkoutCode('jenkins-develop')
-                echo "GIT_PROJECT_URL=$GIT_PROJECT_URL"
+
+                println('Clean workspace')
+                deleteDir()
+                incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
@@ -58,56 +80,54 @@ pipeline {
                 }
             }
         }
-        //Relies on Nexus being configured on Jenkins correctly
-        stage('Publish') {
-            environment {
-                APP_VERSION = updatePomVersion()
-            }
+        stage('Update Version') {
             steps {
-//                def command = '/usr/bin/git commit -am \"JENKINS: new application version \"'
-//                echo command
-
-//                gitCodecheckIn()
-                //Update pom.xml version and checking to version control
-//                sh '/usr/bin/git commit -am "JENKINS: new application version "'
-//                sh 'git push'
-
-                echo "NEW APP VERSION=$APP_VERSION"
-
-                nexusPublisher nexusInstanceId: 'localNexus',
-                        nexusRepositoryId: 'releases',
-                        packages: [[$class         : 'MavenPackage',
-                                    mavenAssetList : [[classifier: '',
-                                                       extension : '',
-                                                       filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
-                                    mavenCoordinate: [artifactId: 'vf-account-service',
-                                                      groupId   : 'com.vodafone.charging',
-                                                      packaging : 'jar',
-                                                      version   : "${APP_VERSION}"]]]
+                gitCodecheckIn()
             }
         }
-        stage('Deploy to Dev environment') {
+        //Relies on Nexus being configured on Jenkins correctly
+        stage('Publish') {
+            steps {
+                publishToNexus()
+            }
+        }
+        stage('Deploy to Dev') {
             steps {
                 echo "deploy to development ..."
             }
-
         }
     }
 }
 
-String getAppPomVersion() {
+String getPomAppVersion() {
     pom = readMavenPom file: 'pom.xml'
     def version = pom.version
     return version
 
 }
 
+Map populatePomValuesMap() {
+
+    pom = readMavenPom file: 'pom.xml'
+    def POM_VALUES_MAP = [:]
+    POM_VALUES_MAP.put('name', pom.name)
+    POM_VALUES_MAP.put('version', pom.version)
+    POM_VALUES_MAP.put('artifactId', pom.artifactId)
+    POM_VALUES_MAP.put('groupId', pom.groupId)
+
+    println "The name is: ${POM_VALUES_MAP.get('name')}"
+    println "The version is: ${POM_VALUES_MAP.get('version')}"
+    println "The artifactId is: ${POM_VALUES_MAP.get('artifactId')}"
+    println "The groupId is: ${POM_VALUES_MAP.get('groupId')}"
+
+    return POM_VALUES_MAP
+
+}
+
 
 String updatePomVersion() {
 
-//    checkoutCode("jenkins-develop")
-
-    println 'OLD pom version ' + getAppPomVersion()
+    println 'OLD pom version ' + getPomAppVersion()
 
     def command = 'mvn build-helper:parse-version versions:set ' +
             '-DnewVersion=' +
@@ -119,54 +139,56 @@ String updatePomVersion() {
 
     sh command
 
-    println 'NEW pom version ' + getAppPomVersion()
+    println 'NEW pom version ' + getPomAppVersion()
 
-//    checkInCodeToGit()
-
-    return getAppPomVersion()
+    return getPomAppVersion()
 }
 
 def gitCodecheckIn() {
+    sh "git push -u origin $DEVELOPMENT_BRANCH_NAME"
+}
 
-    println "running a sh command to check into git"
+def incrementApplicationVersion() {
 
-    dir('/var/jenkins_home/workspace/example-pipeline') {
+    println "incrementing application version"
 
-        sh "git config user.name \"jenkins\" && \
-              git config user.email \"jenkins@example.com\""
+    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                      credentialsId   : 'jenkins',
+                      usernameVariable: "GIT_USER",
+                      passwordVariable: "GIT_ACC_TOKEN"]]) {
 
-        sh "git commit -am 'Jenkins commit of new version ' && git push origin"
+        //These credentials need to be bound in the Jenkins credentials configuration
+        //Otherwise the full string would have to be hardcoded here.
+        sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git $env.WORKSPACE"
+
+        sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
+        sh "git checkout $DEVELOPMENT_BRANCH_NAME"
+
+        APP_VERSION = updatePomVersion()
+
+        sh "git commit -am 'Jenkins commit of new version ' "
+
     }
+
 }
 
-def checkoutCode(String localBranchName) {
-
-    checkout changelog: true, poll: true,
-            scm: [$class                           : 'GitSCM',
-                  branches                         : [[name: '*/develop']],
-                  browser                          : [$class: 'GitLab', repoUrl: 'https://ci2.vfpartnerservices.com/', version: '10.3'],
-                  doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [[$class: 'LocalBranch', localBranch: localBranchName]],
-                  submoduleCfg                     : [],
-                  userRemoteConfigs                :
-                          [[credentialsId: 'ravi-mac', url: 'https://ci2.vfpartnerservices.com/charging-platform/vf-account-service.git']]]
-
-    updatePomVersion()
-    gitCodecheckIn()
-}
-
-def executShellCommand(String command) {
-    def cmd = command
-    def sout = new StringBuffer(), serr = new StringBuffer()
-    def proc = cmd.execute()
-    proc.consumeProcessOutput(sout, serr)
-    proc.waitForOrKill(1000)
-    println sout
+def publishToNexus() {
+    println "Publishing artifact to Nexus version: $APP_VERSION"
+    Map pomInfo = populatePomValuesMap()
+    nexusPublisher nexusInstanceId: 'localNexus',
+            nexusRepositoryId: 'releases',
+            packages: [[$class         : 'MavenPackage',
+                        mavenAssetList : [[classifier: '',
+                                           extension : '',
+                                           filePath  : "target/vf-account-service-${APP_VERSION}.jar"]],
+                        mavenCoordinate: [artifactId: pomInfo.get('artifactId'),
+                                          groupId   : pomInfo.get('groupId'),
+                                          packaging : 'jar',
+                                          version   : "${APP_VERSION}"]]]
 }
 
 String buildBranchName() {
-    int buildNumber = env.BUILD_NUMBER
     def now = new Date()
     def timestamp = now.format("yyyyMMdd-HH:mm:ss.SSS", TimeZone.getTimeZone('UTC'))
-    return "build-$buildNumber-$timestamp"
+    return "-$timestamp"
 }
