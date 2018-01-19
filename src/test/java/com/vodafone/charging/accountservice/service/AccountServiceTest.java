@@ -1,7 +1,6 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
@@ -24,9 +22,6 @@ public class AccountServiceTest {
 
     @InjectMocks
     private AccountService accountService;
-
-    @Autowired
-    private JsonConverter converter;
 
     @Before
     public void init() {

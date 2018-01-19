@@ -31,18 +31,15 @@ public class EnrichedAccountInfoDataBuilder {
                 .build();
     }
 
-    public static EnrichedAccountInfo aEnrichedAccountInfo(ChargingId chargingId) {
-        Random random = new Random();
+    /**
+     * returns the same subset of fields as current ERIF test system
+     * @param chargingId
+     * @return
+     */
+    public static EnrichedAccountInfo aEnrichedAccountInfoForTestERIF(ChargingId chargingId) {
         return new EnrichedAccountInfo.Builder("ACCEPTED")
-//                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO: additional fields
                 .ban("BAN_" + chargingId.getValue())
-//                .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))//this would make it brittle
-//                .serviceProviderId("serviceProviderId")
-//                .childServiceProviderId("childServiceProviderId")
-//                .serviceProviderType("serviceProviderType")
-//                .isPrepay(false)
                 .errorId("OK")
-//                .errorDescription("test-error-description")
                 .build();
     }
 

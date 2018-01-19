@@ -24,6 +24,20 @@ public class EnrichedAccountInfo {
     public EnrichedAccountInfo() {
     }
 
+    public EnrichedAccountInfo(ERIFResponse erifResponse){
+        validationStatus = erifResponse.getStatus();
+        ban = erifResponse.getBan();
+        usergroups = erifResponse.getUsergroups();
+        billingCycleDay = erifResponse.getBillingCycleDay();
+        serviceProviderId = erifResponse.getServiceProviderId();
+        childServiceProviderId = erifResponse.getChildServiceProviderId();
+        serviceProviderType = erifResponse.getServiceProviderType();
+        serviceProviderId = erifResponse.getServiceProviderId();
+        isPrepay = erifResponse.isPrepay();
+        errorId = erifResponse.getErrId();
+        errorDescription = erifResponse.getErrDescription();
+    }
+
     private EnrichedAccountInfo(final Builder builder) {
         this.validationStatus = builder.validationStatus;
         this.ban = builder.ban;

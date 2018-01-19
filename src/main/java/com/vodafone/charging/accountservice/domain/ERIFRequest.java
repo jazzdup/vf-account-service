@@ -2,9 +2,6 @@ package com.vodafone.charging.accountservice.domain;
 
 import lombok.ToString;
 
-/**
- * Created by al on 12/01/18.
- */
 @ToString
 public class ERIFRequest {
     private MessageControl messageControl;

@@ -1,15 +1,13 @@
 package com.vodafone.charging.accountservice.service;
 
-import com.vodafone.charging.accountservice.domain.*;
+import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.MessageControl;
+import com.vodafone.charging.accountservice.domain.Routable;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * The main service object which routes logic
@@ -33,7 +31,7 @@ public class AccountService {
 
         //convert context data to msgcontrol and routable objects
         MessageControl messageControl = new MessageControl(contextData.getLocale());
-        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
+        Routable routable = new Routable(RoutableType.validate.name(), contextData);
 
         EnrichedAccountInfo enrichedAccountInfo = erifClient.validate(messageControl, routable);
 

@@ -25,7 +25,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 
 /**
- * Created by al on 15/01/18.
  * This is a full HTTP E2E test making http calls at the front end with restTemplate and at the back end a wiremocked ERIF
  * TODO: add test with all fields
  */
