@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,8 @@ import static org.mockito.Matchers.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ERIFClientTest {
 
+    @Mock
+    private RestTemplateBuilder restTemplateBuilder;
     @Mock
     private RestTemplate restTemplate;
 
