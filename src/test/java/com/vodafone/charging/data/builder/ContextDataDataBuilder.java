@@ -25,9 +25,9 @@ public class ContextDataDataBuilder {
 
     public static ContextData aContextData(String contextName, Locale locale, ChargingId chargingId) {
         return new ContextData.Builder(contextName, locale, chargingId)
-                .clientId("clientId")
-                .serviceId("serviceId")
-                .vendorId("vendor")
+                .clientId("test-clientId")
+                .serviceId("test-serviceId")
+                .vendorId("test-vendor")
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
                 .build();

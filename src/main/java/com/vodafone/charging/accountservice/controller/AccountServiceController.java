@@ -52,7 +52,7 @@ public class AccountServiceController {
         checkArgument(contextInfo != null, "value contextName was expected but was empty.");
         checkArgument(isNotEmpty(contextInfo.getContextName()), "value contextName was expected but was empty.");
         checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "value chargingId.value was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getChargingId().getType().type()), "value chargingId.type was expected but was empty");
+        checkArgument(isNotEmpty(contextInfo.getChargingId().getType()), "value chargingId.type was expected but was empty");
     }
 
     public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {

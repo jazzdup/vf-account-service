@@ -1,9 +1,11 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ChargingId {
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum Type {
         VODAFONE_ID("vodafoneid"),
         MSISDN("msisdn"),
@@ -21,18 +23,18 @@ public class ChargingId {
         }
     }
 
-    private Type type;
+    private String type;
     private String value;
 
     public ChargingId() {
     }
 
     public ChargingId(final Type type, final String value) {
-        this.type = type;
+        this.type = type.type();
         this.value = value;
     }
 
-    public Type getType() {
+    public String getType() {
         return type;
     }
 
