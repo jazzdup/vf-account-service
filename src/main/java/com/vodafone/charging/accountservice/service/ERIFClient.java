@@ -16,6 +16,9 @@ public class ERIFClient {
     //@TODO: use common config element from PPE
     public static final String url = "http://localhost:8458/broker/router.jsp";
 
+//    @Autowired
+//    private PropertiesAccessor propertiesAccessor;
+
     private final RestTemplate restTemplate;
 
     public ERIFClient(RestTemplateBuilder restTemplateBuilder) {

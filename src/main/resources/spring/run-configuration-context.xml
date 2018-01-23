@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:spring/run-configuration-context-datasource.xml" />
+
+	<beans>
+		<bean id="secureConfigurationProvider" class="com.vodafone.ppe.common.configuration.SecureConfigurationProvider" />
+
+		<bean id="encryptablePropertyPlaceholderConfigurer" class="com.vodafone.ppe.common.configuration.EncryptablePropertyPlaceholderConfigurer"
+			c:encryptor-ref="secureConfigurationProvider"
+			p:order="1"
+			p:location="${encryptablePropertyPlaceholderConfigurerLocation:classpath:config.db.properties}" />
+
+		<bean class="com.vodafone.ppe.common.configuration.service.ParameterService" />
+	</beans>
+
+	<beans profile="dev">
+		<bean id="fileBasedConfigurationService" class="com.vodafone.ppe.common.configuration.XmlFileBasedConfigurationService"
+			c:centralConfigXml="classpath:CentralConfigDefaultData-LIVE.xml" />
+	</beans>
+
+	<beans profile="!dev">
+		<bean id="centralConfigurationLoader" class="com.vodafone.ppe.common.configuration.CentralConfigurationLoader" />
+
+		<bean id="centralConfigurationService" class="com.vodafone.ppe.common.configuration.CentralConfigurationService"
+			p:applicationName="${centralConfigurationServiceApplicationName}"
+			p:configurationEnabled="${central.configuration.enabled}"
+			p:targetFile="${central.configuration.target.file}"
+			p:targetPath="${central.configuration.target.path}" />
+	</beans>
+
+</beans>
