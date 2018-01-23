@@ -86,6 +86,11 @@
             <artifactId>findbugs</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.vodafone.common</groupId>
+            <artifactId>APPLICATION_app_common</artifactId>
+            <version>0.160.0</version>
+        </dependency>
 
 
     </dependencies>
@@ -150,6 +155,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>ppe</id>
+            <url>https://nexus.vfpartnerservices.com/repository/ER/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
 
 </project>
