@@ -62,7 +62,7 @@ public class AccountServiceController {
         //
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(APPLICATION_JSON)
-                .body(new EnrichedAccountInfo.Builder("ResponseType")
+                .body(new EnrichedAccountInfo.Builder("ERROR")
                         .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                         .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build());
     }
