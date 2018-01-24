@@ -26,7 +26,7 @@ public class WiremockDefaultPreparer {
     public static void prepareForValidateJson(final ChargingId chargingId) {
         stubFor(post(urlEqualTo(IF_TEST_URL))
                 .withRequestBody(equalToJson("{\"messageControl\":{\"locale\":\"en_GB\"},\n" +
-                        "\"routable\":{\"type\":\"validate\",\"chargingId\":{\"type\":\"MSISDN\",\"value\":\"" + chargingId.getValue() + "\"},\"clientId\":\"clientId\",\"kycCheck\":false}}", true, true))
+                        "\"routable\":{\"type\":\"validate\",\"chargingId\":{\"type\":\"msisdn\",\"value\":\"" + chargingId.getValue() + "\"},\"clientId\":\"clientId\",\"kycCheck\":false}}", true, true))
                         .willReturn(aResponse()
                                 .withStatus(SC_OK)
                                 .withHeader("connection", "keep-alive")

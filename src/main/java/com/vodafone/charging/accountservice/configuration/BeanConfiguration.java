@@ -46,6 +46,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
         //required for date formatting to follow annotations on class in Java 8
         objectMapper.findAndRegisterModules();
+
         //required to see private members for serialisation (e.g. in 3rd party apps)
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

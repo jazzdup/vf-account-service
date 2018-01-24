@@ -79,7 +79,7 @@ public class VfAccountServiceComponentIT {
                 .billingCycleDay(expectedInfo.getBillingCycleDay())
                 .errId(expectedInfo.getErrorId())
                 .childServiceProviderId(expectedInfo.getChildServiceProviderId())
-                .isPrepay(expectedInfo.isPrepay())
+                .isPrepay(false) //TODO in IF response this should be changed to a string PRE / POST
                 .status(expectedInfo.getValidationStatus())
                 .serviceProviderId(expectedInfo.getServiceProviderId())
                 .serviceProviderType(expectedInfo.getServiceProviderType())
@@ -102,7 +102,7 @@ public class VfAccountServiceComponentIT {
         //then
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "customerType");
     }
 
     @Test
