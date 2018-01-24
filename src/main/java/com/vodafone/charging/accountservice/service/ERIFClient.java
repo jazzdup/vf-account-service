@@ -2,8 +2,6 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,19 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Created by al on 15/01/18.
- */
 @Service
 @Slf4j
 public class ERIFClient {
     //@TODO: use common config element from PPE
     public static final String url = "http://localhost:8458/broker/router.jsp";
 
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
-    public ERIFClient(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+    public ERIFClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     public EnrichedAccountInfo validate(MessageControl messageControl, Routable routable) {

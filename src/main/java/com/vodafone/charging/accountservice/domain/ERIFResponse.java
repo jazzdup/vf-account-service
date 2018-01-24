@@ -5,9 +5,7 @@ import lombok.ToString;
 
 import java.util.List;
 
-/**
- * Created by al on 12/01/18.
- */
+
 @ToString
 @Builder
 public class ERIFResponse {
