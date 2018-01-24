@@ -19,7 +19,7 @@ public class EnrichedAccountInfoTest {
                 .ban("test-ban")
                 .billingCycleDay(22)
                 .childServiceProviderId("test-childServiceProviderId")
-                .isPrepay("PRE")
+                .customerType("PRE")
                 .serviceProviderId("test-serviceProviderId")
                 .serviceProviderType("test-serviceProviderType")
                 .usergroups(usergroups)
@@ -31,7 +31,7 @@ public class EnrichedAccountInfoTest {
         assertThat(accountInfo.getBan()).isEqualTo("test-ban");
         assertThat(accountInfo.getBillingCycleDay()).isEqualTo(22);
         assertThat(accountInfo.getChildServiceProviderId()).isEqualTo("test-childServiceProviderId");
-        assertThat(accountInfo.isPrepay()).isEqualTo("PRE");
+        assertThat(accountInfo.getCustomerType()).isEqualTo("PRE");
         assertThat(accountInfo.getServiceProviderId()).isEqualTo("test-serviceProviderId");
         assertThat(accountInfo.getServiceProviderType()).isEqualTo("test-serviceProviderType");
         assertThat(accountInfo.getUsergroups()).isEqualTo(usergroups);

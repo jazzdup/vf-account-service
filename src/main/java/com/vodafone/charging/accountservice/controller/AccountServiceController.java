@@ -78,7 +78,7 @@ public class AccountServiceController {
                         .serviceProviderType("test-service-provider-type")
                         .usergroups(Lists.newArrayList("usergroup1", "usergroup2"))
                         .childServiceProviderId("child-service-provider-id")
-                        .isPrepay("PRE")
+                        .customerType("PRE")
                         .billingCycleDay(3)
 //                        .errorDescription("OK")
 //                        .errorId("OK")

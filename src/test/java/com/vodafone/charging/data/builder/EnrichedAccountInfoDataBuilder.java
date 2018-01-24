@@ -24,7 +24,7 @@ public class EnrichedAccountInfoDataBuilder {
                 .serviceProviderId("serviceProviderId")
                 .childServiceProviderId("childServiceProviderId")
                 .serviceProviderType("serviceProviderType")
-                .isPrepay("PRE")
+                .customerType("PRE")
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
                 .build();
