@@ -23,7 +23,7 @@ public class Routable {
     }
 
     public Routable(String type, ContextData contextData){
-        type = type;
+        this.type = type;
         chargingId = contextData.getChargingId();
         clientId = contextData.getClientId();
         kycCheck = contextData.isKycCheck();

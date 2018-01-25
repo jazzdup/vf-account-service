@@ -5,7 +5,7 @@
 	xmlns:c="http://www.springframework.org/schema/c"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<import resource="classpath:spring/run-configuration-context-datasource.xml" />
+	<import resource="classpath:centralconfig/run-configuration-context-datasource.xml" />
 
 	<beans>
 		<bean id="secureConfigurationProvider" class="com.vodafone.ppe.common.configuration.SecureConfigurationProvider" />
@@ -13,11 +13,9 @@
 		<bean id="encryptablePropertyPlaceholderConfigurer" class="com.vodafone.ppe.common.configuration.EncryptablePropertyPlaceholderConfigurer"
 			c:encryptor-ref="secureConfigurationProvider"
 			p:order="1"
-			p:location="${encryptablePropertyPlaceholderConfigurerLocation:classpath:config.db.properties}" />
+			p:location="${encryptablePropertyPlaceholderConfigurerLocation:classpath:centralconfig/config.db.properties}" />
 
 		<bean class="com.vodafone.ppe.common.configuration.service.ParameterService" />
-		<bean id ="basePropertiesProvider" class="com.vodafone.ppe.common.configuration.BasePropertiesProvider" />
-
 	</beans>
 
 	<beans profile="dev">

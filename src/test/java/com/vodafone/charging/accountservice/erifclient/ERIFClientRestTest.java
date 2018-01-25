@@ -3,6 +3,7 @@ package com.vodafone.charging.accountservice.erifclient;
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
+import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Test;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RunWith(SpringRunner.class)
 @RestClientTest(ERIFClient.class)
 public class ERIFClientRestTest {
+    @Autowired
+    private PropertiesAccessor propertiesAccessor;
 
     @Autowired
     private ERIFClient erifClient;
@@ -47,8 +50,8 @@ public class ERIFClientRestTest {
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
-
-        server.expect(requestTo(ERIFClient.url)).andExpect(method(POST))
+        String url = propertiesAccessor.getProperty("erif.url");
+        server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 
         final ContextData contextData = ContextDataDataBuilder.aContextData();
@@ -77,8 +80,8 @@ public class ERIFClientRestTest {
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
-
-        server.expect(requestTo(ERIFClient.url)).andExpect(method(POST))
+        String url = propertiesAccessor.getProperty("erif.url");
+        server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 
         final ContextData contextData = ContextDataDataBuilder.aContextData();

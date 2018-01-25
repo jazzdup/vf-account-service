@@ -3,6 +3,7 @@ package com.vodafone.charging.accountservice.erifclient;
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
+import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ERIFClientTest {
+    @Mock
+    private PropertiesAccessor propertiesAccessor;
 
     @Mock
     private RestTemplate restTemplate;
