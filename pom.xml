@@ -87,6 +87,12 @@
             <version>3.0.1</version>
         </dependency>
         <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>2.14.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.vodafone.common</groupId>
             <artifactId>APPLICATION_app_common</artifactId>
             <version>0.160.0</version>
