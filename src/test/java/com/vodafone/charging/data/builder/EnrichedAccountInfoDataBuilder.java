@@ -1,5 +1,6 @@
 package com.vodafone.charging.data.builder;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 
 import java.util.Random;
@@ -24,14 +25,29 @@ public class EnrichedAccountInfoDataBuilder {
                 .serviceProviderId("serviceProviderId")
                 .childServiceProviderId("childServiceProviderId")
                 .serviceProviderType("serviceProviderType")
-                .isPrepay(false)
+                .customerType("PRE")
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
                 .build();
     }
 
+    public static EnrichedAccountInfo aEnrichedAccountInfo(ChargingId chargingId) {
+        Random random = new Random();
+        return new EnrichedAccountInfo.Builder("ACCEPTED")
+//                .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))//@TODO: additional fields
+                .ban("BAN_" + chargingId.getValue())
+//                .billingCycleDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))//this would make it brittle
+//                .serviceProviderId("serviceProviderId")
+//                .childServiceProviderId("childServiceProviderId")
+//                .serviceProviderType("serviceProviderType")
+//                .isPrepay(false)
+                .errorId("OK")
+//                .errorDescription("test-error-description")
+                .build();
+    }
+
     public static EnrichedAccountInfo aEnrichedAccountInfoWhen500Response() {
-        return new EnrichedAccountInfo.Builder("fail")
+        return new EnrichedAccountInfo.Builder("ERROR")
                 .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                 .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build();
 

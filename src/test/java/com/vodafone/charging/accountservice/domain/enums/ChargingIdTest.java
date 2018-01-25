@@ -25,8 +25,7 @@ public class ChargingIdTest {
                 .type(Type.VODAFONE_ID)
                 .value(value)
                 .build();
-        assertThat(chargingId.getType()).isEqualTo(Type.VODAFONE_ID);
-        assertThat(chargingId.getType().type()).isEqualTo("vodafoneid");
+        assertThat(chargingId.getType()).isEqualTo("vodafoneid");
         assertThat(chargingId.getValue()).isEqualTo(value);
     }
 

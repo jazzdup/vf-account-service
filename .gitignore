@@ -22,4 +22,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-/vf-account-service.log
+
+src-delomboked/
+
+*.log

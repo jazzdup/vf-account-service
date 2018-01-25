@@ -22,12 +22,20 @@ public class ContextDataDataBuilder {
                 .kycCheck(false)
                 .build();
     }
-
+    public static ContextData aContextData(ChargingId chargingId) {
+        return new ContextData.Builder("contextName", Locale.UK, chargingId)
+                .clientId("clientId")
+                .serviceId("sAlt")
+                .vendorId("vendorId")
+                .packageType(CALENDAR_PACKAGE_TYPE)
+                .kycCheck(false)
+                .build();
+    }
     public static ContextData aContextData(String contextName, Locale locale, ChargingId chargingId) {
         return new ContextData.Builder(contextName, locale, chargingId)
-                .clientId("clientId")
-                .serviceId("serviceId")
-                .vendorId("vendor")
+                .clientId("test-clientId")
+                .serviceId("test-serviceId")
+                .vendorId("test-vendor")
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
                 .build();
