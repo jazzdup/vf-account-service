@@ -17,7 +17,7 @@ public class EnrichedAccountInfo {
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
-    private boolean isPrepay;
+    private String customerType;
     private String errorId;
     private String errorDescription;
 
@@ -46,7 +46,7 @@ public class EnrichedAccountInfo {
         this.serviceProviderId = builder.serviceProviderId;
         this.childServiceProviderId = builder.childServiceProviderId;
         this.serviceProviderType = builder.serviceProviderType;
-        this.isPrepay = builder.isPrepay;
+        this.customerType = builder.customerType;
         this.errorId = builder.errorId;
         this.errorDescription = builder.errorDescription;
     }
@@ -79,8 +79,8 @@ public class EnrichedAccountInfo {
         return serviceProviderType;
     }
 
-    public boolean isPrepay() {
-        return isPrepay;
+    public String getCustomerType() {
+        return customerType;
     }
 
     public String getErrorId() {
@@ -100,7 +100,7 @@ public class EnrichedAccountInfo {
         private String serviceProviderId;
         private String childServiceProviderId;
         private String serviceProviderType;
-        private boolean isPrepay;
+        private String customerType;
         private String errorId;
         private String errorDescription;
 
@@ -135,8 +135,8 @@ public class EnrichedAccountInfo {
             this.serviceProviderType = serviceProviderType;
             return this;
         }
-        public Builder isPrepay(final boolean isPrepay) {
-            this.isPrepay = isPrepay;
+        public Builder customerType(final String customerType) {
+            this.customerType = customerType;
             return this;
         }
         public Builder errorId(final String errorId) {

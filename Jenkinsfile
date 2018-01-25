@@ -13,7 +13,9 @@
  * Pipeline -> Pipeline script from SCM: Add valid user credentials and specify branch as develop.
  *
  * Docker Image
- * paasmule/java-maven-git-alpine is used simply since it has java8, maven and git installed.
+ * paasmule/java-maven-git-alpine is used since it has java8, maven and git installed.
+ * This can be run like this:
+ *      docker run -it paasmule/java-maven-git-alpine bash
  *
  */
 pipeline {

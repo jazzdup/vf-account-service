@@ -2,8 +2,14 @@ package com.vodafone.charging.accountservice.domain;
 
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT;
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT_CALENDAR_PACKAGE_TYPE;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
@@ -76,6 +82,32 @@ public class ContextDataTest {
         assertThat(contextDataStr).contains("test-vendor");
         assertThat(contextDataStr).contains(EVENT.toString());
         assertThat(contextDataStr).contains("kycCheck=false");
+    }
+
+    @Test
+    public void shouldGetObjectAsMap() throws Exception {
+        ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingId());
+        Map<String, Object> values = contextData.asMap();
+        //check that the key/values are correct
+
+        List<Field> fieldArr = newArrayList(contextData.getClass().getDeclaredFields());
+        Set<String> valuesSet = values.keySet();
+        List<Method> methods = newArrayList(ContextData.class.getMethods());
+
+        //check all the fields
+        for (Field field : fieldArr) {
+            assertThat(valuesSet).contains(field.getName());
+
+            //check all methods are there
+            for (Method method : methods) {
+
+                if (method.getName().equals("get" + field)) {
+                    System.out.println("Method: " + method.getName());
+                    assertThat(values.get(field.getName())).isEqualTo(method.invoke(contextData));
+                    break;
+                }
+            }
+        }
     }
 
 }

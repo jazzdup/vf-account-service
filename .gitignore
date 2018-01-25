@@ -22,4 +22,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+src-delomboked/
+
 *.log

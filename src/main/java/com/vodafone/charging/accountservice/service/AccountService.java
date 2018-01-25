@@ -25,6 +25,9 @@ public class AccountService {
 //        this.erifClient = erifClient;
 //    }
 
+    public AccountService() {
+    }
+
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 
         log.debug("AccountService.enrichAccountData, contextData={}", contextData );

@@ -25,7 +25,7 @@ public class EnrichedAccountInfoDataBuilder {
                 .serviceProviderId("serviceProviderId")
                 .childServiceProviderId("childServiceProviderId")
                 .serviceProviderType("serviceProviderType")
-                .isPrepay(false)
+                .customerType("PRE")
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
                 .build();
@@ -44,7 +44,7 @@ public class EnrichedAccountInfoDataBuilder {
     }
 
     public static EnrichedAccountInfo aEnrichedAccountInfoWhen500Response() {
-        return new EnrichedAccountInfo.Builder("fail")
+        return new EnrichedAccountInfo.Builder("ERROR")
                 .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                 .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build();
 

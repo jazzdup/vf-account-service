@@ -4,11 +4,13 @@ import com.vodafone.charging.accountservice.domain.enums.PackageType;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Represents operation context
- * Could rename it RequestProperties
  */
 @Component
 public class ContextData {
@@ -66,6 +68,17 @@ public class ContextData {
 
     public boolean isKycCheck() {
         return kycCheck;
+    }
+
+    public Map<String, Object> asMap() throws IllegalAccessException {
+        Map<String, Object> values = new HashMap<>();
+
+        Field[] fieldsArr = this.getClass().getDeclaredFields();
+
+        for (Field field : fieldsArr) {
+            values.put(field.getName(), field.get(this));
+        }
+        return values;
     }
 
     @Override
