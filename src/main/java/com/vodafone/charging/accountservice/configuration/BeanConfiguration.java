@@ -7,9 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.accountservice.util.SimplePropertiesAccessor;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
-import com.vodafone.ppe.common.configuration.CentralConfigurationService;
+import com.vodafone.ppe.common.configuration.SecureConfigurationProvider;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,14 +71,23 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     }
 
 
-    @Bean(name = "propertiesAccessor")
-    public SimplePropertiesAccessor getPropertiesAccessor(BasePropertiesProvider basePropertiesProvider) {
-        return new SimplePropertiesAccessor(basePropertiesProvider);
-    }
-//    @Bean(name=baseP)
-//    public SimplePropertiesAccessor getPropertiesAccessor(CentralConfigurationService centralConfigurationService) {
-//        return new CentralConfigurationService()
+//    @Bean(name = "propertiesAccessor")
+//    public SimplePropertiesAccessor getPropertiesAccessor(BasePropertiesProvider basePropertiesProvider) {
+//        return new SimplePropertiesAccessor(basePropertiesProvider);
+//    }
+//    @Bean(name=basePropertiesProvider)
+//    public BasePropertiesProvider getPropertiesAccessor(CentralConfigurationService centralConfigurationService) {
+//        return new CentralConfigurationService().
 //    }
 
+    		
+    @Bean
+    public BasePropertiesProvider basePropertiesProvider(SecureConfigurationProvider secureConfigurationProvider){
+        return new BasePropertiesProvider(secureConfigurationProvider);
+    }
 
+    @Bean(name = "propertiesAccessor")
+    public PropertiesAccessor getPropertiesAccessor(BasePropertiesProvider basePropertiesProvider) {
+        return new SimplePropertiesAccessor(basePropertiesProvider);
+    }
 }

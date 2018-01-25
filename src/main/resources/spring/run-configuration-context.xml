@@ -16,6 +16,8 @@
 			p:location="${encryptablePropertyPlaceholderConfigurerLocation:classpath:config.db.properties}" />
 
 		<bean class="com.vodafone.ppe.common.configuration.service.ParameterService" />
+		<bean id ="basePropertiesProvider" class="com.vodafone.ppe.common.configuration.BasePropertiesProvider" />
+
 	</beans>
 
 	<beans profile="dev">

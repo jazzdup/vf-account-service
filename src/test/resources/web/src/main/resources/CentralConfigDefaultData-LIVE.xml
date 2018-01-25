@@ -1,0 +1,8 @@
+ <parameter>
+    <name>test1</name>
+    <value>value1</value>
+    <description>test param</description>
+    <environment>LIVE</environment>
+    <startup>0</startup>
+    <appname></appname>
+</parameter>

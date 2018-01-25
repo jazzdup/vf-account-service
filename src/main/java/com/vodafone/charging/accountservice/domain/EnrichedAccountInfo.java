@@ -33,7 +33,7 @@ public class EnrichedAccountInfo {
         childServiceProviderId = erifResponse.getChildServiceProviderId();
         serviceProviderType = erifResponse.getServiceProviderType();
         serviceProviderId = erifResponse.getServiceProviderId();
-        isPrepay = erifResponse.isPrepay();
+        customerType = erifResponse.getCustomerType();
         errorId = erifResponse.getErrId();
         errorDescription = erifResponse.getErrDescription();
     }

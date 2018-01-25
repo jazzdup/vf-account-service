@@ -13,7 +13,7 @@ public class ERIFResponseData {
                 .childServiceProviderId("childServiceProviderId")
                 .errDescription("errDesc")
                 .errId("OK")
-                .isPrepay(false)
+                .customerType("PRE")
                 .serviceProviderId("serviceProviderId")
                 .serviceProviderType("serviceProviderType")
                 .status("ACCEPTED")
