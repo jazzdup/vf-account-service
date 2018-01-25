@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ImportResource;
 
 @Configuration
 @ComponentScan(basePackages = "com.vodafone.ppe.common.configuration")
-@ImportResource({"classpath*:centralconfig/run-configuration-context.xml", "classpath*:centralconfig/applicationContext.xml"})
+@ImportResource({"classpath*:centralconfig/run-configuration-context.xml", "classpath*:applicationContext.xml"})
 public class CentralConfig {
 
     @Bean(name = "propertiesAccessor")

@@ -1,7 +1,6 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
@@ -19,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
-public class CentralConfigServiceIT{
-    @Autowired
-    private ERIFClient erifClient;
+public class PropertiesAccessorIT {
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
@@ -42,7 +39,7 @@ public class CentralConfigServiceIT{
     @Test
     public void shouldGetPropertiesAccessorPropertyFromDb()
     {
-        //e.g. ./postInstallation.sh -u centralconfiguser -p centralconfiguser -i XE -a er.account.service -f /home/al/dev/componentize/vf-account-service/src/test/resources/web/src/main/resources/CentralConfigDefaultData-LIVE.xml
+        //e.g. ./postInstallation.sh -u centralconfiguser -p centralconfiguser -i XE -a er.account.service -f /home/al/dev/componentize/vf-account-service/src/test/resources/centralconfig/CentralConfigDefaultData-LIVE.xml
         assertThat(propertiesAccessor.getProperty("test1")).isEqualTo("value1");//different by default
     }
 }
