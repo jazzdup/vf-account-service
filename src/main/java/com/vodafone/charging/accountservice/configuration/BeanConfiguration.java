@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -65,6 +66,5 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         messageConverters.add(new MappingJackson2HttpMessageConverter());
         super.configureMessageConverters(messageConverters);
     }
-
 
 }
