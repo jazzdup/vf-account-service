@@ -33,9 +33,6 @@ import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-/**
- * TODO: mock the ERIF call with spring mock rest server, I can't get @SpringBootTest to work with mocking the rest template
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
@@ -79,7 +76,7 @@ public class VfAccountServiceComponentIT {
                 .billingCycleDay(expectedInfo.getBillingCycleDay())
                 .errId(expectedInfo.getErrorId())
                 .childServiceProviderId(expectedInfo.getChildServiceProviderId())
-                .isPrepay(false) //TODO in IF response this should be changed to a string PRE / POST
+                .customerType(expectedInfo.getCustomerType())
                 .status(expectedInfo.getValidationStatus())
                 .serviceProviderId(expectedInfo.getServiceProviderId())
                 .serviceProviderType(expectedInfo.getServiceProviderType())

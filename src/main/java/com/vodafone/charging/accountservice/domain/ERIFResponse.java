@@ -17,7 +17,7 @@ public class ERIFResponse {
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
-    private boolean isPrepay;
+    private String customerType; //PRE or POST
     private List<String> usergroups;
 
     public String getStatus() {
@@ -52,9 +52,7 @@ public class ERIFResponse {
         return serviceProviderType;
     }
 
-    public boolean isPrepay() {
-        return isPrepay;
-    }
+    public String getCustomerType(){ return customerType; }
 
     public List<String> getUsergroups() {
         return usergroups;
