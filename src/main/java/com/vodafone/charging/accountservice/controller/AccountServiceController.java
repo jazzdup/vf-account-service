@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -30,13 +31,15 @@ public class AccountServiceController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(method = POST)
+    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
         try {
             this.checkContextData(contextData);
         } catch (IllegalArgumentException iae) {
             log.error("Bad request. Mandatory Content is not provided in request body.", iae);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(APPLICATION_JSON_UTF8)
+                    .build();
         }
 
         EnrichedAccountInfo accountInfo;
@@ -58,7 +61,7 @@ public class AccountServiceController {
     public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
         //TODO this should be moved to an http error mapper.  502 Bad Gateway for IF being down
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON_UTF8)
                 .body(new EnrichedAccountInfo.Builder("ERROR")
                         .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                         .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build());
