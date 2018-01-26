@@ -1,6 +1,5 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
@@ -44,7 +43,6 @@ public class AccountServiceController {
         try {
             accountInfo = accountService.enrichAccountData(contextData);
         } catch (Exception e) {
-//            return createSuccessResponse(contextData);
             return createResponse(e);
         }
         return ResponseEntity.ok(accountInfo);
@@ -64,24 +62,6 @@ public class AccountServiceController {
                 .body(new EnrichedAccountInfo.Builder("ERROR")
                         .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                         .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build());
-    }
-
-    //This is for testing purposes only
-    private ResponseEntity<EnrichedAccountInfo> createSuccessResponse(ContextData data) {
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(APPLICATION_JSON)
-                .body(new EnrichedAccountInfo.Builder("ACCEPTED")
-                        .ban(data.getChargingId().getValue() + "_BAN")
-                        .serviceProviderId("test-spid")
-                        .serviceProviderType("test-service-provider-type")
-                        .usergroups(Lists.newArrayList("usergroup1", "usergroup2"))
-                        .childServiceProviderId("child-service-provider-id")
-                        .customerType("PRE")
-                        .billingCycleDay(3)
-//                        .errorDescription("OK")
-//                        .errorId("OK")
-                        .build());
     }
 
 }
