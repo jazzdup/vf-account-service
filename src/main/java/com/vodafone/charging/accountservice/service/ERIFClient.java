@@ -34,17 +34,9 @@ public class ERIFClient {
         ResponseEntity<ERIFResponse> responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);
         ERIFResponse responseBody = responseEntity.getBody();
         log.debug(responseEntity.toString());
-        EnrichedAccountInfo.Builder builder = new EnrichedAccountInfo.Builder(responseBody.getStatus());
-        builder.errorId(responseBody.getErrId())
-                .errorDescription(responseBody.getErrDescription())
-                .ban(responseBody.getBan())
-                .billingCycleDay(responseBody.getBillingCycleDay())
-                .serviceProviderId(responseBody.getServiceProviderId())
-                .serviceProviderType(responseBody.getServiceProviderType())
-                .childServiceProviderId(responseBody.getChildServiceProviderId())
-                .usergroups(responseBody.getUsergroups());
 
-        return builder.build();
+        EnrichedAccountInfo info = new EnrichedAccountInfo(responseBody);
+        return info;
 
     }
 }

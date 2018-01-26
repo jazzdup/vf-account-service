@@ -5,6 +5,7 @@ import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
+import com.vodafone.charging.data.builder.ERIFResponseData;
 import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,13 +40,14 @@ public class ERIFClientRestTest {
 
     /**
      * This test only mocks the ERIF response fields returned by the current default ERIF setup
+     *
      * @throws Exception
      */
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithDefaultFields() throws Exception {
         //given
         final ERIFResponse erifResponse = ERIFResponse.builder()
-            .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
+                .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
                 .build();
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
@@ -69,17 +71,16 @@ public class ERIFClientRestTest {
 
     /**
      * This test mocks all the possible ERIF response fields according to ERIF spec on 18/1/2018
-     * TODO implement this new method with all fields
+     *
      * @throws Exception
      */
+    @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithAllFields() throws Exception {
         //given
-        final ERIFResponse erifResponse = ERIFResponse.builder()
-                .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
-                .build();
+        final ERIFResponse erifResponse = ERIFResponseData.anERIFResponse();
+
         //set expectedInfo to be what we're setting in the mock
-        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
-                .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
+        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
         String url = propertiesAccessor.getProperty("erif.url");
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));

@@ -5,6 +5,7 @@ import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
+import com.vodafone.charging.data.builder.ERIFResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,7 @@ public class ERIFClientTest {
      * This test only mocks the ERIF response fields returned by the current default ERIF setup
      */
     @Test
-    public void shouldValidateAccountAndReturnOK() throws Exception {
+    public void shouldValidateAccountAndReturnOKLimitedFields() throws Exception {
         //given
         final ERIFResponse erifResponse = ERIFResponse.builder()
                 .status("ACCEPTED").ban("BAN_123").errId("OK").billingCycleDay(8)
@@ -63,16 +64,10 @@ public class ERIFClientTest {
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), httpHeaders);
 
-//        ResponseEntity<ERIFResponse> responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);
         given(restTemplate.postForEntity(anyString(),
                 anyObject(),
                 anyObject()))
                 .willReturn(responseEntity);
-
-
-
-//        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
-//                .willReturn(responseEntity);
 
         //when
         EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(messageControl, routable);
@@ -82,5 +77,30 @@ public class ERIFClientTest {
 
     }
 
+    @Test
+    public void shouldValidateAccountAndReturnOKAllFields() throws Exception {
+        //given
+        final ERIFResponse erifResponse = ERIFResponseData.anERIFResponse();
 
+        //set expectedInfo to be what we're setting in the mock
+        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
+
+        ResponseEntity<Object> responseEntity = new ResponseEntity<>(erifResponse, HttpStatus.OK);
+
+        final ContextData contextData = ContextDataDataBuilder.aContextData();
+        MessageControl messageControl = new MessageControl(contextData.getLocale());
+        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
+
+        given(restTemplate.postForEntity(anyString(),
+                anyObject(),
+                anyObject()))
+                .willReturn(responseEntity);
+
+        //when
+        EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(messageControl, routable);
+
+        //then
+        assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
+
+    }
 }
