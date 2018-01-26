@@ -4,7 +4,6 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
-import com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -33,7 +32,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
-public class VfAccountServiceComponentTstNotStubbed {
+public class VfAccountServiceComponentTestNotStubbed {
 
     private MediaType contentType =
             new MediaType(MediaType.APPLICATION_JSON_UTF8.getType(),
@@ -63,7 +62,7 @@ public class VfAccountServiceComponentTstNotStubbed {
         //given
         final ContextData contextData = aContextData();
         String accountJson = converter.toJson(contextData);
-        final EnrichedAccountInfo expectedInfo = EnrichedAccountInfoDataBuilder.aEnrichedAccountInfoForTestERIF(contextData.getChargingId());
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(contextData.getChargingId());
 
         //when
         MvcResult result = mockMvc.perform(post("/accounts/")

@@ -21,11 +21,4 @@ public class Routable {
         this.clientId = contextData.getClientId();
         this.kycCheck = contextData.isKycCheck();
     }
-
-    public Routable(String type, ContextData contextData){
-        this.type = type;
-        chargingId = contextData.getChargingId();
-        clientId = contextData.getClientId();
-        kycCheck = contextData.isKycCheck();
-    }
 }
