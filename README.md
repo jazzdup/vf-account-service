@@ -13,11 +13,21 @@ Application provides a RESTful api which allows clients to enrich Customer Accou
 
 - Commands
 
-Build and run unit and integration tests:
+To build and run unit and integration tests:
+1. Add the following servers to your maven settings.xml:
+    <server>
+      <id>er</id>
+      <username>read-only</username>
+      <password>simplepassword</password>
+    </server>
+    <server>
+      <id>ppe</id>
+      <username>read-only</username>
+      <password>simplepassword</password>
+    </server>
+2. mvn clean verify
 
-mvn clean verify
-
-Run the application in an embedded Tomcat server for dev:
+To run the application in an embedded Tomcat server for dev:
 
 mvn spring-boot:run
 
