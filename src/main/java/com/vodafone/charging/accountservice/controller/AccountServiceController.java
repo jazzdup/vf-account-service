@@ -1,6 +1,5 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.AccountService;
@@ -16,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -31,20 +31,21 @@ public class AccountServiceController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(method = POST)
+    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
         try {
             this.checkContextData(contextData);
         } catch (IllegalArgumentException iae) {
             log.error("Bad request. Mandatory Content is not provided in request body.", iae);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(APPLICATION_JSON_UTF8)
+                    .build();
         }
 
         EnrichedAccountInfo accountInfo;
         try {
             accountInfo = accountService.enrichAccountData(contextData);
         } catch (Exception e) {
-//            return createSuccessResponse(contextData);
             return createResponse(e);
         }
         return ResponseEntity.ok(accountInfo);
@@ -60,28 +61,10 @@ public class AccountServiceController {
     public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
         //TODO this should be moved to an http error mapper.  502 Bad Gateway for IF being down
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON_UTF8)
                 .body(new EnrichedAccountInfo.Builder("ERROR")
                         .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
                         .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build());
-    }
-
-    //This is for testing purposes only
-    private ResponseEntity<EnrichedAccountInfo> createSuccessResponse(ContextData data) {
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(APPLICATION_JSON)
-                .body(new EnrichedAccountInfo.Builder("ACCEPTED")
-                        .ban(data.getChargingId().getValue() + "_BAN")
-                        .serviceProviderId("test-spid")
-                        .serviceProviderType("test-service-provider-type")
-                        .usergroups(Lists.newArrayList("usergroup1", "usergroup2"))
-                        .childServiceProviderId("child-service-provider-id")
-                        .customerType("PRE")
-                        .billingCycleDay(3)
-//                        .errorDescription("OK")
-//                        .errorId("OK")
-                        .build());
     }
 
 }

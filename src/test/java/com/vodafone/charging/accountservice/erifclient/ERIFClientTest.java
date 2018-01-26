@@ -23,6 +23,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ERIFClientTest {
+
     @Mock
     private PropertiesAccessor propertiesAccessor;
 
@@ -58,11 +59,12 @@ public class ERIFClientTest {
 
         final ContextData contextData = ContextDataDataBuilder.aContextData();
         MessageControl messageControl = new MessageControl(contextData.getLocale());
-        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
+        Routable routable = new Routable(RoutableType.validate, contextData);
+//                new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), httpHeaders);
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+//        HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), httpHeaders);
 
         given(restTemplate.postForEntity(anyString(),
                 anyObject(),
@@ -89,12 +91,17 @@ public class ERIFClientTest {
 
         final ContextData contextData = ContextDataDataBuilder.aContextData();
         MessageControl messageControl = new MessageControl(contextData.getLocale());
-        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
+        Routable routable = new Routable(RoutableType.validate, contextData);
 
         given(restTemplate.postForEntity(anyString(),
                 anyObject(),
                 anyObject()))
                 .willReturn(responseEntity);
+
+
+
+//        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+//                .willReturn(responseEntity);
 
         //when
         EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(messageControl, routable);
@@ -103,4 +110,6 @@ public class ERIFClientTest {
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
 
     }
+
+
 }
