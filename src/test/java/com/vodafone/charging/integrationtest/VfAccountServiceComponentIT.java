@@ -3,6 +3,7 @@ package com.vodafone.charging.integrationtest;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -23,7 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
+import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.APPLICATION_LOGIC_ERROR;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,10 +116,10 @@ public class VfAccountServiceComponentIT {
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
                 .andReturn();
 
-        final EnrichedAccountInfo info =
-                (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(info.getErrorId()).isEqualTo(VAS_INTERNAL_SERVER_ERROR.errorId());
-        assertThat(info.getErrorDescription()).isEqualTo(VAS_INTERNAL_SERVER_ERROR.errorDescription());
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, result.getResponse().getContentAsString());
+        assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId());
+        assertThat(error.getErrorDescription()).isEqualTo(APPLICATION_LOGIC_ERROR.errorDesciption());
     }
 
 }

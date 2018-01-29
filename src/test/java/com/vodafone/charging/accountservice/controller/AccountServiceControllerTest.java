@@ -2,6 +2,7 @@ package com.vodafone.charging.accountservice.controller;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.service.AccountService;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Locale;
@@ -19,7 +19,6 @@ import java.util.Locale;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
-import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfoWhen500Response;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -101,26 +100,17 @@ public class AccountServiceControllerTest {
     }
 
     @Test
-    public void shouldCreateA500Response() {
-        final EnrichedAccountInfo expected = aEnrichedAccountInfoWhen500Response();
-        ResponseEntity<EnrichedAccountInfo> entity =
-                accountServiceController.createResponse(new IllegalArgumentException("This is a test exception"));
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(entity.getBody()).isEqualToComparingFieldByField(expected);
-    }
-
-    @Test
-    public void shouldReturnA500ResponseWhenAnUnexpectedInternalExceptionIsThrown() {
+    public void shouldWrapExceptionIntoApplicationLogicException() {
         final ContextData contextData = aContextData();
 
         final String message = "This is a test exception";
         given(accountService.enrichAccountData(contextData))
                 .willThrow(new NullPointerException(message));
 
-        final ResponseEntity<EnrichedAccountInfo> entity = accountServiceController.enrichAccountData(contextData);
-        assertThat(entity).isNotNull();
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(entity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON_UTF8);
+        assertThatThrownBy(()-> accountServiceController.enrichAccountData(contextData))
+                .isInstanceOf(ApplicationLogicException.class)
+                .hasMessage(message)
+                .hasCauseInstanceOf(NullPointerException.class);
     }
 
 }
