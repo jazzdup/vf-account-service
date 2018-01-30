@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Locale;
@@ -64,11 +63,10 @@ public class AccountServiceControllerTest {
     }
 
     @Test
-    public void shouldReturnHttpBadRequest() {
-        final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
-                accountServiceController.enrichAccountData(null);
-        assertThat(enrichedAccountInfoResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        verifyZeroInteractions(accountService);
+    public void shouldThrowIllegalArgumentException() {
+        assertThatThrownBy(() -> accountServiceController.enrichAccountData(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("value contextData was expected but was empty.");
     }
 
     @Test
@@ -83,9 +81,9 @@ public class AccountServiceControllerTest {
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenNullLocale() {
         assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(
-                        "test-context-name",
-                        null,
-                        aChargingId())));
+                "test-context-name",
+                null,
+                aChargingId())));
 
         verifyZeroInteractions(accountService);
     }
@@ -107,7 +105,7 @@ public class AccountServiceControllerTest {
         given(accountService.enrichAccountData(contextData))
                 .willThrow(new NullPointerException(message));
 
-        assertThatThrownBy(()-> accountServiceController.enrichAccountData(contextData))
+        assertThatThrownBy(() -> accountServiceController.enrichAccountData(contextData))
                 .isInstanceOf(ApplicationLogicException.class)
                 .hasMessage(message)
                 .hasCauseInstanceOf(NullPointerException.class);

@@ -17,7 +17,7 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContext
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ContextDataTest {
+public class NullableContextDataTest {
 
     @Test
     public void shouldNotAllowNullContextName() {
