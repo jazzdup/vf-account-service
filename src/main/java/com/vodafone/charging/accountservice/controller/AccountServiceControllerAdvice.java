@@ -31,36 +31,43 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
     public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request, ApplicationLogicException ex) {
         log.error("Handling ApplicationLogicException with message: {}", ex.getMessage());
         final HttpStatus status = this.getStatus(request, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(new AccountServiceError(APPLICATION_LOGIC_ERROR.status().value(),
-                APPLICATION_LOGIC_ERROR.errorId().value(),
-                APPLICATION_LOGIC_ERROR.errorDesciption()), status);
+        return new ResponseEntity<>(AccountServiceError.builder()
+                .status(APPLICATION_LOGIC_ERROR.status().value())
+                .errorId(APPLICATION_LOGIC_ERROR.errorId().value())
+                .errorDescription(APPLICATION_LOGIC_ERROR.errorDesciption()).build(),
+                status);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<AccountServiceError> handleIllegalArgumentException(HttpServletRequest request, IllegalArgumentException ex) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError(BAD_REQUEST_ERROR.status().value(),
-                BAD_REQUEST_ERROR.errorId().value(),
-                BAD_REQUEST_ERROR.errorDesciption()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(AccountServiceError.builder()
+                .status(BAD_REQUEST_ERROR.status().value())
+                .errorId(BAD_REQUEST_ERROR.errorId().value())
+                .errorDescription(BAD_REQUEST_ERROR.errorDesciption())
+                .build(), HttpStatus.BAD_REQUEST);
+
     }
 
     //Catch everything not mapped yet
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ResponseEntity<AccountServiceError> handleGenericException(Exception ex, HttpStatus status) {
+    public ResponseEntity<AccountServiceError> handleGenericException(HttpServletRequest request, Exception ex) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError(UNKNOWN_ERROR.status().value(),
-                UNKNOWN_ERROR.errorId().value(),
-                UNKNOWN_ERROR.errorDesciption()), status);
+        return new ResponseEntity<>(AccountServiceError
+                .builder().status(UNKNOWN_ERROR.status().value())
+                .errorId(UNKNOWN_ERROR.errorId().value())
+                .errorDescription(UNKNOWN_ERROR.errorDesciption()).build(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError(MESSAGE_NOT_READABLE_ERROR.status().value(),
-                MESSAGE_NOT_READABLE_ERROR.errorId().value(),
-                MESSAGE_NOT_READABLE_ERROR.errorDesciption()), status);
+        return new ResponseEntity<>(AccountServiceError
+                .builder().status(MESSAGE_NOT_READABLE_ERROR.status().value())
+                .errorId(MESSAGE_NOT_READABLE_ERROR.errorId().value())
+                .errorDescription(MESSAGE_NOT_READABLE_ERROR.errorDesciption()).build(), status);
     }
 
     private HttpStatus getStatus(HttpServletRequest request, HttpStatus defaultStatus) {
