@@ -3,9 +3,6 @@ package com.vodafone.charging.accountservice.domain.enums;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by al on 15/01/18.
- */
 public abstract class Headers {
     private static final String TARGET = "x-vf-target";
 

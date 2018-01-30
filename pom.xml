@@ -94,9 +94,18 @@
             <version>2.14.0</version>
             <scope>test</scope>
         </dependency>
-
-
-
+        <!--ppe-common-config to be pulled from a nexus once configured and we know which one to use -->
+        <dependency>
+            <groupId>com.vodafone.ppe</groupId>
+            <artifactId>ppe-common-config</artifactId>
+            <version>r18-01-1v3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
+            <!--<scope>test</scope>-->
+        </dependency>
     </dependencies>
 
     <build>
@@ -157,8 +166,35 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
+    <repositories>
+        <!--<repository>-->
+            <!--<id>er</id>-->
+            <!--<url>https://nexus.vfpartnerservices.com/repository/er/</url>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+                <!--<updatePolicy>daily</updatePolicy>-->
+                <!--<checksumPolicy>fail</checksumPolicy>-->
+            <!--</snapshots>-->
+        <!--</repository>-->
+        <repository>
+            <id>ppe</id>
+            <url>https://nexus.vfpartnerservices.com/repository/ppe/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
