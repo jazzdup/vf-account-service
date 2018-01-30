@@ -60,8 +60,7 @@ public class VfAccountServiceHttpTest {
             .status("ACCEPTED").ban("BAN_7777").errId("OK").billingCycleDay(8)
                 .build();
         //set expectedInfo to be what we're setting in the mock @TODO expand to all fields
-        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
-                .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         WiremockPreparer.prepareForValidateJson(chargingId);
