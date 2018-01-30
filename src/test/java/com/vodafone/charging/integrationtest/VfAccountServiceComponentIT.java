@@ -26,8 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Locale;
 
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.APPLICATION_LOGIC_ERROR;
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.BAD_REQUEST_ERROR;
+import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
@@ -123,7 +122,8 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, result.getResponse().getContentAsString());
-        assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId());
+        assertThat(error.getStatus()).isEqualTo(APPLICATION_LOGIC_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).isEqualTo(APPLICATION_LOGIC_ERROR.errorDesciption());
     }
 
@@ -138,8 +138,9 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
-        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId());
-        assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
+        assertThat(error.getStatus()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.errorId().value());
+        assertThat(error.getErrorDescription()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.errorDesciption());
     }
 
     @Test
@@ -154,7 +155,8 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
-        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId());
+        assertThat(error.getStatus()).isEqualTo(BAD_REQUEST_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
     }
 
@@ -170,7 +172,7 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
-        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId());
+        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
     }
 }

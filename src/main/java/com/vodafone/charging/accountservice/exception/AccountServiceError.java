@@ -1,5 +1,8 @@
 package com.vodafone.charging.accountservice.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AccountServiceError {
 
     private String status;
@@ -13,17 +16,5 @@ public class AccountServiceError {
         this.status = status;
         this.errorId = errorId;
         this.errorDescription = errorDescription;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getErrorId() {
-        return errorId;
-    }
-
-    public String getErrorDescription() {
-        return errorDescription;
     }
 }

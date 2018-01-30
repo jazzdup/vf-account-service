@@ -18,9 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.APPLICATION_LOGIC_ERROR;
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.BAD_REQUEST_ERROR;
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.UNKNOWN_ERROR;
+import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
 
 @ControllerAdvice
 @RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -28,45 +26,22 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
 
     private Logger log = LoggerFactory.getLogger(AccountServiceControllerAdvice.class);
 
-    public enum ApplicationErrors {
-
-        APPLICATION_LOGIC_ERROR("SYSTEM_ERROR", "An error occurred within the Account Service."),
-        BAD_REQUEST_ERROR("SYSTEM_ERROR", "Incorrect request parameters were passed."),
-        UNKNOWN_ERROR("SYSTEM_ERROR", "An unknown error has occurred.");
-
-        private String errorId;
-        private String errorDesciption;
-
-        ApplicationErrors(String errorId, String errorDesciption) {
-            this.errorId = errorId;
-            this.errorDesciption = errorDesciption;
-        }
-
-        public String errorId() {
-            return errorId;
-        }
-
-        public String errorDesciption() {
-            return errorDesciption;
-        }
-    }
-
     @ExceptionHandler(ApplicationLogicException.class)
     @ResponseBody
     public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request, ApplicationLogicException ex) {
         log.error("Handling ApplicationLogicException with message: {}", ex.getMessage());
         final HttpStatus status = this.getStatus(request, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(new AccountServiceError("ERROR",
-                APPLICATION_LOGIC_ERROR.errorId(),
+        return new ResponseEntity<>(new AccountServiceError(APPLICATION_LOGIC_ERROR.status().value(),
+                APPLICATION_LOGIC_ERROR.errorId().value(),
                 APPLICATION_LOGIC_ERROR.errorDesciption()), status);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
-    public ResponseEntity<?> handleIllegalArgumentException(HttpServletRequest request, IllegalArgumentException ex) {
+    public ResponseEntity<AccountServiceError> handleIllegalArgumentException(HttpServletRequest request, IllegalArgumentException ex) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError("ERROR",
-                BAD_REQUEST_ERROR.errorId(),
+        return new ResponseEntity<>(new AccountServiceError(BAD_REQUEST_ERROR.status().value(),
+                BAD_REQUEST_ERROR.errorId().value(),
                 BAD_REQUEST_ERROR.errorDesciption()), HttpStatus.BAD_REQUEST);
     }
 
@@ -75,17 +50,17 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
     @ResponseBody
     public ResponseEntity<AccountServiceError> handleGenericException(Exception ex, HttpStatus status) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError("ERROR",
-                UNKNOWN_ERROR.errorId(),
+        return new ResponseEntity<>(new AccountServiceError(UNKNOWN_ERROR.status().value(),
+                UNKNOWN_ERROR.errorId().value(),
                 UNKNOWN_ERROR.errorDesciption()), status);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
-        return new ResponseEntity<>(new AccountServiceError("ERROR",
-                BAD_REQUEST_ERROR.errorId(),
-                BAD_REQUEST_ERROR.errorDesciption()), status);
+        return new ResponseEntity<>(new AccountServiceError(MESSAGE_NOT_READABLE_ERROR.status().value(),
+                MESSAGE_NOT_READABLE_ERROR.errorId().value(),
+                MESSAGE_NOT_READABLE_ERROR.errorDesciption()), status);
     }
 
     private HttpStatus getStatus(HttpServletRequest request, HttpStatus defaultStatus) {
