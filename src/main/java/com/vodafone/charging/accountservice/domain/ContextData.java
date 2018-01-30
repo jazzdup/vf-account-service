@@ -24,7 +24,7 @@ public class ContextData {
     private String clientId;
     private boolean kycCheck;
 
-    private ContextData() {
+    protected ContextData() {
     }
 
     private ContextData(final Builder builder) {

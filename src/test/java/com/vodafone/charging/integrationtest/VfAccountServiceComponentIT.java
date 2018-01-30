@@ -24,8 +24,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.vodafone.charging.accountservice.controller.AccountServiceControllerAdvice.ApplicationErrors.APPLICATION_LOGIC_ERROR;
+import java.util.Locale;
+
+import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
+import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -57,14 +61,6 @@ public class VfAccountServiceComponentIT {
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
-
-    @Test
-    public void shouldReturnNotFound404() throws Exception {
-
-        mockMvc.perform(post("/account")
-                .contentType(contentType))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
@@ -104,6 +100,14 @@ public class VfAccountServiceComponentIT {
     }
 
     @Test
+    public void shouldReturnNotFound404() throws Exception {
+
+        mockMvc.perform(post("/account")
+                .contentType(contentType))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
     public void shouldThrowInternalExceptionAndReturnHttp500() throws Exception {
         final String accountJson = converter.toJson(aContextData());
 
@@ -118,8 +122,57 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, result.getResponse().getContentAsString());
-        assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId());
+        assertThat(error.getStatus()).isEqualTo(APPLICATION_LOGIC_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).isEqualTo(APPLICATION_LOGIC_ERROR.errorDesciption());
     }
 
+
+    @Test
+    public void shouldReturnHttp400WhenContextDataIsNull() throws Exception {
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getStatus()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.errorId().value());
+        assertThat(error.getErrorDescription()).isEqualTo(MESSAGE_NOT_READABLE_ERROR.errorDesciption());
+    }
+
+    @Test
+    public void shouldReturnHttp400WhenLocaleIsNotProvided() throws Exception {
+        final String accountJson = converter.toJson(aNullableContextData("context-name", null, aChargingId()));
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getStatus()).isEqualTo(BAD_REQUEST_ERROR.status().value());
+        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
+        assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
+    }
+
+    @Test
+    public void shouldReturnHttp400WhenChargingIdIsNotProvided() throws Exception {
+        final String accountJson = converter.toJson(aNullableContextData("context-name", Locale.UK, null));
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
+        assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
+    }
 }

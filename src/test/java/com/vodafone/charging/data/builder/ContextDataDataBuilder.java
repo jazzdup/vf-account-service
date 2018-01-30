@@ -2,10 +2,12 @@ package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.data.object.NullableContextData;
 
 import java.util.Locale;
 
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.CALENDAR_PACKAGE_TYPE;
+import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT_CALENDAR_PACKAGE_TYPE;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 
 /**
@@ -39,6 +41,16 @@ public class ContextDataDataBuilder {
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
                 .build();
+    }
+
+    public static ContextData aNullableContextData(String contextName, Locale locale, ChargingId chargingId) {
+        return new NullableContextData(contextName, locale, chargingId, "test-service-id", EVENT_CALENDAR_PACKAGE_TYPE, "test-vendor-id", "client-id", false);
+//                .clientId("test-clientId")
+//                .serviceId("test-serviceId")
+//                .vendorId("test-vendor")
+//                .packageType(CALENDAR_PACKAGE_TYPE)
+//                .kycCheck(false)
+//                .build();
     }
 
 }
