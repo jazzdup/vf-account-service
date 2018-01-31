@@ -2,12 +2,14 @@ package com.vodafone.charging.accountservice.controller;
 
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
+import static com.vodafone.charging.accountservice.errors.ERCoreErrorId.SYSTEM_ERROR;
+import static com.vodafone.charging.accountservice.errors.ERCoreErrorStatus.ERROR;
 
 @ControllerAdvice
 @RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -36,14 +40,14 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                 status);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(MethodArgumentValidationException.class)
     @ResponseBody
-    public ResponseEntity<AccountServiceError> handleIllegalArgumentException(HttpServletRequest request, IllegalArgumentException ex) {
-        log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
+    public ResponseEntity<AccountServiceError> handleIllegalArgumentException(HttpServletRequest request,
+                                                                              MethodArgumentValidationException ex) {
         return new ResponseEntity<>(AccountServiceError.builder()
-                .status(BAD_REQUEST_ERROR.status().value())
-                .errorId(BAD_REQUEST_ERROR.errorId().value())
-                .errorDescription(BAD_REQUEST_ERROR.errorDesciption())
+                .status(ERROR.value())
+                .errorId(SYSTEM_ERROR.value())
+                .errorDescription(ex.getMessage())
                 .build(), HttpStatus.BAD_REQUEST);
 
     }
@@ -60,12 +64,28 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
         log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
         return new ResponseEntity<>(AccountServiceError
                 .builder().status(MESSAGE_NOT_READABLE_ERROR.status().value())
                 .errorId(MESSAGE_NOT_READABLE_ERROR.errorId().value())
                 .errorDescription(MESSAGE_NOT_READABLE_ERROR.errorDesciption()).build(), status);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+
+        return new ResponseEntity<>(AccountServiceError
+                .builder().status(ERROR.value())
+                .errorId(SYSTEM_ERROR.value())
+                .errorDescription(ex.getMessage()).build(), status);
+
     }
 
     private HttpStatus getStatus(HttpServletRequest request, HttpStatus defaultStatus) {

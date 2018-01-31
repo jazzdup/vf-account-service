@@ -4,6 +4,7 @@ import com.vodafone.charging.accountservice.domain.enums.PackageType;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Locale;
@@ -14,9 +15,10 @@ import java.util.Map;
  */
 @Component
 public class ContextData {
-
     private String contextName;
+    @NotNull(message = "'locale' is compulsory and cannot be null")
     private Locale locale;
+    @NotNull(message = "'chargingId' is compulsory and cannot be null")
     private ChargingId chargingId;
     private String serviceId;
     private PackageType packageType;

@@ -1,7 +1,10 @@
 package com.vodafone.charging.accountservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
 
 @Component
 public class ChargingId {
@@ -23,7 +26,11 @@ public class ChargingId {
         }
     }
 
+    @NotNull
     private String type;
+
+    @NotNull
+    @NotBlank
     private String value;
 
     public ChargingId() {

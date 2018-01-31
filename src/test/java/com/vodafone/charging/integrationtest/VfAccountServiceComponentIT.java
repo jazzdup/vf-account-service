@@ -1,8 +1,12 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
+import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +29,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Locale;
+import java.util.Random;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
-import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.*;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
@@ -157,11 +162,12 @@ public class VfAccountServiceComponentIT {
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
         assertThat(error.getStatus()).isEqualTo(BAD_REQUEST_ERROR.status().value());
         assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
-        assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
+        assertThat(error.getErrorDescription()).contains("Field error in object 'contextData' on field 'locale'");
+        assertThat(error.getErrorDescription()).contains("'locale' is compulsory and cannot be null");
     }
 
     @Test
-    public void shouldReturnHttp400WhenChargingIdIsNotProvided() throws Exception {
+    public void shouldReturnHttp400WhenChargingIdIsNull() throws Exception {
         final String accountJson = converter.toJson(aNullableContextData("context-name", Locale.UK, null));
 
         MvcResult response = mockMvc.perform(post("/accounts/")
@@ -172,7 +178,51 @@ public class VfAccountServiceComponentIT {
 
         final AccountServiceError error =
                 (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getStatus()).isEqualTo(BAD_REQUEST_ERROR.status().value());
         assertThat(error.getErrorId()).isEqualTo(BAD_REQUEST_ERROR.errorId().value());
-        assertThat(error.getErrorDescription()).isEqualTo(BAD_REQUEST_ERROR.errorDesciption());
+        assertThat(error.getErrorDescription()).contains("Field error in object 'contextData' on field 'chargingId'");
+        assertThat(error.getErrorDescription()).contains("'chargingId' is compulsory and cannot be null");
+    }
+
+    @Test
+    public void shouldReturnHttp400WhenChargingIdMsisdnIsNull() throws Exception {
+
+        final ChargingId chargingId = aNullableChargingId(Type.MSISDN.type(), null);
+        final String accountJson = converter.toJson(aNullableContextData("context-name",
+                Locale.UK,
+                chargingId));
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getStatus()).isEqualTo(ERCoreErrorStatus.ERROR.value());
+        assertThat(error.getErrorId()).isEqualTo(ERCoreErrorId.SYSTEM_ERROR.value());
+        assertThat(error.getErrorDescription()).isEqualTo("chargingId.value is compulsory but was empty");
+    }
+
+    @Test
+    public void shouldReturnHttp400WhenChargingIdTypeIsNull() throws Exception {
+
+        final ChargingId chargingId = aNullableChargingId(null, String.valueOf(new Random().nextInt()));
+        final String accountJson = converter.toJson(aNullableContextData("context-name",
+                Locale.UK,
+                chargingId));
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        final AccountServiceError error =
+                (AccountServiceError) converter.fromJson(AccountServiceError.class, response.getResponse().getContentAsString());
+        assertThat(error.getStatus()).isEqualTo(ERCoreErrorStatus.ERROR.value());
+        assertThat(error.getErrorId()).isEqualTo(ERCoreErrorId.SYSTEM_ERROR.value());
+        assertThat(error.getErrorDescription()).isEqualTo("chargingId.type is compulsory but was empty");
     }
 }

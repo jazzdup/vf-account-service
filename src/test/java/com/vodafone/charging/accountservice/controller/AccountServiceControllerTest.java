@@ -1,8 +1,10 @@
 package com.vodafone.charging.accountservice.controller;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +16,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Locale;
+import java.util.Random;
 
-import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingIdWithMsisdnValue;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,37 +67,35 @@ public class AccountServiceControllerTest {
     }
 
     @Test
-    public void shouldThrowIllegalArgumentException() {
-        assertThatThrownBy(() -> accountServiceController.enrichAccountData(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("value contextData was expected but was empty.");
-    }
-
-    @Test
-    public void shouldThrowIllegalArgumentExceptionWhenNullContextName() {
-        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(null, Locale.UK, aChargingId())))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("contextName");
-
+    public void shouldThrowIllegalArgumentExceptionWhenNullChargingIdValueIsNull() {
+        final ContextData contextData = aContextData("test-context-name",Locale.UK, aChargingIdWithMsisdnValue(null));
+        assertThatThrownBy(() -> accountServiceController.checkContextData(contextData))
+                .isInstanceOf(MethodArgumentValidationException.class)
+                .isNotInstanceOf(IllegalArgumentException.class)
+                .hasMessage("chargingId.value is compulsory but was empty");
         verifyZeroInteractions(accountService);
     }
 
     @Test
-    public void shouldThrowIllegalArgumentExceptionWhenNullLocale() {
-        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(
-                "test-context-name",
-                null,
-                aChargingId())));
-
+    public void shouldThrowIllegalArgumentExceptionWhenNullChargingIdValueIsEmpty() {
+        final ContextData contextData = aContextData("test-context-name",Locale.UK, aChargingIdWithMsisdnValue(""));
+        assertThatThrownBy(() -> accountServiceController.checkContextData(contextData))
+                .isInstanceOf(MethodArgumentValidationException.class)
+                .isNotInstanceOf(IllegalArgumentException.class)
+                .hasMessage("chargingId.value is compulsory but was empty");
         verifyZeroInteractions(accountService);
     }
 
     @Test
-    public void shouldThrowIllegalArgumentExceptionWhenNullChargingId() {
-        assertThatThrownBy(() -> accountServiceController.checkContextData(aContextData(
-                "test-context-name",
-                Locale.UK,
-                null)));
+    public void shouldThrowIllegalArgumentExceptionWhenNullChargingIdTypeIsNull() {
+
+        ChargingId chargingId = aNullableChargingId(null, String.valueOf(new Random().nextInt()));
+
+        final ContextData contextData = aContextData("test-context-name",Locale.UK, chargingId);
+        assertThatThrownBy(() -> accountServiceController.checkContextData(contextData))
+                .isInstanceOf(MethodArgumentValidationException.class)
+                .isNotInstanceOf(IllegalArgumentException.class)
+                .hasMessage("chargingId.type is compulsory but was empty");
         verifyZeroInteractions(accountService);
     }
 

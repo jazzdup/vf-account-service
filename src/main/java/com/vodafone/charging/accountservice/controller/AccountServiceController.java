@@ -3,14 +3,16 @@ package com.vodafone.charging.accountservice.controller;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
@@ -22,15 +24,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @RestController
 @RequestMapping("/accounts")
+@Slf4j
 public class AccountServiceController {
-
-    private static final Logger log = LoggerFactory.getLogger(AccountServiceController.class);
 
     @Autowired
     private AccountService accountService;
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
+    public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@Valid @RequestBody ContextData contextData) {
 
         this.checkContextData(contextData);
 
@@ -43,14 +44,17 @@ public class AccountServiceController {
         return ResponseEntity.ok(accountInfo);
     }
 
+    /*
+    jsr303 Validation does not appear to work for the ChargingId object within contextInfo.
+    Hence this is manually checked here.
+     */
     public void checkContextData(final ContextData contextInfo) {
-        checkArgument(contextInfo != null, "value contextData was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getContextName()), "value contextName was expected but was empty."); //TODO Does this really need to be there?
-        checkArgument(contextInfo.getChargingId() != null, "value chargingId.value was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "value chargingId.value was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getChargingId().getType()), "value chargingId.type was expected but was empty");
-        checkArgument(contextInfo.getLocale() != null, "value locale was expected but was null");
-        checkArgument(isNotEmpty(contextInfo.getLocale().toString()), "value locale was expected but was empty");
+        try {
+            checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "chargingId.value is compulsory but was empty");
+            checkArgument(isNotEmpty(contextInfo.getChargingId().getType()), "chargingId.type is compulsory but was empty");
+        } catch(IllegalArgumentException iae) {
+            throw new MethodArgumentValidationException(iae.getMessage(), iae);
+        }
     }
 
 }
