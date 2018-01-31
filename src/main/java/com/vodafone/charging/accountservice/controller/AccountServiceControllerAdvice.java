@@ -2,8 +2,7 @@ package com.vodafone.charging.accountservice.controller;
 
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,9 +21,8 @@ import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
 
 @ControllerAdvice
 @RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@Slf4j
 public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandler {
-
-    private Logger log = LoggerFactory.getLogger(AccountServiceControllerAdvice.class);
 
     @ExceptionHandler(ApplicationLogicException.class)
     @ResponseBody
