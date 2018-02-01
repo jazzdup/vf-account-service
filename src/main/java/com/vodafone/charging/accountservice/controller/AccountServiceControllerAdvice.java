@@ -30,7 +30,8 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(ApplicationLogicException.class)
     @ResponseBody
-    public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request, ApplicationLogicException ex) {
+    public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request,
+                                                                               ApplicationLogicException ex) {
         log.error("Handling ApplicationLogicException with message: {}", ex.getMessage());
         final HttpStatus status = this.getStatus(request, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(AccountServiceError.builder()
@@ -80,7 +81,6 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-
         return new ResponseEntity<>(AccountServiceError
                 .builder().status(ERROR.value())
                 .errorId(SYSTEM_ERROR.value())
