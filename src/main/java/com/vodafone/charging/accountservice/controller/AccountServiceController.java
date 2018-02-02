@@ -79,9 +79,6 @@ public class AccountServiceController {
             checkArgument(isNotEmpty(headers.get(TARGET_HEADER_NAME).stream()
                     .findFirst().orElseThrow(() -> new IllegalArgumentException(targetMessage))), targetMessage);
 
-//            checkArgument(isNotEmpty(country), countryMessage);
-//            checkArgument(isNotEmpty(target), targetMessage);
-
         } catch (IllegalArgumentException iae) {
             throw new MethodArgumentValidationException(iae.getMessage(), iae);
         }

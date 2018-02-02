@@ -3,6 +3,7 @@ package com.vodafone.charging.integrationtest;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ChargingId.Type;
+import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
@@ -17,7 +18,10 @@ import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,10 +33,12 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
-import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.*;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -69,7 +75,8 @@ public class VfAccountServiceComponentIT {
     public void shouldValidateAccountAndReturnOK() throws Exception {
         //given
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
-        String accountJson = converter.toJson(aContextData());
+        final ContextData contextData = aContextData();
+        String accountJson = converter.toJson(contextData);
         ERIFResponse erifResponse = ERIFResponse.builder()
                 .ban(expectedInfo.getBan())
                 .billingCycleDay(expectedInfo.getBillingCycleDay())
@@ -91,7 +98,8 @@ public class VfAccountServiceComponentIT {
         //when
         MvcResult result = mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
-                .content(accountJson))
+                .content(accountJson)
+                .headers(aHttpHeaders(contextData.getClientId(), contextData.getLocale(), contextData.getChargingId())))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
@@ -111,14 +119,16 @@ public class VfAccountServiceComponentIT {
 
     @Test
     public void shouldThrowInternalExceptionAndReturnHttp500() throws Exception {
-        final String accountJson = converter.toJson(aContextData());
+        ContextData contextData = aContextData();
+        final String accountJson = converter.toJson(contextData);
 
         given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
                 .willThrow(new RuntimeException("This is a test exception"));
 
         MvcResult result = mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
-                .content(accountJson))
+                .content(accountJson)
+                .headers(aHttpHeaders(contextData.getClientId(), contextData.getLocale(), contextData.getChargingId())))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
                 .andReturn();
 
@@ -128,7 +138,6 @@ public class VfAccountServiceComponentIT {
         assertThat(error.getErrorId()).isEqualTo(APPLICATION_LOGIC_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).isEqualTo(APPLICATION_LOGIC_ERROR.errorDesciption());
     }
-
 
     @Test
     public void shouldReturnHttp400WhenContextDataIsNull() throws Exception {
@@ -191,7 +200,8 @@ public class VfAccountServiceComponentIT {
 
         MvcResult response = mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
-                .content(accountJson))
+                .content(accountJson)
+                .headers(aHttpHeaders("test-client-id", Locale.UK, aChargingId())))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn();
 
@@ -212,7 +222,8 @@ public class VfAccountServiceComponentIT {
 
         MvcResult response = mockMvc.perform(post("/accounts/")
                 .contentType(contentType)
-                .content(accountJson))
+                .content(accountJson)
+                .headers(aHttpHeaders("client-id", Locale.UK, aChargingId())))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn();
 
@@ -221,26 +232,5 @@ public class VfAccountServiceComponentIT {
         assertThat(error.getStatus()).isEqualTo(ERCoreErrorStatus.ERROR.value());
         assertThat(error.getErrorId()).isEqualTo(ERCoreErrorId.SYSTEM_ERROR.value());
         assertThat(error.getErrorDescription()).isEqualTo("chargingId.type is compulsory but was empty");
-    }
-
-    @Test
-    public void shouldPassHeadersInRequest() throws Exception {
-
-        ChargingId chargingId = aChargingId();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("request.msisdn.header.name", chargingId.getValue());
-
-        final String accountJson = converter.toJson(aContextData("context-name", Locale.UK, chargingId));
-
-        MvcResult response = mockMvc.perform(post("/accounts/")
-                .contentType(contentType)
-                .content(accountJson)
-                .headers(headers))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-
-        assertThat(response.getResponse().getStatus()).isEqualTo(HttpStatus.OK);
-
-
     }
 }
