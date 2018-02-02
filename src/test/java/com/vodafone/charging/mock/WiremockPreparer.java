@@ -5,7 +5,7 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.enums.ResponseType;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.vodafone.charging.accountservice.domain.enums.Headers.REQUEST_CHARGING_ID_HEADER_NAME;
+import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.REQUEST_CHARGING_ID_HEADER_NAME;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.SOAP_NS;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.VODAFONE_NS;
 import static com.vodafone.charging.mock.IFRequestXpathEnum.VALIDATE;
@@ -31,7 +31,7 @@ public class WiremockPreparer extends WiremockDefaultPreparer {
     					.withBody(response))
     			);
     }
-    
+
 	/**
 	 * JIRA ET-2057:KYC success would be verification_not_required|verified, KYC failed would be not-verified|in-progress|rejected;
 	 */
@@ -46,5 +46,5 @@ public class WiremockPreparer extends WiremockDefaultPreparer {
                                 .withBody(validateResponse))
         );
     }
-    
+
 }

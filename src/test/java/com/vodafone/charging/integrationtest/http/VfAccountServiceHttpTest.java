@@ -16,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,6 +25,7 @@ import java.net.URI;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.data.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
+import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.http.HttpMethod.POST;
@@ -48,7 +46,7 @@ public class VfAccountServiceHttpTest {
     private JsonConverter jsonConverter;
 
     @Autowired
-    private RestTemplate testRestTemplate;
+    private RestTemplate restTemplate;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(DEFAULT_ER_IF_PORT.value());
@@ -63,10 +61,14 @@ public class VfAccountServiceHttpTest {
         final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
+        HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
+                contextData.getLocale(),
+                contextData.getChargingId());
+
         WiremockPreparer.prepareForValidateJson(chargingId);
 
         //when
-        ResponseEntity<EnrichedAccountInfo> responseEntity = testRestTemplate.postForEntity(url, contextData, EnrichedAccountInfo.class);
+        ResponseEntity<EnrichedAccountInfo> responseEntity = restTemplate.exchange(url, POST, new HttpEntity<>(contextData, headers), EnrichedAccountInfo.class);
         EnrichedAccountInfo enrichedAccountInfo = responseEntity.getBody();
 
         //then
@@ -88,7 +90,9 @@ public class VfAccountServiceHttpTest {
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         WiremockPreparer.prepareForValidateJson(chargingId);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
+                contextData.getLocale(),
+                contextData.getChargingId());
         headers.setAccept(newArrayList(APPLICATION_JSON_UTF8, APPLICATION_JSON));
         headers.setContentType(APPLICATION_JSON_UTF8);
 
@@ -97,7 +101,7 @@ public class VfAccountServiceHttpTest {
 
 
         //when
-        ResponseEntity<Object> responseEntity = testRestTemplate.exchange(url, POST, requestEntity, Object.class);
+        ResponseEntity<Object> responseEntity = restTemplate.exchange(url, POST, requestEntity, Object.class);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -17,10 +17,7 @@ import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -224,5 +221,26 @@ public class VfAccountServiceComponentIT {
         assertThat(error.getStatus()).isEqualTo(ERCoreErrorStatus.ERROR.value());
         assertThat(error.getErrorId()).isEqualTo(ERCoreErrorId.SYSTEM_ERROR.value());
         assertThat(error.getErrorDescription()).isEqualTo("chargingId.type is compulsory but was empty");
+    }
+
+    @Test
+    public void shouldPassHeadersInRequest() throws Exception {
+
+        ChargingId chargingId = aChargingId();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("request.msisdn.header.name", chargingId.getValue());
+
+        final String accountJson = converter.toJson(aContextData("context-name", Locale.UK, chargingId));
+
+        MvcResult response = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson)
+                .headers(headers))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        assertThat(response.getResponse().getStatus()).isEqualTo(HttpStatus.OK);
+
+
     }
 }

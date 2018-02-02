@@ -93,7 +93,7 @@ public class AccountServiceControllerAdviceTest {
     }
 
     @Test
-    public void shouldhandleHttpMessageNotReadableException() throws Exception {
+    public void shouldHandleHttpMessageNotReadableException() throws Exception {
         final AccountServiceError expectedError = AccountServiceError.builder()
                 .status(ERROR.value())
                 .errorId(SYSTEM_ERROR.value())
@@ -111,7 +111,7 @@ public class AccountServiceControllerAdviceTest {
     }
 
     @Test
-    public void shouldhandleMethodArgumentNotValid() throws Exception {
+    public void shouldHandleMethodArgumentNotValid() throws Exception {
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
 
         final String message = "This is a test exception message";
