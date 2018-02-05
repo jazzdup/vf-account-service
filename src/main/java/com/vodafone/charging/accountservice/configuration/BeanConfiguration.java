@@ -24,6 +24,7 @@ import java.util.List;
  * Spring Bean configuration file
  */
 @Configuration
+//@EnableSwagger2
 public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
 
@@ -65,6 +66,15 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         messageConverters.add(new MappingJackson2HttpMessageConverter());
         super.configureMessageConverters(messageConverters);
     }
+
+//    @Bean
+//    public Docket api() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .select()
+//                .apis(RequestHandlerSelectors.any())
+//                .paths(PathSelectors.any())
+//                .build();
+//    }
 
 
 }

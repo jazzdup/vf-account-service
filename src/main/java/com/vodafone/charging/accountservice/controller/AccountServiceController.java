@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.COUNTRY_HEADER_NAME;
-import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.TARGET_HEADER_NAME;
+import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.COUNTRY_HEADER_NAME;
+import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.TARGET_HEADER_NAME;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -34,11 +34,9 @@ public class AccountServiceController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
-
-        this.checkMandatoryHeaders(headers);
         this.checkContextData(contextData);
 
         EnrichedAccountInfo accountInfo;
@@ -63,20 +61,23 @@ public class AccountServiceController {
         }
     }
 
+    /**
+     * Checks that the mandatory Country and Target header exist, otherwise reject the request.
+     */
     public void checkMandatoryHeaders(final HttpHeaders headers) {
         try {
             final String countryMessage = "header: " + COUNTRY_HEADER_NAME + " is mandatory";
             final String targetMessage = "header: " + TARGET_HEADER_NAME + " is mandatory";
 
-            checkArgument(headers.get(COUNTRY_HEADER_NAME) != null, countryMessage);
-            checkArgument(headers.get(TARGET_HEADER_NAME) != null, targetMessage);
+            checkArgument(headers.get(COUNTRY_HEADER_NAME.getName()) != null, countryMessage);
+            checkArgument(headers.get(TARGET_HEADER_NAME.getName()) != null, targetMessage);
 
-            checkArgument( isNotEmpty(headers.get(COUNTRY_HEADER_NAME).stream()
+            checkArgument( isNotEmpty(headers.get(COUNTRY_HEADER_NAME.getName()).stream()
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException(countryMessage))),
                     countryMessage);
 
-            checkArgument(isNotEmpty(headers.get(TARGET_HEADER_NAME).stream()
+            checkArgument(isNotEmpty(headers.get(TARGET_HEADER_NAME.getName()).stream()
                     .findFirst().orElseThrow(() -> new IllegalArgumentException(targetMessage))), targetMessage);
 
         } catch (IllegalArgumentException iae) {

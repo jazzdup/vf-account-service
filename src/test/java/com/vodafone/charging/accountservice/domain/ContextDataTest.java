@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -17,7 +18,7 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContext
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class NullableContextDataTest {
+public class ContextDataTest {
 
     @Test
     public void shouldNotAllowNullContextName() {
@@ -47,8 +48,10 @@ public class NullableContextDataTest {
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")
+                .partnerId("partner")
                 .packageType(EVENT_CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
                 .build();
 
         assertThat(contextData.getContextName()).isEqualTo("test-context-name");
@@ -59,7 +62,8 @@ public class NullableContextDataTest {
         assertThat(contextData.getVendorId()).isEqualTo("vendor");
         assertThat(contextData.getPackageType()).isEqualTo(EVENT_CALENDAR_PACKAGE_TYPE);
         assertThat(contextData.isKycCheck()).isEqualTo(false);
-
+        assertThat(contextData.getTarget()).isEqualTo(ERIFRequestTarget.GLOBAL);
+        assertThat(contextData.getPartnerId()).isEqualTo("partner");
     }
 
     @Test
@@ -71,6 +75,8 @@ public class NullableContextDataTest {
                 .vendorId("test-vendor")
                 .packageType(EVENT)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
+                .partnerId("partnerId")
                 .build();
 
         final String contextDataStr = contextData.toString();
@@ -82,6 +88,8 @@ public class NullableContextDataTest {
         assertThat(contextDataStr).contains("test-vendor");
         assertThat(contextDataStr).contains(EVENT.toString());
         assertThat(contextDataStr).contains("kycCheck=false");
+        assertThat(contextDataStr).contains(ERIFRequestTarget.GLOBAL.toString());
+        assertThat(contextDataStr).contains("partnerId");
     }
 
     @Test
