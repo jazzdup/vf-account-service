@@ -19,9 +19,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.Locale;
 import java.util.Random;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.COUNTRY_HEADER_NAME;
-import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.TARGET_HEADER_NAME;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingIdWithMsisdnValue;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
@@ -30,7 +27,8 @@ import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHea
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -123,74 +121,76 @@ public class AccountServiceControllerTest {
                 .hasCauseInstanceOf(NullPointerException.class);
     }
 
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsMissing() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList());
+//    TODO HEADER TESTS PROBABLY NOT REQUIRED ANY MORE
 
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-    }
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsEmptyString() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList(""));
-        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
-
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-    }
-
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsNull() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(null);
-        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
-
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-    }
-
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsMissing() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList());
-
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-    }
-
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsEmptyString() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList(""));
-
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-    }
-
-    @Test
-    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsNull() {
-        HttpHeaders headers = mock(HttpHeaders.class);
-        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-        given(headers.get(TARGET_HEADER_NAME)).willReturn(null);
-
-        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-                .isInstanceOf(MethodArgumentValidationException.class)
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-    }
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsMissing() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList());
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
+//    }
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsEmptyString() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList(""));
+//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
+//    }
+//
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsNull() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(null);
+//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
+//    }
+//
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsMissing() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
+//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList());
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
+//    }
+//
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsEmptyString() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
+//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList(""));
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
+//    }
+//
+//    @Test
+//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsNull() {
+//        HttpHeaders headers = mock(HttpHeaders.class);
+//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
+//        given(headers.get(TARGET_HEADER_NAME)).willReturn(null);
+//
+//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
+//                .isInstanceOf(MethodArgumentValidationException.class)
+//                .hasCauseInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
+//    }
 
 }

@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import com.vodafone.charging.accountservice.domain.enums.PackageType;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -22,9 +23,11 @@ public class ContextData {
     private ChargingId chargingId;
     private String serviceId;
     private PackageType packageType;
+    private String partnerId;
     private String vendorId;
     private String clientId;
     private boolean kycCheck;
+    private ERIFRequestTarget target;
 
     protected ContextData() {
     }
@@ -36,8 +39,10 @@ public class ContextData {
         this.serviceId = builder.serviceId;
         this.packageType = builder.packageType;
         this.vendorId = builder.vendorId;
+        this.partnerId = builder.partnerId;
         this.clientId = builder.clientId;
         this.kycCheck = builder.kycCheck;
+        this.target = builder.target;
     }
 
     public String getContextName() {
@@ -64,12 +69,20 @@ public class ContextData {
         return vendorId;
     }
 
+    public String getPartnerId() {
+        return partnerId;
+    }
+
     public String getClientId() {
         return clientId;
     }
 
     public boolean isKycCheck() {
         return kycCheck;
+    }
+
+    public ERIFRequestTarget getTarget() {
+        return target;
     }
 
     public Map<String, Object> asMap() throws IllegalAccessException {
@@ -92,8 +105,10 @@ public class ContextData {
                 ", serviceId='" + serviceId + '\'' +
                 ", packageType=" + packageType +
                 ", vendorId='" + vendorId + '\'' +
+                ", partnerId='" + partnerId + '\'' +
                 ", clientId='" + clientId + '\'' +
                 ", kycCheck=" + kycCheck +
+                ", target=" + target +
                 '}';
     }
 
@@ -102,11 +117,13 @@ public class ContextData {
         private String contextName;
         private final Locale locale;
         private final ChargingId chargingId;
-        private String serviceId; //should be optional
+        private String serviceId;
         private PackageType packageType;
-        private String vendorId; //optional
+        private String vendorId;
+        private String partnerId;
         private String clientId;
-        private boolean kycCheck; //optional
+        private boolean kycCheck;
+        private ERIFRequestTarget target = ERIFRequestTarget.LOCAL;
 
         public Builder(@NonNull String contextName,
                        @NonNull Locale locale,
@@ -128,12 +145,21 @@ public class ContextData {
             this.vendorId = vendorId;
             return this;
         }
+        public Builder partnerId(final String partnerId) {
+            this.partnerId = partnerId;
+            return this;
+        }
         public Builder clientId(final String clientId) {
             this.clientId = clientId;
             return this;
         }
         public Builder kycCheck(final boolean kycCheck) {
             this.kycCheck = kycCheck;
+            return this;
+        }
+
+        public Builder target(final ERIFRequestTarget target) {
+            this.target = target;
             return this;
         }
 

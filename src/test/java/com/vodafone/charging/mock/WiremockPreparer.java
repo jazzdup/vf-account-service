@@ -5,7 +5,7 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.enums.ResponseType;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.vodafone.charging.accountservice.domain.ValidateHttpHeaders.REQUEST_CHARGING_ID_HEADER_NAME;
+import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.REQUEST_CHARGING_ID_HEADER_NAME;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.SOAP_NS;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.VODAFONE_NS;
 import static com.vodafone.charging.mock.IFRequestXpathEnum.VALIDATE;
@@ -21,7 +21,7 @@ public class WiremockPreparer extends WiremockDefaultPreparer {
 									            String xPath,
 									            String response) {
     	return stubFor(post(urlEqualTo(IF_TEST_URL))
-    			.withHeader(REQUEST_CHARGING_ID_HEADER_NAME, equalTo(chargingId.toString()))
+    			.withHeader(REQUEST_CHARGING_ID_HEADER_NAME.getName(), equalTo(chargingId.toString()))
     			.withRequestBody(matchingXPath(xPath)
     					.withXPathNamespace(SOAP_NS.prefix(), SOAP_NS.url())
     					.withXPathNamespace(VODAFONE_NS.prefix(), VODAFONE_NS.url()))
