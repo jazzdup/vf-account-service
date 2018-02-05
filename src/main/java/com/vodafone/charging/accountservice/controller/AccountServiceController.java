@@ -38,7 +38,7 @@ public class AccountServiceController {
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
 
-        this.checkMandatoryHeaders(headers);
+//        this.checkMandatoryHeaders(headers);
         this.checkContextData(contextData);
 
         EnrichedAccountInfo accountInfo;
@@ -63,6 +63,11 @@ public class AccountServiceController {
         }
     }
 
+    /**
+     * Checks that the mandatory Country and Target header exist, otherwise reject the request.
+     * TODO We should probably include these in the main request body.  No point in having these as headers.
+     * TODO We can assume country == locale, target can be "local" unless specified as "global".
+     */
     public void checkMandatoryHeaders(final HttpHeaders headers) {
         try {
             final String countryMessage = "header: " + COUNTRY_HEADER_NAME + " is mandatory";

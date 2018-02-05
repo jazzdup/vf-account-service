@@ -1,5 +1,6 @@
-package com.vodafone.charging.accountservice.erifclient;
+package com.vodafone.charging.integrationtest;
 
+import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.service.ERIFClient;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -21,11 +23,11 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-//TODO: may be replaced but doesn't run when moved to integrationtest dir due to @RestClientTest(ERIFClient.class) and lacking required spring config
-//hence maybe we should consider this as another kind of unit test of rest client as opposed to IT.
+//This test should not be required.  Keeping it for now.
 @RunWith(SpringRunner.class)
+@SpringBootTest(classes = AccountServiceApplication.class)
 @RestClientTest(ERIFClient.class)
-public class ERIFClientRestTest {
+public class ERIFClientRestIT {
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
