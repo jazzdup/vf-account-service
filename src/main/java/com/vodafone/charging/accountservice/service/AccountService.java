@@ -17,28 +17,20 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AccountService {
 
-    //@TODO: make DI consistent across classes but causes AccountServiceTest to fail
     @Autowired
     private ERIFClient erifClient;
-
-//    public AccountService(ERIFClient erifClient) {
-//        this.erifClient = erifClient;
-//    }
 
     public AccountService() {
     }
 
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 
-        log.debug("AccountService.enrichAccountData, contextData={}", contextData );
+        log.debug("contextData={}", contextData);
 
-        //convert context data to msgcontrol and routable objects
-        MessageControl messageControl = new MessageControl(contextData.getLocale());
-        Routable routable = new Routable(RoutableType.validate.name(), contextData.getChargingId(), contextData.getClientId(), contextData.isKycCheck());
+        final MessageControl messageControl = new MessageControl(contextData.getLocale());
+        final Routable routable = new Routable(RoutableType.validate, contextData);
 
-        EnrichedAccountInfo enrichedAccountInfo = erifClient.validate(messageControl, routable);
-
-        return enrichedAccountInfo;
+        return erifClient.validate(messageControl, routable);
 
     }
 

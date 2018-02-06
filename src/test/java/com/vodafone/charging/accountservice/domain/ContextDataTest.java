@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -47,8 +48,10 @@ public class ContextDataTest {
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")
+                .partnerId("partner")
                 .packageType(EVENT_CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
                 .build();
 
         assertThat(contextData.getContextName()).isEqualTo("test-context-name");
@@ -59,7 +62,8 @@ public class ContextDataTest {
         assertThat(contextData.getVendorId()).isEqualTo("vendor");
         assertThat(contextData.getPackageType()).isEqualTo(EVENT_CALENDAR_PACKAGE_TYPE);
         assertThat(contextData.isKycCheck()).isEqualTo(false);
-
+        assertThat(contextData.getTarget()).isEqualTo(ERIFRequestTarget.GLOBAL);
+        assertThat(contextData.getPartnerId()).isEqualTo("partner");
     }
 
     @Test
@@ -71,6 +75,8 @@ public class ContextDataTest {
                 .vendorId("test-vendor")
                 .packageType(EVENT)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
+                .partnerId("partnerId")
                 .build();
 
         final String contextDataStr = contextData.toString();
@@ -82,6 +88,8 @@ public class ContextDataTest {
         assertThat(contextDataStr).contains("test-vendor");
         assertThat(contextDataStr).contains(EVENT.toString());
         assertThat(contextDataStr).contains("kycCheck=false");
+        assertThat(contextDataStr).contains(ERIFRequestTarget.GLOBAL.toString());
+        assertThat(contextDataStr).contains("partnerId");
     }
 
     @Test

@@ -1,22 +1,26 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.vodafone.charging.accountservice.exception.ErrorIds.VAS_INTERNAL_SERVER_ERROR;
+import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.COUNTRY_HEADER_NAME;
+import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.TARGET_HEADER_NAME;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -24,64 +28,62 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @RestController
 @RequestMapping("/accounts")
+@Slf4j
 public class AccountServiceController {
-
-    private static final Logger log = LoggerFactory.getLogger(AccountServiceController.class);
 
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(method = POST)
-    public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestBody ContextData contextData) {
-        try {
-            this.checkContextData(contextData);
-        } catch (IllegalArgumentException iae) {
-            log.error("Bad request. Mandatory Content is not provided in request body.", iae);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+    public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
+                                                                 @Valid @RequestBody ContextData contextData) {
+        this.checkContextData(contextData);
 
         EnrichedAccountInfo accountInfo;
         try {
             accountInfo = accountService.enrichAccountData(contextData);
         } catch (Exception e) {
-//            return createSuccessResponse(contextData);
-            return createResponse(e);
+            throw new ApplicationLogicException(e.getMessage(), e);
         }
         return ResponseEntity.ok(accountInfo);
     }
 
+    /*
+    jsr303 Validation does not appear to work for the ChargingId object within contextInfo.
+    Hence this is manually checked here.
+     */
     public void checkContextData(final ContextData contextInfo) {
-        checkArgument(contextInfo != null, "value contextName was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getContextName()), "value contextName was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "value chargingId.value was expected but was empty.");
-        checkArgument(isNotEmpty(contextInfo.getChargingId().getType()), "value chargingId.type was expected but was empty");
+        try {
+            checkArgument(isNotEmpty(contextInfo.getChargingId().getValue()), "chargingId.value is compulsory but was empty");
+            checkArgument(isNotEmpty(contextInfo.getChargingId().getType()), "chargingId.type is compulsory but was empty");
+        } catch (IllegalArgumentException iae) {
+            throw new MethodArgumentValidationException(iae.getMessage(), iae);
+        }
     }
 
-    public ResponseEntity<EnrichedAccountInfo> createResponse(Exception e) {
-        //TODO this should be moved to an http error mapper.  502 Bad Gateway for IF being down
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(APPLICATION_JSON)
-                .body(new EnrichedAccountInfo.Builder("ERROR")
-                        .errorId(VAS_INTERNAL_SERVER_ERROR.errorId())
-                        .errorDescription(VAS_INTERNAL_SERVER_ERROR.errorDescription()).build());
-    }
+    /**
+     * Checks that the mandatory Country and Target header exist, otherwise reject the request.
+     */
+    public void checkMandatoryHeaders(final HttpHeaders headers) {
+        try {
+            final String countryMessage = "header: " + COUNTRY_HEADER_NAME + " is mandatory";
+            final String targetMessage = "header: " + TARGET_HEADER_NAME + " is mandatory";
 
-    //This is for testing purposes only
-    private ResponseEntity<EnrichedAccountInfo> createSuccessResponse(ContextData data) {
+            checkArgument(headers.get(COUNTRY_HEADER_NAME.getName()) != null, countryMessage);
+            checkArgument(headers.get(TARGET_HEADER_NAME.getName()) != null, targetMessage);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(APPLICATION_JSON)
-                .body(new EnrichedAccountInfo.Builder("ACCEPTED")
-                        .ban(data.getChargingId().getValue() + "_BAN")
-                        .serviceProviderId("test-spid")
-                        .serviceProviderType("test-service-provider-type")
-                        .usergroups(Lists.newArrayList("usergroup1", "usergroup2"))
-                        .childServiceProviderId("child-service-provider-id")
-                        .customerType("PRE")
-                        .billingCycleDay(3)
-//                        .errorDescription("OK")
-//                        .errorId("OK")
-                        .build());
+            checkArgument( isNotEmpty(headers.get(COUNTRY_HEADER_NAME.getName()).stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(countryMessage))),
+                    countryMessage);
+
+            checkArgument(isNotEmpty(headers.get(TARGET_HEADER_NAME.getName()).stream()
+                    .findFirst().orElseThrow(() -> new IllegalArgumentException(targetMessage))), targetMessage);
+
+        } catch (IllegalArgumentException iae) {
+            throw new MethodArgumentValidationException(iae.getMessage(), iae);
+        }
+
     }
 
 }
