@@ -21,7 +21,6 @@ import java.util.UUID;
 
 @Slf4j
 public class LoggingUtil {
-
 	protected static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
 		String result = servletRequest.getParameter(parameter);
 		if (StringUtils.isNotEmpty(result)) {
@@ -67,6 +66,12 @@ public class LoggingUtil {
                 .transactionId(transactionId)
                 .timestamp(new Date())
 
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
+				.service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
+				.partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
+				.callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
+
                 .inboundRequestUri(request.getRequestURI())
                 .inboundRequestIp(request.getRemoteAddr())
                 .inboundRequestPort(Integer.toString(request.getRemotePort()))
@@ -80,16 +85,21 @@ public class LoggingUtil {
                 .setValue(UlfConstants.ULF_REFERER, request.getHeader(com.google.common.net.HttpHeaders.REFERER))
                 .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE));
         ULFLogger.log(builder.build());
-    }
+	}
 
 	protected static void logHttpRequestOut(HttpRequest request, String useCaseId, String transactionId) {
 		final ULFEntry.Builder builder = new ULFEntry.Builder()
 				.component(UlfConstants.ULF_LOG_COMPONENT)
 				.logpoint(ULFEntry.Logpoint.REQUEST_OUT.toString())
-				.setValue(UlfConstants.ULF_JSESSIONID, ULFThreadLocal.getValue(UlfConstants.LOGGING_JSESSION_ID_ATTRIBUTE))
+				.setValue(UlfConstants.ULF_JSESSIONID, ULFThreadLocal.getValue(UlfConstants.JSESSION_ID))
 				.usecaseId(useCaseId)
 				.transactionId(transactionId)
 				.timestamp(new Date())
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
+				.service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
+				.partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
+				.callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
 
 //				.inboundRequestUri(request.getRequestURI())
 //				.inboundRequestIp(request.getRemoteAddr())
@@ -116,10 +126,17 @@ public class LoggingUtil {
 		builder
 				.component(UlfConstants.ULF_LOG_COMPONENT)
 				.logpoint(ULFEntry.Logpoint.RESPONSE_IN.toString())
-				.setValue(UlfConstants.ULF_JSESSIONID,  ULFThreadLocal.getValue(UlfConstants.LOGGING_JSESSION_ID_ATTRIBUTE))
+				.setValue(UlfConstants.ULF_JSESSIONID,  ULFThreadLocal.getValue(UlfConstants.JSESSION_ID))
 				.usecaseId(useCaseId)
 				.transactionId(transactionId)
 				.timestamp(new Date())
+
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
+				.partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
+				.callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
 
 //				.inboundRequestUri(request.getRequestURI())
 //				.inboundRequestIp(request.getRemoteAddr())
@@ -152,6 +169,13 @@ public class LoggingUtil {
                 .usecaseId(useCaseId)
                 .transactionId(transactionId)
                 .timestamp(new Date())
+
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
+				.chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
+				.service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
+				.partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
+				.callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
 
                 .inboundRequestUri(request.getRequestURI())
                 .inboundRequestIp(request.getRemoteAddr())
