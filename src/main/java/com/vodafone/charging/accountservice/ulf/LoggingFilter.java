@@ -43,7 +43,6 @@ public class LoggingFilter implements Filter {
             ULFThreadLocal.setValue(ULFKeys.USECASE_ID, useCaseId);
 
             final String jSessionId = request.getSession().getId();
-            ULFThreadLocal.setValue(UlfConstants.JSESSION_ID, request.getSession().getId());
             ULFThreadLocal.setValue(ULFKeys.SERVER_NAME, request.getServerName());
             ULFThreadLocal.setValue(ULFKeys.COUNTRY_CODE, request.getHeader("country"));
             ULFThreadLocal.setValue(ULFKeys.SERVICE, request.getRequestURI());
