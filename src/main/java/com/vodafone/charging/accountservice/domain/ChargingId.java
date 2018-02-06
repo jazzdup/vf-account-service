@@ -74,4 +74,8 @@ public class ChargingId {
                 ", value='" + value + '\'' +
                 '}';
     }
+
+    public String toIfString() {
+        return type + ": " + value;
+    }
 }

@@ -2,9 +2,6 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.domain.MessageControl;
-import com.vodafone.charging.accountservice.domain.Routable;
-import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,10 +24,11 @@ public class AccountService {
 
         log.debug("contextData={}", contextData);
 
-        final MessageControl messageControl = new MessageControl(contextData.getLocale());
-        final Routable routable = new Routable(RoutableType.validate, contextData);
+//        final MessageControl messageControl = new MessageControl(contextData.getLocale());
+//        final Routable routable = new Routable(RoutableType.validate, contextData);
 
-        return erifClient.validate(messageControl, routable);
+//        return erifClient.validate(messageControl, routable);
+        return erifClient.validate(contextData);
 
     }
 

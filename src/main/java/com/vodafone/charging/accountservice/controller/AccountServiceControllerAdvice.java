@@ -33,12 +33,11 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
     public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request,
                                                                                ApplicationLogicException ex) {
         log.error("Handling ApplicationLogicException with message: {}", ex.getMessage());
-        final HttpStatus status = this.getStatus(request, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(AccountServiceError.builder()
                 .status(APPLICATION_LOGIC_ERROR.status().value())
                 .errorId(APPLICATION_LOGIC_ERROR.errorId().value())
                 .errorDescription(APPLICATION_LOGIC_ERROR.errorDesciption()).build(),
-                status);
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentValidationException.class)
@@ -87,13 +86,4 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                 .errorDescription(ex.getMessage()).build(), status);
 
     }
-
-    private HttpStatus getStatus(HttpServletRequest request, HttpStatus defaultStatus) {
-        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-        if (statusCode == null) {
-            return defaultStatus;
-        }
-        return HttpStatus.valueOf(statusCode);
-    }
-
 }

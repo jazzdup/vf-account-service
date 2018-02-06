@@ -1,6 +1,7 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.*;
+import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,27 @@ public class ERIFClient {
     public ERIFClient(RestTemplate restTemplate, PropertiesAccessor propertiesAccessor) {
         this.restTemplate = restTemplate;
         this.propertiesAccessor = propertiesAccessor;
+    }
+
+    public EnrichedAccountInfo validate(ContextData contextData) {
+
+        final MessageControl messageControl = new MessageControl(contextData.getLocale());
+        final Routable routable = new Routable(RoutableType.validate, contextData);
+        final ValidateHttpHeaders headers = new ValidateHttpHeaders(contextData);
+        final HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), headers.getHttpHeaders());
+
+        log.debug(request.toString());
+        final String url = propertiesAccessor.getProperty("erif.url");
+
+        final ResponseEntity<ERIFResponse> responseEntity;
+
+        responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);
+
+        final ERIFResponse responseBody = responseEntity.getBody();
+        log.debug(responseEntity.toString());
+
+        return new EnrichedAccountInfo(responseBody);
+
     }
 
     public EnrichedAccountInfo validate(MessageControl messageControl, Routable routable) {

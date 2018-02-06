@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Locale;
 import java.util.Random;
 
-import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingIdWithMsisdnValue;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
@@ -73,7 +73,7 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldThrowMethodArgumentValidationExceptionWhenNullChargingIdValueIsNull() {
-        final ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingIdWithMsisdnValue(null));
+        final ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingId(null));
         assertThatThrownBy(() -> accountServiceController.checkContextData(contextData))
                 .isInstanceOf(MethodArgumentValidationException.class)
                 .isNotInstanceOf(IllegalArgumentException.class)
@@ -83,7 +83,7 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldThrowMethodArgumentValidationExceptionWhenNullChargingIdValueIsEmpty() {
-        final ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingIdWithMsisdnValue(""));
+        final ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingId(""));
         assertThatThrownBy(() -> accountServiceController.checkContextData(contextData))
                 .isInstanceOf(MethodArgumentValidationException.class)
                 .isNotInstanceOf(IllegalArgumentException.class)
