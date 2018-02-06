@@ -1,19 +1,13 @@
 package com.vodafone.charging.accountservice.util;
 
-import com.vodafone.application.errors.ConfigPropertyMissingException;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class SimplePropertiesAccessor implements PropertiesAccessor {
-
-	private static final Logger logger = LoggerFactory.getLogger(SimplePropertiesAccessor.class);
 
 	private final BasePropertiesProvider basePropertiesProvider;
 
@@ -32,12 +26,22 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 		return Boolean.parseBoolean(value);
 	}
 	@Override
-	public String getOptionalProperty(String key) {
+	public boolean getPropertyAsBoolean(String key, boolean defaultValue) {
+		String value = getOptionalProperty(key);
+		return value != null ? Boolean.parseBoolean(value) : defaultValue;
+	}
+
+	@Override
+	public boolean isOptionalProperty(String key) {
+		return getPropertyAsBoolean(key, false);
+	}
+
+	private String getOptionalProperty(String key) {
 		return basePropertiesProvider.getProperty(key, null);
 	}
 
 	/**
-	 * @throws ConfigPropertyMissingException when the property could not be found
+	 * @throws com.vodafone.ppe.common.configuration.error.MissingConfigurationException if the property could not be found
 	 */
 	@Override
 	public String getProperty(String key) {
@@ -65,18 +69,15 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 		return basePropertiesProvider;
 	}
 
-	@Nonnull
-	public List<String> splitProperty(String property) {
-		final List<String> list = new ArrayList<>();
-
-		if (StringUtils.isNotEmpty(property)) {
-			final String[] partnerArray = StringUtils.split(property, ",");
-			for (String s : StringUtils.stripAll(partnerArray)) {
-				list.add(s);
-			}
-		}
-
-		return list;
-	}
+//	@Nonnull
+//	private List<String> splitProperty(String property) {
+//		final List<String> list = new ArrayList<>();
+//		if (StringUtils.isNotEmpty(property)) {
+//			final String[] partnerArray = StringUtils.split(property, ",");
+//			list.addAll(Arrays.asList(StringUtils.stripAll(partnerArray)));
+//		}
+//
+//		return list;
+//	}
 
 }
