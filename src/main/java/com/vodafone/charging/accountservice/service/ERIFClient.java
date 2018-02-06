@@ -33,7 +33,7 @@ public class ERIFClient {
         final HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), headers.getHttpHeaders());
 
         log.debug(request.toString());
-        final String url = propertiesAccessor.getProperty("erif.url");
+        final String url = propertiesAccessor.getProperty("erif.url", "http://127.0.0.1:8080");
 
         final ResponseEntity<ERIFResponse> responseEntity;
         responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);

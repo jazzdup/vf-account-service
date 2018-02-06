@@ -26,4 +26,5 @@ nbdist/
 src-delomboked/
 
 *.log
+logs/
 *.cer
