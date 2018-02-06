@@ -49,10 +49,12 @@ public class PropertiesAccessorIT {
         assertThat(prop).isEqualTo(expected);
         final int intProp = propertiesAccessor.getPropertyAsInt("notthere", 5);
         assertThat(intProp).isEqualTo(5);
+        final boolean bProp = propertiesAccessor.getPropertyAsBoolean("notthere", true);
+        assertThat(bProp).isEqualTo(true);
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(5);
+        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(7);
     }
 
     @Test

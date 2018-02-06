@@ -10,6 +10,8 @@ public interface PropertiesAccessor {
 	String SEPARATOR = ".";
 
 	boolean getPropertyAsBoolean(String key);
+	boolean getPropertyAsBoolean(String key, boolean defaultValue);
+	boolean isOptionalProperty(String key);
 
 	Map<String, String> getPropertiesList();
 

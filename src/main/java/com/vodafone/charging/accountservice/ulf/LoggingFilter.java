@@ -4,6 +4,7 @@ import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
 import com.vodafone.application.util.ULFUtils.WrappedResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -19,6 +20,8 @@ import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHead
 @Slf4j
 @Component
 public class LoggingFilter implements Filter {
+    @Autowired
+    private UlfLogger ulfLogger;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -50,12 +53,12 @@ public class LoggingFilter implements Filter {
             ULFThreadLocal.setValue(ULFKeys.PARTNER, request.getHeader(REQUEST_PARTNER_ID_HEADER_NAME.getName()));
             ULFThreadLocal.setValue(UlfConstants.REQUEST_CLASS, request.getHeader(REQUEST_CLASS_HEADER_NAME.getName()));
 
-            LoggingUtil.logHttpRequestIn(request, useCaseId, transactionId);
+            ulfLogger.logHttpRequestIn(request, useCaseId, transactionId);
 
             final WrappedResponse wrappedResponse = new WrappedResponse((HttpServletResponse) servletResponse);
             chain.doFilter(request, wrappedResponse);
 
-            LoggingUtil.logHttpResponseOut(request, wrappedResponse, useCaseId, transactionId);
+            ulfLogger.logHttpResponseOut(request, wrappedResponse, useCaseId, transactionId);
 
         } finally {
             ULFThreadLocal.clean();

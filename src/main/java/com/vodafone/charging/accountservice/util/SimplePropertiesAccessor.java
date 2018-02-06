@@ -25,6 +25,16 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 		String value = getOptionalProperty(key);
 		return Boolean.parseBoolean(value);
 	}
+	@Override
+	public boolean getPropertyAsBoolean(String key, boolean defaultValue) {
+		String value = getOptionalProperty(key);
+		return value != null ? Boolean.parseBoolean(value) : defaultValue;
+	}
+
+	@Override
+	public boolean isOptionalProperty(String key) {
+		return getPropertyAsBoolean(key, false);
+	}
 
 	private String getOptionalProperty(String key) {
 		return basePropertiesProvider.getProperty(key, null);

@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.configuration;
 
+import com.vodafone.charging.accountservice.ulf.UlfLogger;
 import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import com.vodafone.charging.accountservice.util.SimplePropertiesAccessor;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
@@ -9,12 +10,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 @Configuration
-@ComponentScan(basePackages = "com.vodafone.ppe.common.configuration")
+@ComponentScan(basePackageClasses = {com.vodafone.ppe.common.configuration.BasePropertiesProvider.class
+        , com.vodafone.charging.accountservice.ulf.UlfLogger.class})
 @ImportResource({"classpath*:centralconfig/run-configuration-context.xml", "classpath*:applicationContext.xml"})
 public class CentralConfig {
 
     @Bean(name = "propertiesAccessor")
     public PropertiesAccessor getPropertiesAccessor(BasePropertiesProvider basePropertiesProvider) {
         return new SimplePropertiesAccessor(basePropertiesProvider);
+    }
+
+    @Bean(name = "ulfLogger")
+    public UlfLogger ulfLogger(PropertiesAccessor propertiesAccessor){
+        return new UlfLogger(propertiesAccessor);
     }
 }
