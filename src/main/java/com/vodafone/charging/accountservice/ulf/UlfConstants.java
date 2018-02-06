@@ -3,7 +3,6 @@ package com.vodafone.charging.accountservice.ulf;
 public final class UlfConstants {
 
 	public static final String CHARGING_ID = "chargingId";
-	public static final String JSESSION_ID = "jsessionid";
 	public static final String USECASE_ID = "uid";
 	public static final String CORRELATION_ID = "correlationId";
 	public static final String REQUEST_CLASS = "requestClass";

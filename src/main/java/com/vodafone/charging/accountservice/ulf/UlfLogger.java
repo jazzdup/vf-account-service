@@ -119,7 +119,6 @@ public class UlfLogger {
         final ULFEntry.Builder builder = new ULFEntry.Builder()
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.REQUEST_OUT.toString())
-                .setValue(UlfConstants.ULF_JSESSIONID, ULFThreadLocal.getValue(UlfConstants.JSESSION_ID))
                 .usecaseId(useCaseId)
                 .transactionId(transactionId)
                 .timestamp(new Date())
@@ -138,13 +137,12 @@ public class UlfLogger {
         try {
             builder.setValue(UlfConstants.ULF_HTTP_STATUS_CODE, String.valueOf(response.getStatusCode()));
         } catch (IOException e) {
-            log.error(e.getStackTrace().toString());
+            log.error(e.getMessage(), e);
         }
 
         builder
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.RESPONSE_IN.toString())
-                .setValue(UlfConstants.ULF_JSESSIONID,  ULFThreadLocal.getValue(UlfConstants.JSESSION_ID))
                 .usecaseId(useCaseId)
                 .transactionId(transactionId)
                 .timestamp(new Date())
