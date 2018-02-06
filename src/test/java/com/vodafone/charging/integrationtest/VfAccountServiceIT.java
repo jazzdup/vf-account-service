@@ -18,7 +18,6 @@ import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Locale;
@@ -64,7 +64,7 @@ public class VfAccountServiceIT {
     private JsonConverter converter;
 
     @MockBean
-    private TestRestTemplate testRestTemplate;
+    private RestTemplate restTemplate;
 
     @Before
     public void setUp() {
@@ -92,7 +92,7 @@ public class VfAccountServiceIT {
 
         ResponseEntity<ERIFResponse> responseEntity = new ResponseEntity<>(erifResponse, HttpStatus.OK);
 
-        given(testRestTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
                 .willReturn(responseEntity);
 
         //when
@@ -122,7 +122,7 @@ public class VfAccountServiceIT {
         ContextData contextData = aContextData();
         final String accountJson = converter.toJson(contextData);
 
-        given(testRestTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
                 .willThrow(new RuntimeException("This is a test exception"));
 
         MvcResult result = mockMvc.perform(post("/accounts/")
