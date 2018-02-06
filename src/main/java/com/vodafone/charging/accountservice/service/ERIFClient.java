@@ -36,7 +36,6 @@ public class ERIFClient {
         final String url = propertiesAccessor.getProperty("erif.url");
 
         final ResponseEntity<ERIFResponse> responseEntity;
-
         responseEntity = restTemplate.postForEntity(url, request, ERIFResponse.class);
 
         final ERIFResponse responseBody = responseEntity.getBody();

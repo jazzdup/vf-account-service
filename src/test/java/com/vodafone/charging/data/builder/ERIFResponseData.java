@@ -3,11 +3,11 @@ package com.vodafone.charging.data.builder;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ERIFResponseData {
-    public static ERIFResponse anERIFResponse(){
+
+    public static ERIFResponse aERIFResponse(){
         return ERIFResponse.builder()
                 .ban("BAN_123")
                 .billingCycleDay(7)
@@ -18,21 +18,21 @@ public class ERIFResponseData {
                 .serviceProviderId("serviceProviderId")
                 .serviceProviderType("serviceProviderType")
                 .status("ACCEPTED")
-                .usergroups(new ArrayList<String>(Arrays.asList("ug1", "ug2")))
+                .usergroups(newArrayList("test-ug1", "test-ug2"))
                 .build();
     }
-    public static ERIFResponse anERIFResponse(ChargingId chargingId){
+    public static ERIFResponse aERIFResponse(ChargingId chargingId, String status, String errorId, String errorDescription){
         return ERIFResponse.builder()
                 .ban("BAN_" + chargingId.getValue())
                 .billingCycleDay(7)
                 .childServiceProviderId("childServiceProviderId")
-                .errDescription("errDesc")
-                .errId("OK")
+                .errId(errorId)
+                .errDescription(errorDescription)
                 .customerType("PRE")
                 .serviceProviderId("serviceProviderId")
                 .serviceProviderType("serviceProviderType")
-                .status("ACCEPTED")
-                .usergroups(new ArrayList<String>(Arrays.asList("ug1", "ug2")))
+                .status(status)
+                .usergroups(newArrayList("test-ug1", "test-ug2"))
                 .build();
     }
 }

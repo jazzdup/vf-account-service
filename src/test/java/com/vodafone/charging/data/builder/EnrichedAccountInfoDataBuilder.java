@@ -1,6 +1,7 @@
 package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 
 import java.util.Random;
@@ -28,6 +29,23 @@ public class EnrichedAccountInfoDataBuilder {
                 .customerType("PRE")
                 .errorId("test-error-id")
                 .errorDescription("test-error-description")
+                .build();
+    }
+
+    public static EnrichedAccountInfo aEnrichedAccountInfo(ERIFResponse response) {
+
+        Random random = new Random();
+
+        return new EnrichedAccountInfo.Builder(response.getStatus())
+                .usergroups(response.getUsergroups())
+                .ban(response.getBan())
+                .billingCycleDay(response.getBillingCycleDay())
+                .serviceProviderId(response.getServiceProviderId())
+                .childServiceProviderId(response.getChildServiceProviderId())
+                .serviceProviderType(response.getServiceProviderType())
+                .customerType(response.getCustomerType())
+                .errorId(response.getErrId())
+                .errorDescription(response.getErrDescription())
                 .build();
     }
 
