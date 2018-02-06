@@ -13,8 +13,6 @@ public interface PropertiesAccessor {
 
 	Map<String, String> getPropertiesList();
 
-	String getOptionalProperty(String key);
-
 	String getProperty(String key);
 	String getProperty(String key, String defaultValue);
 
