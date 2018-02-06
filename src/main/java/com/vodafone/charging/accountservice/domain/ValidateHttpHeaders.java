@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class ValidateHttpHeaders {
     private static final String envTypeConfigPropName = "central.configuration.env.type";
     private static final String VALIDATE_REQUEST_CLASS = "VALIDATE";
 
-    public ValidateHttpHeaders(ContextData contextData) {
+    public ValidateHttpHeaders(@NonNull ContextData contextData) {
         httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(APPLICATION_JSON);
         httpHeaders.setAccept(newArrayList(APPLICATION_JSON, APPLICATION_JSON_UTF8));

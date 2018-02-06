@@ -10,7 +10,7 @@ import java.util.Locale;
 @ToString
 @Getter
 public class MessageControl{
-    private Locale locale	= null;
+    private Locale locale;
 
     public MessageControl(Locale locale) {
         this.locale = locale;

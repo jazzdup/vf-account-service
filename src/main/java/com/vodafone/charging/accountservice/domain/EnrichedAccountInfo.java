@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class EnrichedAccountInfo {
     public EnrichedAccountInfo() {
     }
 
-    public EnrichedAccountInfo(ERIFResponse erifResponse){
+    public EnrichedAccountInfo(@NonNull ERIFResponse erifResponse){
         validationStatus = erifResponse.getStatus();
         ban = erifResponse.getBan();
         usergroups = erifResponse.getUsergroups();

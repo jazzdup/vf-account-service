@@ -3,6 +3,7 @@ package com.vodafone.charging.accountservice.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,7 +16,7 @@ public class Routable {
     private String clientId; //e.g. demo
     private Boolean kycCheck;
 
-    public Routable(RoutableType type, ContextData contextData) {
+    public Routable(RoutableType type, @NonNull ContextData contextData) {
         this.type = type.name();
         this.chargingId = contextData.getChargingId();
         this.clientId = contextData.getClientId();
