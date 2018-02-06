@@ -8,9 +8,6 @@ public class ERIFRequest {
     private MessageControl messageControl;
     private Routable routable;
 
-    public ERIFRequest() {
-    }
-
     public ERIFRequest(@NonNull MessageControl messageControl, @NonNull Routable routable) {
         this.messageControl = messageControl;
         this.routable = routable;
