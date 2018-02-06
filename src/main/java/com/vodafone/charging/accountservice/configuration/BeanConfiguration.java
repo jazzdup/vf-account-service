@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.vodafone.charging.accountservice.ulf.ERIFClientHttpRequestInterceptor;
+import com.vodafone.charging.accountservice.ulf.UlfLogger;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,9 +58,14 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         return objectMapper;
     }
 
+    /**
+     * configures ERIFClientHttpRequestInterceptor for logging request/responses to/from ERIF
+     */
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder.build();
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder, UlfLogger ulfLogger) {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        restTemplate.setInterceptors(Collections.singletonList(new ERIFClientHttpRequestInterceptor(ulfLogger)));
+        return restTemplate;
     }
 
 

@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
@@ -46,7 +46,7 @@ public class VfAccountServiceHttpTest {
     private JsonConverter jsonConverter;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private TestRestTemplate testRestTemplate;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(DEFAULT_ER_IF_PORT.value());
@@ -68,7 +68,7 @@ public class VfAccountServiceHttpTest {
         WiremockPreparer.prepareForValidateJson(chargingId);
 
         //when
-        ResponseEntity<EnrichedAccountInfo> responseEntity = restTemplate.exchange(url, POST, new HttpEntity<>(contextData, headers), EnrichedAccountInfo.class);
+        ResponseEntity<EnrichedAccountInfo> responseEntity = testRestTemplate.exchange(url, POST, new HttpEntity<>(contextData, headers), EnrichedAccountInfo.class);
         EnrichedAccountInfo enrichedAccountInfo = responseEntity.getBody();
 
         //then
@@ -101,7 +101,7 @@ public class VfAccountServiceHttpTest {
 
 
         //when
-        ResponseEntity<Object> responseEntity = restTemplate.exchange(url, POST, requestEntity, Object.class);
+        ResponseEntity<Object> responseEntity = testRestTemplate.exchange(url, POST, requestEntity, Object.class);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
