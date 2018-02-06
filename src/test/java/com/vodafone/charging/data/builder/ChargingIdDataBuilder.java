@@ -14,7 +14,7 @@ public class ChargingIdDataBuilder {
         return new ChargingId(ChargingId.Type.MSISDN, generateChargingId());
     }
 
-    public static ChargingId aChargingIdWithMsisdnValue(String msisdn) {
+    public static ChargingId aChargingId(String msisdn) {
         return new ChargingId.Builder().type(ChargingId.Type.MSISDN).value(msisdn).build();
     }
 

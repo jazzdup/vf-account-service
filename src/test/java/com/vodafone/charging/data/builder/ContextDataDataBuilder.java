@@ -2,6 +2,7 @@ package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import com.vodafone.charging.data.object.NullableContextData;
 
 import java.util.Locale;
@@ -20,8 +21,10 @@ public class ContextDataDataBuilder {
                 .clientId("clientId")
                 .serviceId("sAlt")
                 .vendorId("vendorId")
+                .partnerId("partner-id")
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.LOCAL)
                 .build();
     }
     public static ContextData aContextData(ChargingId chargingId) {
@@ -29,8 +32,10 @@ public class ContextDataDataBuilder {
                 .clientId("clientId")
                 .serviceId("sAlt")
                 .vendorId("vendorId")
+                .partnerId("partner-id")
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.LOCAL)
                 .build();
     }
     public static ContextData aContextData(String contextName, Locale locale, ChargingId chargingId) {
@@ -38,8 +43,10 @@ public class ContextDataDataBuilder {
                 .clientId("test-clientId")
                 .serviceId("test-serviceId")
                 .vendorId("test-vendor")
+                .partnerId("partner-id")
                 .packageType(CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.LOCAL)
                 .build();
     }
 

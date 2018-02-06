@@ -12,4 +12,7 @@ public enum ERIFRequestTarget {
 
     String value;
 
+    public String getValue() {
+        return value;
+    }
 }
