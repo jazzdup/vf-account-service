@@ -68,7 +68,7 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-        log.error("Handling IllegalArgumentException with message: {}", ex.getMessage());
+        log.error("Incoming request message not readable: {}, returning status {}", ex.getMessage(), status.toString());
         return new ResponseEntity<>(AccountServiceError
                 .builder().status(MESSAGE_NOT_READABLE_ERROR.status().value())
                 .errorId(MESSAGE_NOT_READABLE_ERROR.errorId().value())

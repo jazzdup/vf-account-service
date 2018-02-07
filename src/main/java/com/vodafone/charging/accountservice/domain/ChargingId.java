@@ -1,12 +1,13 @@
 package com.vodafone.charging.accountservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-
 @Component
+@ApiModel(description = "Unique Identifier for Charging Customers")
 public class ChargingId {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum Type {
@@ -26,10 +27,11 @@ public class ChargingId {
         }
     }
 
-    @NotNull
+    @ApiModelProperty(value = "Vodafone Charging Account Type", required = true, allowableValues = "msisdn,vodafoneid,pstn")
+    @NotBlank
     private String type;
 
-    @NotNull
+    @ApiModelProperty(value = "Vodafone Charging Account Identifier", required = true)
     @NotBlank
     private String value;
 
@@ -57,6 +59,7 @@ public class ChargingId {
             this.type = type;
             return this;
         }
+
         public ChargingId.Builder value(final String value) {
             this.value = value;
             return this;

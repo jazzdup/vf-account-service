@@ -3,8 +3,8 @@ package com.vodafone.charging.accountservice.domain.enums;
 
 public enum ERIFRequestTarget {
 
-    GLOBAL("global"),
-    LOCAL("local");
+    LOCAL("local"),
+    GLOBAL("global");
 
     ERIFRequestTarget(String value) {
         this.value = value;
