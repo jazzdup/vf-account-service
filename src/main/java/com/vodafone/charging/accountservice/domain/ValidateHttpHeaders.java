@@ -30,7 +30,7 @@ public class ValidateHttpHeaders {
         Assert.isTrue(TEXT_XML.equals(mediaType), "media type must be text/xml for SOAP");
         httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(mediaType);
-        httpHeaders.setAccept(newArrayList(mediaType, mediaType));
+        httpHeaders.setAccept(newArrayList(mediaType));
         setHttpHeaders(contextData);
     }
 

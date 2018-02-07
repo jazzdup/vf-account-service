@@ -36,14 +36,17 @@ public class WiremockDefaultPreparer {
         );
     }
 
-    public static void prepareForValidateSoap(final ChargingId chargingId) {
-        String validateResponse = aAccountValidationSoapResponse(ResponseType.OK, chargingId.getValue(), "OK", null);
+    public static void prepareForValidateSoap(final ChargingId chargingId, String ban) {
+        String validateResponse = aAccountValidationSoapResponse(ResponseType.OK, ban, "OK", null);
         stubFor(post(urlEqualTo(IF_TEST_URL))
                         .withRequestBody(matchingXPath(VALIDATE.path())
                                 .withXPathNamespace(SOAP_NS.prefix(), SOAP_NS.url())
                                 .withXPathNamespace(VODAFONE_NS.prefix(), VODAFONE_NS.url()))
                         .willReturn(aResponse()
                                 .withStatus(SC_OK)
+                                .withHeader("connection", "keep-alive")
+                                .withHeader("Content-Type", "application/xml")
+                                .withHeader("transfer-encoding", "chunked")
                                 .withBody(validateResponse))
         );
     }

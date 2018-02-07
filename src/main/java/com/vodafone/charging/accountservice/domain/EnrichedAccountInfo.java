@@ -43,24 +43,26 @@ public class EnrichedAccountInfo {
 
     /**
      * for not-quite-soap version
-     * @param erifResponse
+     * @param response
      */
-    public EnrichedAccountInfo(@NonNull Response erifResponse){
-        validationStatus = erifResponse.getStatus();
-        ban = erifResponse.getBan();
-        Response.UserGroups userGroups = erifResponse.getUserGroups();
-        usergroups = new ArrayList<String>();
-        for (String item: userGroups.getItem()) {
-            usergroups.add(item);
+    public EnrichedAccountInfo(@NonNull Response response){
+        validationStatus = response.getStatus();
+        ban = response.getBan();
+        Response.UserGroups userGroups = response.getUserGroups();
+        if (userGroups != null && userGroups.getItem() != null) {
+            usergroups = new ArrayList<String>();
+            for (String item : userGroups.getItem()) {
+                usergroups.add(item);
+            }
         }
-        billingCycleDay = erifResponse.getBillingCycleDay();
-        serviceProviderId = erifResponse.getSpId();
-        childServiceProviderId = erifResponse.getChildSpId();
-        serviceProviderType = erifResponse.getSpType();
-        serviceProviderId = erifResponse.getSpId();
-        customerType = erifResponse.getIsPrepay();
-        errorId = erifResponse.getErrId();
-        errorDescription = erifResponse.getErrDescription();
+        billingCycleDay = response.getBillingCycleDay();
+        serviceProviderId = response.getSpId();
+        childServiceProviderId = response.getChildSpId();
+        serviceProviderType = response.getSpType();
+        serviceProviderId = response.getSpId();
+        customerType = response.getIsPrepay();
+        errorId = response.getErrId();
+        errorDescription = response.getErrDescription();
     }
 
     private EnrichedAccountInfo(final Builder builder) {

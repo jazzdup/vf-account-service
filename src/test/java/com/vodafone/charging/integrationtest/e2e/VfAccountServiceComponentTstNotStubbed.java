@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -58,7 +57,7 @@ public class VfAccountServiceComponentTstNotStubbed {
 
     //can run this test against a running ERIF
     @Test
-    public void shouldValidateAccountAndReturnOKAgainstRealERIF() throws Exception {
+    public void shouldValidateAccountAndReturnOKAgainstRealERIFUsingJson() throws Exception {
         log.debug("in shouldValidateAccountAndReturnOKAgainstRealERIF");
         //given
         final ContextData contextData = aContextData();

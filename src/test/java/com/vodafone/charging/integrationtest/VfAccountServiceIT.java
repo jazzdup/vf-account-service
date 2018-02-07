@@ -6,9 +6,12 @@ import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
+import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.data.builder.EnvelopeData;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -42,6 +45,7 @@ import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHea
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -66,13 +70,16 @@ public class VfAccountServiceIT {
     @MockBean
     private RestTemplate restTemplate;
 
+    @MockBean
+    PropertiesAccessor propertiesAccessor;
+
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
-    public void shouldValidateAccountAndReturnOK() throws Exception {
+    public void shouldValidateAccountJsonAndReturnOK() throws Exception {
         //given
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
         final ContextData contextData = aContextData();
@@ -108,7 +115,33 @@ public class VfAccountServiceIT {
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
         assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "customerType");
     }
+    @Test
+    public void shouldValidateAccountXmlAndReturnOK() throws Exception {
+        //given
+        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+        final Envelope envelope = EnvelopeData.anEnvelope();
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(envelope.getBody().getResponse());
+        final ContextData contextData = aContextData();
+        String accountJson = converter.toJson(contextData);
 
+        ResponseEntity<Envelope> responseEntity = new ResponseEntity<>(envelope, HttpStatus.OK);
+
+        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<Envelope>>any()))
+                .willReturn(responseEntity);
+
+        //when
+        MvcResult result = mockMvc.perform(post("/accounts/")
+                .contentType(contentType)
+                .content(accountJson)
+                .headers(aHttpHeaders(contextData.getClientId(), contextData.getLocale(), contextData.getChargingId())))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        //then
+        final EnrichedAccountInfo info =
+                (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
+        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "customerType");
+    }
     @Test
     public void shouldReturnNotFound404() throws Exception {
 

@@ -47,7 +47,6 @@ public class AccountServiceTest {
         given(erifClient.validate(contextData)).willReturn(expectedInfo);
         given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("json");
 
-
         //when
         final EnrichedAccountInfo info = accountService.enrichAccountData(contextData);
 
@@ -56,19 +55,50 @@ public class AccountServiceTest {
         verify(erifClient).validate(any(ContextData.class));
 
     }
+    @Test
+    public void shouldCallERIFXmlClientWithoutChangingContextData() throws Exception {
+        //given
+        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
+        final ContextData contextData = aContextData();
+        given(erifXmlClient.validate(contextData)).willReturn(expectedInfo);
+        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+
+        //when
+        final EnrichedAccountInfo info = accountService.enrichAccountData(contextData);
+
+        //then
+        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+        verify(erifXmlClient).validate(any(ContextData.class));
+    }
 
     @Test
-    public void shouldPropogateAnyExceptionWithoutModification() {
+    public void shouldPropagateAnyExceptionWithoutModificationERIFClient() {
         final ContextData contextData = aContextData();
         final String message = "This is a test exception message";
         given(erifClient.validate(contextData))
                 .willThrow(new RuntimeException(message));
+        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("json");
 
         assertThatThrownBy(()-> accountService.enrichAccountData(contextData))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage(message);
 
         verify(erifClient).validate(any(ContextData.class));
+    }
+
+    @Test
+    public void shouldPropagateAnyExceptionWithoutModificationERIFXmlClient() {
+        final ContextData contextData = aContextData();
+        final String message = "This is a test exception message";
+        given(erifXmlClient.validate(contextData))
+                .willThrow(new RuntimeException(message));
+        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+
+        assertThatThrownBy(()-> accountService.enrichAccountData(contextData))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage(message);
+
+        verify(erifXmlClient).validate(any(ContextData.class));
     }
 
 }
