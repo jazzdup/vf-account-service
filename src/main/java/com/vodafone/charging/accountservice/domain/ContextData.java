@@ -2,6 +2,8 @@ package com.vodafone.charging.accountservice.domain;
 
 import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import com.vodafone.charging.accountservice.domain.enums.PackageType;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +17,18 @@ import java.util.Map;
  * Represents operation context
  */
 @Component
+@ApiModel(description = "Contextual Information from incoming requests")
 public class ContextData {
     private String contextName;
+
+    @ApiModelProperty(value = "This the locale of the customer", required = true)
     @NotNull(message = "'locale' is compulsory and cannot be null")
     private Locale locale;
+
+    @ApiModelProperty(value = "Vodafone Charging Account Type", required = true)
     @NotNull(message = "'chargingId' is compulsory and cannot be null")
     private ChargingId chargingId;
+
     private String serviceId;
     private PackageType packageType;
     private String partnerId;
@@ -137,22 +145,27 @@ public class ContextData {
             this.serviceId = serviceId;
             return this;
         }
+
         public Builder packageType(final PackageType packageType) {
             this.packageType = packageType;
             return this;
         }
+
         public Builder vendorId(final String vendorId) {
             this.vendorId = vendorId;
             return this;
         }
+
         public Builder partnerId(final String partnerId) {
             this.partnerId = partnerId;
             return this;
         }
+
         public Builder clientId(final String clientId) {
             this.clientId = clientId;
             return this;
         }
+
         public Builder kycCheck(final boolean kycCheck) {
             this.kycCheck = kycCheck;
             return this;
@@ -169,3 +182,4 @@ public class ContextData {
 
     }
 }
+

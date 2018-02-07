@@ -5,14 +5,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.ResponseMessageBuilder;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.time.LocalDate;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
  * Spring Boot Application class
@@ -31,10 +40,16 @@ public class AccountServiceApplication {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.vodafone.charging.accountservice"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(apiInfo());
+                .directModelSubstitute(LocalDate.class,
+                        String.class)
+                .apiInfo(apiInfo())
+                .useDefaultResponseMessages(false)
+                .globalResponseMessage(RequestMethod.POST, newArrayList(new ResponseMessageBuilder().code(INTERNAL_SERVER_ERROR.value())
+                        .message(INTERNAL_SERVER_ERROR.getReasonPhrase())
+                        .responseModel(new ModelRef("AccountServiceError")).build()));
     }
 
     private ApiInfo apiInfo() {
@@ -44,6 +59,25 @@ public class AccountServiceApplication {
                 .description("REST Api to enrich Vodafone Account Information via interaction with OPCO and Partner Services")
                 .build();
 
+    }
+
+    @Bean
+    public UiConfiguration uiConfig() {
+        return UiConfigurationBuilder.builder()
+                .deepLinking(true)
+                .displayOperationId(false)
+                .defaultModelsExpandDepth(10)
+                .defaultModelExpandDepth(10)
+                .defaultModelRendering(ModelRendering.MODEL)
+                .displayRequestDuration(false)
+                .docExpansion(DocExpansion.LIST)
+                .filter(false)
+                .maxDisplayedTags(null)
+                .operationsSorter(OperationsSorter.ALPHA)
+                .showExtensions(false)
+                .tagsSorter(TagsSorter.ALPHA)
+                .validatorUrl(null)
+                .build();
     }
 
 }
