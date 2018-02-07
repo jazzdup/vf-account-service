@@ -51,7 +51,7 @@ public class ERIFClientTest {
     }
 
     @Test
-    public void shouldValidateAccountAndReturnOK() {
+    public void shouldValidateAccountAndReturnOKWithJson() {
         //given
         final ERIFResponse erifResponse = aERIFResponse();
 

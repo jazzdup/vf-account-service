@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
 public class PropertiesAccessorIT {
+
+    public final int TOTAL_NUMBER_OF_PROPS = 8;
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
@@ -54,7 +56,7 @@ public class PropertiesAccessorIT {
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(7);
+        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(TOTAL_NUMBER_OF_PROPS);
     }
 
     @Test

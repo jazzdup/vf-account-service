@@ -1,8 +1,10 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.xml.Response;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +20,7 @@ public class EnrichedAccountInfo {
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
-    private String customerType;
+    private String customerType;// is the PRE/POST string for prepay type
     private String errorId;
     private String errorDescription;
 
@@ -35,6 +37,28 @@ public class EnrichedAccountInfo {
         serviceProviderType = erifResponse.getServiceProviderType();
         serviceProviderId = erifResponse.getServiceProviderId();
         customerType = erifResponse.getCustomerType();
+        errorId = erifResponse.getErrId();
+        errorDescription = erifResponse.getErrDescription();
+    }
+
+    /**
+     * for not-quite-soap version
+     * @param erifResponse
+     */
+    public EnrichedAccountInfo(@NonNull Response erifResponse){
+        validationStatus = erifResponse.getStatus();
+        ban = erifResponse.getBan();
+        Response.UserGroups userGroups = erifResponse.getUserGroups();
+        usergroups = new ArrayList<String>();
+        for (String item: userGroups.getItem()) {
+            usergroups.add(item);
+        }
+        billingCycleDay = erifResponse.getBillingCycleDay();
+        serviceProviderId = erifResponse.getSpId();
+        childServiceProviderId = erifResponse.getChildSpId();
+        serviceProviderType = erifResponse.getSpType();
+        serviceProviderId = erifResponse.getSpId();
+        customerType = erifResponse.getIsPrepay();
         errorId = erifResponse.getErrId();
         errorDescription = erifResponse.getErrDescription();
     }
