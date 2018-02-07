@@ -5,7 +5,7 @@ package com.vodafone.charging.accountservice.exception;
  */
 public enum ErrorIds {
 
-    VAS_INTERNAL_SERVER_ERROR("VAS Internal Server Error", "Internal Server Error in Vodafone Account Service.");
+    VAS_INTERNAL_SERVER_ERROR("VAS Internal Server Error", "Internal Server Error in Vodafone Account Service");
 
     private final String errorId;
     private final String errorDescription;
