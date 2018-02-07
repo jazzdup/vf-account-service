@@ -27,7 +27,7 @@ public class ChargingId {
         }
     }
 
-    @ApiModelProperty(value = "Vodafone Charging Account Type", required = true, allowableValues = "msisdn,vodafoneid,pstn")
+    @ApiModelProperty(value = "Vodafone Charging Account Type", required = true, allowableValues = "msisdn,vodafoneid,pstn,stb")
     @NotBlank
     private String type;
 
