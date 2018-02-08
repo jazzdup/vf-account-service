@@ -2,18 +2,21 @@ package com.vodafone.charging.accountservice.ulf;
 
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
-import com.vodafone.application.util.ULFUtils.WrappedResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.*;
@@ -26,6 +29,8 @@ import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHead
 public class LoggingFilter implements Filter {
     @Autowired
     private UlfLogger ulfLogger;
+
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss','SSSZ");
 
     protected static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
         String result = servletRequest.getParameter(parameter);
@@ -64,7 +69,7 @@ public class LoggingFilter implements Filter {
             throws IOException, ServletException {
 
         try {
-            log.info("Doing Filter");
+            log.debug("in LoggingFilter");
             final HttpServletRequest request = (HttpServletRequest) servletRequest;
 
             final String transactionId = getOrCreate(request, UlfConstants.LOGGING_TRANSACTION_ID_ATTRIBUTE, UlfConstants.LOGGING_TRANSACTION_ID_HEADER, null);
@@ -83,12 +88,14 @@ public class LoggingFilter implements Filter {
             ULFThreadLocal.setValue(ULFKeys.PARTNER, request.getHeader(REQUEST_PARTNER_ID_HEADER_NAME.getName()));
             ULFThreadLocal.setValue(UlfConstants.REQUEST_CLASS, request.getHeader(REQUEST_CLASS_HEADER_NAME.getName()));
 
-            ulfLogger.logHttpRequestIn(request, useCaseId, transactionId);
+            ULFThreadLocal.setValue(UlfConstants.REQUEST_TIMESTAMP, formatter.format(new Date()));
 
-            final WrappedResponse wrappedResponse = new WrappedResponse((HttpServletResponse) servletResponse);
-            chain.doFilter(request, wrappedResponse);
+            HttpServletRequest requestToCache = new ContentCachingRequestWrapper((HttpServletRequest) servletRequest);
+            HttpServletResponse responseToCache = new ContentCachingResponseWrapper((HttpServletResponse)servletResponse);
 
-            ulfLogger.logHttpResponseOut(request, wrappedResponse, useCaseId, transactionId);
+            chain.doFilter(requestToCache, responseToCache);
+            ulfLogger.logHttpRequestIn(requestToCache, useCaseId, transactionId);
+            ulfLogger.logHttpResponseOut(request, responseToCache, useCaseId, transactionId);
 
         } finally {
             ULFThreadLocal.clean();
