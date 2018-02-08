@@ -30,6 +30,10 @@ public class LoggingFilter implements Filter {
     @Autowired
     private UlfLogger ulfLogger;
 
+    public LoggingFilter(UlfLogger ulfLogger) {
+        this.ulfLogger = ulfLogger;
+    }
+
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss','SSSZ");
 
     protected static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
