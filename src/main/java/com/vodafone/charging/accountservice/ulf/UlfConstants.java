@@ -13,5 +13,4 @@ public final class UlfConstants {
     public static final String LOGGING_TRANSACTION_ID_HEADER = "X-vfgtransactionid";
     public static final String LOGGING_USECASE_ID_HEADER = "X-vfgusecaseid";
     public static final String LOGGING_USECASE_ID_COOKIE = "uid";
-
 }

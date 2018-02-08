@@ -10,7 +10,7 @@ import com.vodafone.application.AppConstants;
 import com.vodafone.application.logging.ULFEntry;
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
-import lombok.extern.slf4j.Slf4j;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Component
-@Slf4j
 public class UlfLogger {
+    private static final Logger log = LoggerFactory.getLogger(UlfLogger.class);
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 

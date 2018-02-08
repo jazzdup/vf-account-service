@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.accountservice.properties;
 
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 

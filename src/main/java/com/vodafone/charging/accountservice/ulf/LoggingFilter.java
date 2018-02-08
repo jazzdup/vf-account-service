@@ -36,7 +36,7 @@ public class LoggingFilter implements Filter {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss','SSSZ");
 
-    protected static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
+    private static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
         String result = servletRequest.getParameter(parameter);
         if (StringUtils.isNotEmpty(result)) {
             return result;
