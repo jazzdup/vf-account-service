@@ -3,7 +3,7 @@ package com.vodafone.charging.accountservice.service;
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

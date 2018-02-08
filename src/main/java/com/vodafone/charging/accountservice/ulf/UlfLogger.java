@@ -11,7 +11,6 @@ import com.vodafone.application.logging.ULFEntry;
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
 import com.vodafone.application.util.ULFUtils;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

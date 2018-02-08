@@ -1,8 +1,8 @@
 package com.vodafone.charging.accountservice.configuration;
 
 import com.vodafone.charging.accountservice.ulf.UlfLogger;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
-import com.vodafone.charging.accountservice.util.SimplePropertiesAccessor;
+import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
+import com.vodafone.charging.accountservice.ulf.SimplePropertiesAccessor;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

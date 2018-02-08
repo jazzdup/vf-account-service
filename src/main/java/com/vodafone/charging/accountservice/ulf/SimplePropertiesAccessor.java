@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.util;
+package com.vodafone.charging.accountservice.ulf;
 
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 import lombok.extern.slf4j.Slf4j;

@@ -4,13 +4,17 @@ import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
 import com.vodafone.application.util.ULFUtils.WrappedResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.*;
 
@@ -22,6 +26,33 @@ import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHead
 public class LoggingFilter implements Filter {
     @Autowired
     private UlfLogger ulfLogger;
+
+    protected static String getOrCreate(HttpServletRequest servletRequest, String parameter, String header, String cookie) {
+        String result = servletRequest.getParameter(parameter);
+        if (StringUtils.isNotEmpty(result)) {
+            return result;
+        }
+
+        result = servletRequest.getHeader(header);
+        if (StringUtils.isNotEmpty(result)) {
+            return result;
+        }
+
+        if (StringUtils.isNotEmpty(cookie) && ArrayUtils.isNotEmpty(servletRequest.getCookies())) {
+            for (Cookie c : servletRequest.getCookies()) {
+                if (cookie.equals(c.getName())) {
+                    result = c.getValue();
+                    break;
+                }
+            }
+
+            if (StringUtils.isNotEmpty(result)) {
+                return result;
+            }
+        }
+
+        return UUID.randomUUID().toString();
+    }
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -36,10 +67,10 @@ public class LoggingFilter implements Filter {
             log.info("Doing Filter");
             final HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-            final String transactionId = LoggingUtil.getOrCreate(request, UlfConstants.LOGGING_TRANSACTION_ID_ATTRIBUTE, UlfConstants.LOGGING_TRANSACTION_ID_HEADER, null);
+            final String transactionId = getOrCreate(request, UlfConstants.LOGGING_TRANSACTION_ID_ATTRIBUTE, UlfConstants.LOGGING_TRANSACTION_ID_HEADER, null);
             ULFThreadLocal.setValue(ULFKeys.TRANSACTION_ID, transactionId);
 
-            final String useCaseId = LoggingUtil.getOrCreate(request, UlfConstants.USECASE_ID, UlfConstants.LOGGING_USECASE_ID_HEADER, UlfConstants.LOGGING_USECASE_ID_COOKIE);
+            final String useCaseId = getOrCreate(request, UlfConstants.USECASE_ID, UlfConstants.LOGGING_USECASE_ID_HEADER, UlfConstants.LOGGING_USECASE_ID_COOKIE);
             ULFThreadLocal.setValue(ULFKeys.USECASE_ID, useCaseId);
 
             final String jSessionId = request.getSession().getId();
