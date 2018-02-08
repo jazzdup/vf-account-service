@@ -82,7 +82,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public FilterRegistrationBean loggingFilterRegistration(UlfLogger ulfLogger){
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(loggingFilter(ulfLogger));
-        registration.addUrlPatterns("/accounts/*");
+        registration.addUrlPatterns("/accounts");
         registration.setName("loggingFilter");
         registration.setOrder(1);
         return registration;
