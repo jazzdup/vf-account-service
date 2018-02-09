@@ -10,27 +10,33 @@ import com.vodafone.application.AppConstants;
 import com.vodafone.application.logging.ULFEntry;
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
-import com.vodafone.application.util.ULFUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
 @Component
-@Slf4j
 public class UlfLogger {
+    private static final Logger log = LoggerFactory.getLogger(UlfLogger.class);
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
@@ -75,27 +81,17 @@ public class UlfLogger {
         return getGson().toJson(obj.getEntryElements());
     }
 
-    protected static void handleCustomError(ULFUtils.WrappedResponse response, ULFEntry.Builder builder) {
-        if (StringUtils.isNotEmpty(response.getError())) {
-            final String error = ULFThreadLocal.getValue(ULFKeys.ERROR);
-            if (StringUtils.isEmpty(error)) {
-                builder.error(response.getError());
-            }
-        }
-    }
-
     protected void logHttpRequestIn(HttpServletRequest request, String useCaseId, String transactionId) {
         final ULFEntry.Builder builder = new ULFEntry.Builder()
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.REQUEST_IN.toString())
-                .setValue(UlfConstants.ULF_JSESSIONID, request.getSession().getId())
                 .usecaseId(useCaseId)
                 .transactionId(transactionId)
-                .timestamp(new Date())
+                .timestamp(ULFThreadLocal.getValue(UlfConstants.REQUEST_TIMESTAMP))
 
                 .chargingid(ULFThreadLocal.getValue(ULFKeys.CHARGING_ID))
                 .msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
-                .service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
+//                .service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
                 .partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
                 .callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
 
@@ -111,10 +107,34 @@ public class UlfLogger {
                 .setValue(UlfConstants.ULF_USER_AGENT, request.getHeader(HttpHeaders.USER_AGENT))
                 .setValue(UlfConstants.ULF_REFERER, request.getHeader(com.google.common.net.HttpHeaders.REFERER))
                 .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE));
+
+        if (isEnabledLogWithPayload()) {
+            try {
+                ContentCachingRequestWrapper wrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
+                if (wrapper != null) {
+                    byte[] buf = wrapper.getContentAsByteArray();
+                    if (buf.length > 0) {
+                        String payload = new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
+                        builder.payload(payload);
+                    }
+                }
+
+//
+//                ResettableStreamHttpServletRequest wrappedRequest = new ResettableStreamHttpServletRequest(
+//                        (HttpServletRequest) request);
+//                // wrappedRequest.getInputStream().read();
+//                String body = IOUtils.toString(wrappedRequest.getReader());
+//                log.info(wrappedRequest.getRequestURI(), wrappedRequest.getUserPrincipal(), body);
+//                builder.payload(body);
+//                wrappedRequest.resetInputStream();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
         log(builder.build());
     }
 
-    protected void logHttpRequestOut(HttpRequest request, String useCaseId, String transactionId) {
+    protected void logHttpRequestOut(HttpRequest request, byte[] bytes, String useCaseId, String transactionId) {
         final ULFEntry.Builder builder = new ULFEntry.Builder()
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.REQUEST_OUT.toString())
@@ -126,12 +146,23 @@ public class UlfLogger {
                 .service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
                 .partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
                 .callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
-                .httpMethod(request.getMethod().name())
+                .httpMethod(request.getMethod().toString())
+                .outboundUrl(request.getURI().toString())
                 .opco(ULFThreadLocal.getValue(ULFKeys.COUNTRY_CODE))
                 .channel(ULFThreadLocal.getValue(ULFKeys.CHANNEL));
-        log(builder.build());
+        if (isEnabledLogWithPayload()) {
+            try {
+                String payload = new String(bytes, "UTF-8");
+                builder.payload(payload);
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+            log(builder.build());
+        }
     }
-    protected void logHttpResponseIn(HttpRequest request, ClientHttpResponse response, String useCaseId, String transactionId) {
+    protected ClientHttpResponse logHttpResponseIn(HttpRequest request, ClientHttpResponse response, String useCaseId, String transactionId) {
+        ClientHttpResponse responseCopy = new BufferingClientHttpResponseWrapper(response);
+
         ULFEntry.Builder builder = new ULFEntry.Builder();
         try {
             builder.setValue(UlfConstants.ULF_HTTP_STATUS_CODE, String.valueOf(response.getStatusCode()));
@@ -152,7 +183,7 @@ public class UlfLogger {
                 .service(ULFThreadLocal.getValue((ULFKeys.SERVICE)))
                 .partner(ULFThreadLocal.getValue((ULFKeys.PARTNER)))
                 .callerId(ULFThreadLocal.getValue((ULFKeys.CALLER_ID)))
-                .httpMethod(request.getMethod().name())
+                .httpMethod(request.getMethod().toString())
                 .errorCode(ULFThreadLocal.getValue(ULFKeys.ERROR_CODE))
                 .error(ULFThreadLocal.getValue(ULFKeys.ERROR))
                 .opco(ULFThreadLocal.getValue(ULFKeys.COUNTRY_CODE))
@@ -160,15 +191,63 @@ public class UlfLogger {
                 .msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
                 .partner(ULFThreadLocal.getValue(ULFKeys.PARTNER))
                 .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE));
-//				.payload(response.getPayload());
-
+        if (isEnabledLogWithPayload() ) {
+            try {
+                builder.payload(IOUtils.toString(responseCopy.getBody()));
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
         log(builder.build());
+        return responseCopy;
     }
-    protected void logHttpResponseOut(HttpServletRequest request, ULFUtils.WrappedResponse response, String useCaseId, String transactionId) {
+
+    private class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
+
+        private final ClientHttpResponse response;
+
+        private byte[] body;
+
+
+        BufferingClientHttpResponseWrapper(ClientHttpResponse response) {
+            this.response = response;
+        }
+
+
+        public HttpStatus getStatusCode() throws IOException {
+            return this.response.getStatusCode();
+        }
+
+        public int getRawStatusCode() throws IOException {
+            return this.response.getRawStatusCode();
+        }
+
+        public String getStatusText() throws IOException {
+            return this.response.getStatusText();
+        }
+
+        public org.springframework.http.HttpHeaders getHeaders() {
+            return this.response.getHeaders();
+        }
+
+        public InputStream getBody() throws IOException {
+            if (this.body == null) {
+                this.body = StreamUtils.copyToByteArray(this.response.getBody());
+            }
+            return new ByteArrayInputStream(this.body);
+        }
+
+        public void close() {
+            this.response.close();
+        }
+
+    }
+
+    protected void logHttpResponseOut(HttpServletRequest request, HttpServletResponse response, String useCaseId, String transactionId) {
+        ContentCachingResponseWrapper wrapper = WebUtils.getNativeResponse(response, ContentCachingResponseWrapper.class);
         final ULFEntry.Builder builder = new ULFEntry.Builder()
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.RESPONSE_OUT.toString())
-                .setValue(UlfConstants.ULF_JSESSIONID, request.getSession().getId())
                 .usecaseId(useCaseId)
                 .transactionId(transactionId)
                 .timestamp(new Date())
@@ -195,27 +274,23 @@ public class UlfLogger {
                 .msisdn(ULFThreadLocal.getValue(ULFKeys.MSISDN))
                 .partner(ULFThreadLocal.getValue(ULFKeys.PARTNER))
 
-                .redirectUrl(response.getRedirect())
                 .setValue(UlfConstants.ULF_USER_AGENT, request.getHeader(HttpHeaders.USER_AGENT))
                 .setValue(UlfConstants.ULF_REFERER, request.getHeader(com.google.common.net.HttpHeaders.REFERER))
-                .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE))
-                .payload(response.getPayload());
+                .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE));
 
-        if (isErrorStatusCode(response.getStatus())) {
-            builder.status(ULFUtils.ERROR_STATUS);
-            handleCustomError(response, builder);
-
-        } else {
-            builder.status(ULFUtils.SUCCESS_STATUS);
+        try {
+            if (isEnabledLogWithPayload()) {
+                byte[] buf = wrapper.getContentAsByteArray();
+                if (buf.length > 0) {
+                    String payload = new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
+                    builder.payload(payload);
+                }
+            }
+            wrapper.copyBodyToResponse();
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
-
         log(builder.build());
-    }
 
-    /**
-     * Check whether a HTTP status code is an error code (not 1xx, 2xx or 3xx)
-     */
-    private static boolean isErrorStatusCode(int statusCode) {
-        return statusCode >= HttpServletResponse.SC_BAD_REQUEST;
     }
 }

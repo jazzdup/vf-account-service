@@ -25,17 +25,17 @@ public class ERIFClientHttpRequestInterceptor implements ClientHttpRequestInterc
 
     @Override
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
-        log.info("intercept before");
+        log.debug("logging intercept before");
         final String transactionId = ULFThreadLocal.getValue(ULFKeys.TRANSACTION_ID);
         final String useCaseId = ULFThreadLocal.getValue(ULFKeys.USECASE_ID);
 
-        httpRequest.getMethod();
-        ulfLogger.logHttpRequestOut(httpRequest, useCaseId, transactionId);
+        ulfLogger.logHttpRequestOut(httpRequest, bytes, useCaseId, transactionId);
 
         ClientHttpResponse response = clientHttpRequestExecution.execute(httpRequest, bytes);
+        log.debug("logging intercept after");
 
-        log.info("intercept after");
-        ulfLogger.logHttpResponseIn(httpRequest, response, useCaseId, transactionId);
+        response = ulfLogger.logHttpResponseIn(httpRequest, response, useCaseId, transactionId);
+
         return response;
     }
 }
