@@ -2,7 +2,7 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

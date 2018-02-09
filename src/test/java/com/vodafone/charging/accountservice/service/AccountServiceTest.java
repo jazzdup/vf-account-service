@@ -2,7 +2,7 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

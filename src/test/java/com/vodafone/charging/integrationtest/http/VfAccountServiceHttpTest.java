@@ -6,7 +6,7 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import com.vodafone.charging.mock.WiremockPreparer;
