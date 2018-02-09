@@ -4,7 +4,7 @@ import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.accountservice.service.ERIFClient;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import org.junit.Before;
 import org.junit.Test;

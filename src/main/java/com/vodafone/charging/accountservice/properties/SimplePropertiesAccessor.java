@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.util;
+package com.vodafone.charging.accountservice.properties;
 
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -68,16 +68,5 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 	public BasePropertiesProvider getProvider() {
 		return basePropertiesProvider;
 	}
-
-//	@Nonnull
-//	private List<String> splitProperty(String property) {
-//		final List<String> list = new ArrayList<>();
-//		if (StringUtils.isNotEmpty(property)) {
-//			final String[] partnerArray = StringUtils.split(property, ",");
-//			list.addAll(Arrays.asList(StringUtils.stripAll(partnerArray)));
-//		}
-//
-//		return list;
-//	}
 
 }

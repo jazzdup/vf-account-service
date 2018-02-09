@@ -1,7 +1,7 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.util.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.ppe.common.configuration.CentralConfigurationService;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import lombok.extern.slf4j.Slf4j;

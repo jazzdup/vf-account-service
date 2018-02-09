@@ -36,3 +36,17 @@ To run the application standalone you can also run:
 java jar <path-to-jar>
 
 e.g. java jar target/vf-account-service-0.0.1-SNAPSHOT.jar
+
+API
+
+REST Api Documentation can be seen at the following url:
+
+http://<HOST>:<PORT/v2/api-docs
+
+With the Swagger-UI location:
+
+http://<HOST:<PORT>/swagger-ui.html
+
+Note that the application must be running to see the documentation.
+
+ 

@@ -8,8 +8,10 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.vodafone.charging.accountservice.ulf.ERIFClientHttpRequestInterceptor;
+import com.vodafone.charging.accountservice.ulf.LoggingFilter;
 import com.vodafone.charging.accountservice.ulf.UlfLogger;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,6 +21,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.servlet.Filter;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +76,20 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
         messageConverters.add(new MappingJackson2HttpMessageConverter());
         super.configureMessageConverters(messageConverters);
+    }
+
+    @Bean
+    public FilterRegistrationBean loggingFilterRegistration(UlfLogger ulfLogger){
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(loggingFilter(ulfLogger));
+        registration.addUrlPatterns("/accounts");
+        registration.setName("loggingFilter");
+        registration.setOrder(1);
+        return registration;
+    }
+
+    public Filter loggingFilter(UlfLogger ulfLogger){
+        return new LoggingFilter(ulfLogger);
     }
 
 //    @Bean
