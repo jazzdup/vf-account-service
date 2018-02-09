@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Slf4j
 public class PropertiesAccessorIT {
 
-    public final int TOTAL_NUMBER_OF_PROPS = 8;
+    public final int TOTAL_NUMBER_OF_PROPS = 11;
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
@@ -55,8 +55,26 @@ public class PropertiesAccessorIT {
         assertThat(bProp).isEqualTo(true);
     }
     @Test
+    public void shouldGetPropertiesForOpcoFromFile(){
+        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
+        final String expectedUrlGB = expectedUrl + ".GB";
+        final String expectedUrlDE = expectedUrl + ".DE";
+
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+        assertThat(url).isEqualTo(expectedUrlGB);
+
+        final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
+        assertThat(url2).isEqualTo(expectedUrlDE);
+
+        final String url3 = propertiesAccessor.getPropertyForOpco("erif.url", "FR");
+        assertThat(url3).isEqualTo(expectedUrl);
+
+        final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR", "DEFAULT");
+        assertThat(url4).isEqualTo("DEFAULT");
+    }
+    @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(TOTAL_NUMBER_OF_PROPS);
+        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(TOTAL_NUMBER_OF_PROPS);
     }
 
     @Test

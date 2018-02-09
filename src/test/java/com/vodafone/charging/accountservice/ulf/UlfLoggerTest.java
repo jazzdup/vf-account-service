@@ -1,7 +1,6 @@
 package com.vodafone.charging.accountservice.ulf;
 
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +34,8 @@ public class UlfLoggerTest {
 
     @Mock
     private Logger loggerMock;
-    @Mock
-    private Log logMock;
+//    @Mock
+//    private Log logMock;
     @Mock
     private PropertiesAccessor propertiesAccessor;
     @InjectMocks
@@ -49,7 +48,7 @@ public class UlfLoggerTest {
 //        when(LogFactory.getLog(any(Class.class))).thenReturn(logMock);
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.without.payload.enable"), anyBoolean())).willReturn(true);
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.payload.enable"), anyBoolean())).willReturn(true);
-        given(propertiesAccessor.isOptionalProperty(eq("ulf.logger.with.pretty.printing.enable"))).willReturn(true);
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
     }
     @Test
     public void shouldReturnCorrectBooleans() throws Exception {
