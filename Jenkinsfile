@@ -45,8 +45,8 @@ pipeline {
             steps {
 
                 println('Clean workspace')
-                deleteDir()
-                incrementApplicationVersion()
+//                deleteDir()
+//                incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
@@ -56,41 +56,45 @@ pipeline {
         stage('Build..') {
             steps {
                 echo 'Building..'
-                sh 'mvn -B -DskipTests clean package'
+//                sh 'mvn -B -DskipTests clean package'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn test'
+//                sh 'mvn test'
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    echo 'Gather surefire reports.'
+//                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-                sh 'mvn failsafe:integration-test'
+//                sh 'mvn failsafe:integration-test'
             }
             post {
                 always {
-                    junit 'target/failsafe-reports/*.xml'
+                    echo 'Gather failsafe Test reports'
+//                    junit 'target/failsafe-reports/*.xml'
                 }
             }
         }
         stage('Update Version') {
             steps {
-                gitCodecheckIn()
+                echo 'Update version ..'
+//                gitCodecheckIn()
             }
         }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
-                publishToNexus()
+                echo 'Publish to Nexus ..'
+//                publishToNexus()
             }
         }
         stage('Deploy to Dev') {
