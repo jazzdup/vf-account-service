@@ -1,8 +1,4 @@
 package com.vodafone.charging.accountservice.ulf;
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,7 +38,7 @@ public class UlfLogger {
     }
 
     public boolean isEnabledLogWithPayload() {
-        return propertiesAccessor.getPropertyAsBoolean("ulf.logger.with.payload.enable", true);
+        return propertiesAccessor.getPropertyAsBoolean("ulf.logger.with.payload.enable", false);
     }
 
     public boolean isEnabledLogWithoutPayload() {
@@ -50,7 +46,7 @@ public class UlfLogger {
     }
 
     public boolean isEnabledLogWithPrettyPrinting() {
-        return propertiesAccessor.isOptionalProperty("ulf.logger.with.pretty.printing.enable");
+        return propertiesAccessor.getPropertyAsBoolean("ulf.logger.with.pretty.printing.enable", false);
     }
 
 

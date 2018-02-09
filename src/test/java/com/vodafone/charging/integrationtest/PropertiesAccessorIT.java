@@ -54,7 +54,7 @@ public class PropertiesAccessorIT {
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(7);
+        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(7);
     }
 
     @Test

@@ -12,7 +12,7 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 	private final BasePropertiesProvider basePropertiesProvider;
 
 	@Override
-	public Map<String, String> getPropertiesList() {
+	public Map<String, String> getPropertiesMap() {
 		return basePropertiesProvider.configurationData();
 	}
 
@@ -29,11 +29,6 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 	public boolean getPropertyAsBoolean(String key, boolean defaultValue) {
 		String value = getOptionalProperty(key);
 		return value != null ? Boolean.parseBoolean(value) : defaultValue;
-	}
-
-	@Override
-	public boolean isOptionalProperty(String key) {
-		return getPropertyAsBoolean(key, false);
 	}
 
 	private String getOptionalProperty(String key) {
