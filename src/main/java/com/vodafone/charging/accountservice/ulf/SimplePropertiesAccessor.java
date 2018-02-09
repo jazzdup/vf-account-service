@@ -1,5 +1,8 @@
 package com.vodafone.charging.accountservice.ulf;
 
+import com.vodafone.application.errors.ConfigPropertyMissingException;
+import com.vodafone.application.logging.ULFKeys;
+import com.vodafone.application.util.ULFThreadLocal;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,6 +11,7 @@ import java.util.Map;
 
 @Slf4j
 public class SimplePropertiesAccessor implements PropertiesAccessor {
+	private final String SEPARATOR = ".";
 
 	private final BasePropertiesProvider basePropertiesProvider;
 
@@ -60,19 +64,28 @@ public class SimplePropertiesAccessor implements PropertiesAccessor {
 	}
 
 	@Override
+	public String getPropertyForOpco(String key, String country, String defaultGlobalValue){
+		final String value = basePropertiesProvider.getProperty(key, country, null, null, null, null);
+		return value != null ? value : defaultGlobalValue;
+	}
+	@Override
+	public String getPropertyForOpco(String key, String country) {
+		final String value = basePropertiesProvider.getProperty(key, country, null, null, null, null);
+		if (value == null) {
+			final String error = "Unable to find a property with key=" + key + " for opco=" + country;
+			log.error(error);
+			ULFThreadLocal.setValue(ULFKeys.ERROR_CODE, ConfigPropertyMissingException.class.getSimpleName());
+			ULFThreadLocal.setValue(ULFKeys.ERROR, error);
+			throw new ConfigPropertyMissingException(error);
+		}
+		return value;
+	}
+
+
+	@Override
 	public BasePropertiesProvider getProvider() {
 		return basePropertiesProvider;
 	}
 
-//	@Nonnull
-//	private List<String> splitProperty(String property) {
-//		final List<String> list = new ArrayList<>();
-//		if (StringUtils.isNotEmpty(property)) {
-//			final String[] partnerArray = StringUtils.split(property, ",");
-//			list.addAll(Arrays.asList(StringUtils.stripAll(partnerArray)));
-//		}
-//
-//		return list;
-//	}
 
 }

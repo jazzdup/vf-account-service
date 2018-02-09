@@ -17,5 +17,19 @@ public interface PropertiesAccessor {
 
 	Map<String, String> getPropertiesMap();
 
+	/**
+	 * Country is 2-digit (capitalised) ISO code at end of property key
+	 * separated by a full stop (.)
+	 * If property value not found for specific country, will return defaultGlobalValue.
+	 */
+	String getPropertyForOpco(String key, String country, String defaultGlobalValue);
+	/**
+	 * Country is 2-digit (capitalised) ISO code at end of property key
+	 * separated by a full stop (.)
+	 * If property value not found for specific country, will return
+	 * property value of key without ISO code if available.
+	 */
+	String getPropertyForOpco(String key, String country);
+
 	BasePropertiesProvider getProvider();
 }

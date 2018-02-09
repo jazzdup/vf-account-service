@@ -101,4 +101,25 @@ public class PropertiesTest {
         assertThat(v2).isEqualTo("value2");
     }
 
+    /**
+     * requires integration test for thorough testing
+     */
+    @Test
+    public void shouldGetPropertiesForOpcoOK(){
+        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
+        final String expectedUrlGB = expectedUrl + ".GB";
+        final String expectedUrlDE = expectedUrl + ".DE";
+        when(basePropertiesProvider.getProperty("erif.url", "GB", null, null, null, null)).thenReturn(expectedUrlGB);
+        when(basePropertiesProvider.getProperty("erif.url", "DE", null, null, null, null)).thenReturn(expectedUrlDE);
+        when(basePropertiesProvider.getProperty("erif.url", null, null, null, null, null)).thenReturn(expectedUrlGB);
+
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+        assertThat(url).isEqualTo(expectedUrlGB);
+
+        final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
+        assertThat(url2).isEqualTo(expectedUrlDE);
+
+        final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "GB", "DEFAULT");
+        assertThat(url4).isEqualTo("DEFAULT");
+    }
 }

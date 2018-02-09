@@ -53,6 +53,21 @@ public class PropertiesAccessorIT {
         assertThat(bProp).isEqualTo(true);
     }
     @Test
+    public void shouldGetPropertiesForOpcoFromFile(){
+        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
+        final String expectedUrlGB = expectedUrl + ".GB";
+        final String expectedUrlDE = expectedUrl + ".DE";
+
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+        assertThat(url).isEqualTo(expectedUrlGB);
+
+        final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
+        assertThat(url2).isEqualTo(expectedUrlDE);
+
+        final String url3 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR");
+        assertThat(url3).isEqualTo(expectedUrl);
+    }
+    @Test
     public void shouldValidateNumberOfPropsFromFile(){
         assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(7);
     }
