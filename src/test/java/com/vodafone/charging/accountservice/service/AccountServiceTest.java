@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -61,7 +62,7 @@ public class AccountServiceTest {
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
         final ContextData contextData = aContextData();
         given(erifXmlClient.validate(contextData)).willReturn(expectedInfo);
-        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
 
         //when
         final EnrichedAccountInfo info = accountService.enrichAccountData(contextData);
@@ -92,7 +93,7 @@ public class AccountServiceTest {
         final String message = "This is a test exception message";
         given(erifXmlClient.validate(contextData))
                 .willThrow(new RuntimeException(message));
-        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
 
         assertThatThrownBy(()-> accountService.enrichAccountData(contextData))
                 .isInstanceOf(RuntimeException.class)

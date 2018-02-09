@@ -113,12 +113,13 @@ public class VfAccountServiceIT {
         //then
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "customerType");
+        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
     }
     @Test
     public void shouldValidateAccountXmlAndReturnOK() throws Exception {
         //given
-        given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("soap");
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
+
         final Envelope envelope = EnvelopeData.anEnvelope();
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(envelope.getBody().getResponse());
         final ContextData contextData = aContextData();
@@ -140,7 +141,7 @@ public class VfAccountServiceIT {
         //then
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "customerType");
+        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
     }
     @Test
     public void shouldReturnNotFound404() throws Exception {
