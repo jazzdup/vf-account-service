@@ -56,7 +56,11 @@ pipeline {
         stage('Build..') {
             steps {
                 echo 'Building..'
-                sh 'mvn -B -DskipTests clean package'
+                configFileProvider(
+                        [configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
+                    sh 'mvn -s $MAVEN_SETTINGS -DskipTests clean package'
+                }
+//                sh 'mvn -B -DskipTests clean package'
             }
         }
 
