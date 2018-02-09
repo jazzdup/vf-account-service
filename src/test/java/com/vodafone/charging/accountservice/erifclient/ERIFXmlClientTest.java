@@ -70,6 +70,7 @@ public class ERIFXmlClientTest {
         final EnrichedAccountInfo enrichedAccountInfo = erifXmlClient.validate(contextData);
 
         //then
+        //validate actual request and response in full:
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
 
         InOrder inOrder = Mockito.inOrder(propertiesAccessor, xmlRestTemplate);
@@ -86,19 +87,17 @@ public class ERIFXmlClientTest {
         final Validate validate = request.getBody().getBody().getMessagegroup().getRequest().getValidate();
         final HttpHeaders headers = request.getHeaders();
 
-
         assertThat(urlCaptor.getValue()).isEqualTo(url);
+
         assertThat(msgcontrol.getCountry()).isEqualTo(contextData.getLocale().getCountry());
         assertThat(validate.isKycCheck()).isEqualTo(contextData.isKycCheck());
         assertThat(validate.getClientId()).isEqualTo(contextData.getClientId());
         assertThat(validate.getAccountId().getType()).isEqualTo(contextData.getChargingId().getType());
-        assertThat(validate.getAccountId().getValue()).isEqualTo(contextData.getChargingId().getValue());
-
-        assertThat(validate.getClientId()).isEqualTo(contextData.getClientId());
         assertThat(validate.getPackageType()).isEqualTo(contextData.getPackageType().name());
         assertThat(validate.getPartnerId()).isEqualTo(contextData.getPartnerId());
         assertThat(validate.getServiceId()).isEqualTo(contextData.getServiceId());
         assertThat(validate.getVendorId()).isEqualTo(contextData.getVendorId());
+
         HttpHeaderValidator.validateHttpHeadersXml(headers, contextData);
     }
 

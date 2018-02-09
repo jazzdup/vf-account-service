@@ -24,6 +24,10 @@ public class WiremockDefaultPreparer {
     public static final String LOCAL_HEADER_VALUE = "local";
 
     public static void prepareForValidateJson(final ChargingId chargingId) {
+        String body = "{\"status\":\"ACCEPTED\",\"ban\":\"BAN_123\",\"errId\":\"OK\",\"errDescription\":\"errDesc\"" +
+                ",\"billingCycleDay\":9,\"spId\":\"serviceProviderId\",\"isPrepay\":\"PRE\"" +
+                ",\"childSpId\":\"childServiceProviderId\",\"spType\":\"serviceProviderType\"" +
+                ",\"userGroups\":[\"test-ug2\",\"test-ug1\"]}\n";
         stubFor(post(urlEqualTo(IF_TEST_URL))
                 .withRequestBody(equalToJson("{\"messageControl\":{\"locale\":\"en_GB\"},\n" +
                         "\"routable\":{\"type\":\"validate\",\"chargingId\":{\"type\":\"msisdn\",\"value\":\"" + chargingId.getValue() + "\"},\"clientId\":\"clientId\",\"kycCheck\":false}}", true, true))
@@ -32,7 +36,8 @@ public class WiremockDefaultPreparer {
                                 .withHeader("connection", "keep-alive")
                                 .withHeader("Content-Type", "application/json")
                                 .withHeader("transfer-encoding", "chunked")
-                                .withBodyFile("erifResponseValidate.txt"))
+                                .withBody(body))
+//                                .withBodyFile("erifResponseValidate.txt"))
         );
     }
 

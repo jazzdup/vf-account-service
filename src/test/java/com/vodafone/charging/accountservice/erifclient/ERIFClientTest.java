@@ -90,6 +90,13 @@ public class ERIFClientTest {
         assertThat(routable.getChargingId()).isEqualTo(contextData.getChargingId());
         assertThat(routable.getType()).isEqualTo(RoutableType.validate.name());
 
+        //validate actual request and response in full:
+        assertThat(enrichedAccountInfo).isEqualToIgnoringGivenFields(erifResponse
+                , "validationStatus", "errorId", "errorDescription");
+        assertThat(enrichedAccountInfo.getValidationStatus()).isEqualTo(erifResponse.getStatus());
+        assertThat(enrichedAccountInfo.getErrorId()).isEqualTo(erifResponse.getErrId());
+        assertThat(enrichedAccountInfo.getErrorDescription()).isEqualTo(erifResponse.getErrDescription());
+
         HttpHeaderValidator.validateHttpHeadersJson(headers, contextData);
     }
 

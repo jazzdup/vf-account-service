@@ -88,12 +88,12 @@ public class VfAccountServiceIT {
                 .ban(expectedInfo.getBan())
                 .billingCycleDay(expectedInfo.getBillingCycleDay())
                 .errId(expectedInfo.getErrorId())
-                .childServiceProviderId(expectedInfo.getChildServiceProviderId())
-                .customerType(expectedInfo.getCustomerType())
+                .childSpId(expectedInfo.getChildServiceProviderId())
+                .isPrepay(expectedInfo.getCustomerType())
                 .status(expectedInfo.getValidationStatus())
-                .serviceProviderId(expectedInfo.getServiceProviderId())
-                .serviceProviderType(expectedInfo.getServiceProviderType())
-                .usergroups(expectedInfo.getUsergroups())
+                .spId(expectedInfo.getServiceProviderId())
+                .spType(expectedInfo.getServiceProviderType())
+                .userGroups(expectedInfo.getUsergroups())
                 .errDescription(expectedInfo.getErrorDescription())
                 .build();
 

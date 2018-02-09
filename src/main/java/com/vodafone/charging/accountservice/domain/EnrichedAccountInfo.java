@@ -30,13 +30,13 @@ public class EnrichedAccountInfo {
     public EnrichedAccountInfo(@NonNull ERIFResponse erifResponse){
         validationStatus = erifResponse.getStatus();
         ban = erifResponse.getBan();
-        usergroups = erifResponse.getUsergroups();
+        usergroups = erifResponse.getUserGroups();
         billingCycleDay = erifResponse.getBillingCycleDay();
-        serviceProviderId = erifResponse.getServiceProviderId();
-        childServiceProviderId = erifResponse.getChildServiceProviderId();
-        serviceProviderType = erifResponse.getServiceProviderType();
-        serviceProviderId = erifResponse.getServiceProviderId();
-        customerType = erifResponse.getCustomerType();
+        serviceProviderId = erifResponse.getSpId();
+        childServiceProviderId = erifResponse.getChildSpId();
+        serviceProviderType = erifResponse.getSpType();
+        serviceProviderId = erifResponse.getSpId();
+        customerType = erifResponse.getIsPrepay();
         errorId = erifResponse.getErrId();
         errorDescription = erifResponse.getErrDescription();
     }

@@ -5,7 +5,9 @@ import lombok.ToString;
 
 import java.util.List;
 
-
+/**
+ * the names of the fields match the json field names, don't change them!
+ */
 @ToString
 @Builder
 public class ERIFResponse {
@@ -14,11 +16,11 @@ public class ERIFResponse {
     private String errId;
     private String errDescription;
     private Integer billingCycleDay;
-    private String serviceProviderId;
-    private String childServiceProviderId;
-    private String serviceProviderType;
-    private String customerType; //PRE or POST
-    private List<String> usergroups;
+    private String spId;
+    private String childSpId;
+    private String spType;
+    private String isPrepay; //PRE or POST
+    private List<String> userGroups;
 
     public String getStatus() {
         return status;
@@ -40,22 +42,22 @@ public class ERIFResponse {
         return billingCycleDay;
     }
 
-    public String getServiceProviderId() {
-        return serviceProviderId;
+    public String getSpId() {
+        return spId;
     }
 
-    public String getChildServiceProviderId() {
-        return childServiceProviderId;
+    public String getChildSpId() {
+        return childSpId;
     }
 
-    public String getServiceProviderType() {
-        return serviceProviderType;
+    public String getSpType() {
+        return spType;
     }
 
-    public String getCustomerType(){ return customerType; }
+    public String getIsPrepay(){ return isPrepay; }
 
-    public List<String> getUsergroups() {
-        return usergroups;
+    public List<String> getUserGroups() {
+        return userGroups;
     }
 
 }

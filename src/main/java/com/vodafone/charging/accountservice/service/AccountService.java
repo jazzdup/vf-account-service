@@ -30,8 +30,8 @@ public class AccountService {
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
 
         log.debug("contextData={}", contextData);
-        String country = contextData.getLocale().getCountry();
-        String protocol = propertiesAccessor.getProperty("gb.erif.communication.protocol");
+        String protocol = propertiesAccessor.getPropertyForOpco("erif.communication.protocol"
+                , contextData.getLocale().getCountry(), "json");
         if ("soap".equalsIgnoreCase(protocol)){
             log.info("doing soap");
             return erifXmlClient.validate(contextData);
