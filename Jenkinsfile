@@ -67,24 +67,24 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-//                sh 'mvn test'
+                sh 'mvn test'
             }
             post {
                 always {
                     echo 'Gather surefire reports.'
-//                    junit 'target/surefire-reports/*.xml'
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-//                sh 'mvn failsafe:integration-test'
+                sh 'mvn failsafe:integration-test'
             }
             post {
                 always {
                     echo 'Gather failsafe Test reports'
-//                    junit 'target/failsafe-reports/*.xml'
+                    junit 'target/failsafe-reports/*.xml'
                 }
             }
         }
