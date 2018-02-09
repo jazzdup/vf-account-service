@@ -46,9 +46,9 @@ pipeline {
 
                 println('Clean workspace')
                 deleteDir()
-//                incrementApplicationVersion()
+                incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
-//                echo "CURRENT APP VERSION=$APP_VERSION"
+                echo "CURRENT APP VERSION=$APP_VERSION"
                 echo "Jenkins BUILD_TAG=$BUILD_TAG"
                 echo "Jenkins BUILD_NUMBER=$currentBuild.number"
             }
