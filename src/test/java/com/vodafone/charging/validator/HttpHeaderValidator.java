@@ -5,8 +5,7 @@ import com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName;
 import org.springframework.http.HttpHeaders;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.*;
 
 /**
  * Testing aid methods to avoid repetition around checking HttpHeader values
@@ -15,11 +14,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 public class HttpHeaderValidator {
 
 
-    public static void validateHttpHeaders(final HttpHeaders headers, final ContextData contextData) {
+    public static void validateHttpHeadersJson(final HttpHeaders headers, final ContextData contextData) {
 
         assertThat(headers).isNotNull();
         assertThat(headers.getContentType()).isEqualTo(APPLICATION_JSON);
         assertThat(headers.getAccept()).containsExactly(APPLICATION_JSON, APPLICATION_JSON_UTF8);
+        validateHttpHeaders(headers, contextData);
+
+    }
+    public static void validateHttpHeadersXml(final HttpHeaders headers, final ContextData contextData) {
+        assertThat(headers).isNotNull();
+        assertThat(headers.getContentType()).isEqualTo(TEXT_XML);
+        assertThat(headers.getAccept()).containsExactly(TEXT_XML);
+        validateHttpHeaders(headers, contextData);
+
+    }
+
+    private static void validateHttpHeaders(HttpHeaders headers, ContextData contextData) {
         assertThat(headers.get(ValidateHttpHeaderName.COUNTRY_HEADER_NAME.getName()))
                 .containsExactly(contextData.getLocale().getCountry());
         assertThat(headers.get(ValidateHttpHeaderName.TARGET_HEADER_NAME.getName()))
@@ -37,7 +48,6 @@ public class HttpHeaderValidator {
 //        httpHeaders.set(ValidateHttpHeaderName.REQUEST_PACKAGE_ID_HEADER_NAME.getName(), contextData.getPackageId());
         assertThat(headers.get(ValidateHttpHeaderName.REQUEST_CLASS_HEADER_NAME.getName()))
                 .containsExactly("VALIDATE");
-
     }
 
 }

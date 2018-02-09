@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.ulf;
 
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -30,7 +31,7 @@ public class ERIFClientHttpRequestInterceptorTest {
         ClientHttpRequestExecution clientHttpRequestExecution = mock(ClientHttpRequestExecution.class);
         erifClientHttpRequestInterceptor.intercept(httpRequest, null, clientHttpRequestExecution );
         InOrder inOrder = Mockito.inOrder(ulfLogger, ulfLogger);
-        inOrder.verify(ulfLogger).logHttpRequestOut(anyObject(), anyString(), anyString());
+        inOrder.verify(ulfLogger).logHttpRequestOut(anyObject(), anyObject(), anyString(), anyString());
         inOrder.verify(ulfLogger).logHttpResponseIn(anyObject(), anyObject(), anyString(), anyString());
         inOrder.verifyNoMoreInteractions();
     }

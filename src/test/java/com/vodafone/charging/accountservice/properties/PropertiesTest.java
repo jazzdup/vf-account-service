@@ -1,7 +1,5 @@
 package com.vodafone.charging.accountservice.properties;
 
-import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
-import com.vodafone.charging.accountservice.ulf.SimplePropertiesAccessor;
 import com.vodafone.ppe.common.configuration.BasePropertiesProvider;
 import org.junit.Before;
 import org.junit.Test;

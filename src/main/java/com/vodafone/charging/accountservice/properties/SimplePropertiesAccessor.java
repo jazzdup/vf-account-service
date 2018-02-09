@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.accountservice.properties;
 
 import com.vodafone.application.errors.ConfigPropertyMissingException;
 import com.vodafone.application.logging.ULFKeys;
@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Slf4j
 public class SimplePropertiesAccessor implements PropertiesAccessor {
-	private final String SEPARATOR = ".";
 
 	private final BasePropertiesProvider basePropertiesProvider;
 

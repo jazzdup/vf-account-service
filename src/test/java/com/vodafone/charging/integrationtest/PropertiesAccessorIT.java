@@ -1,7 +1,7 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.ppe.common.configuration.CentralConfigurationService;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
 public class PropertiesAccessorIT {
+
+    public final int TOTAL_NUMBER_OF_PROPS = 11;
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
@@ -72,7 +74,7 @@ public class PropertiesAccessorIT {
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(10);
+        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(TOTAL_NUMBER_OF_PROPS);
     }
 
     @Test
