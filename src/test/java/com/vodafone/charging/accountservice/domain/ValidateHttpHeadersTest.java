@@ -14,6 +14,6 @@ public class ValidateHttpHeadersTest {
     public void shouldCreateAllValidateHeadersCorrectly() {
         ContextData contextData = aContextData();
         ValidateHttpHeaders validateHttpHeaders = new ValidateHttpHeaders(contextData);
-        HttpHeaderValidator.validateHttpHeaders(validateHttpHeaders.getHttpHeaders(), contextData);
+        HttpHeaderValidator.validateHttpHeadersJson(validateHttpHeaders.getHttpHeaders(), contextData);
     }
 }

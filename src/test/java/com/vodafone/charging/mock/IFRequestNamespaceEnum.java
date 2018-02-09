@@ -1,8 +1,8 @@
 package com.vodafone.charging.mock;
 
 public enum IFRequestNamespaceEnum {
-    SOAP_NS("soap", "http://www.w3.org/2001/12/soap-envelope"),
-    VODAFONE_NS("vf", "http://www.vizzavi.net/chargingandpayments/message/1.0");
+    SOAP_NS("SOAP-ENV", "http://www.w3.org/2001/12/soap-envelope"),
+    VODAFONE_NS("ns2", "http://www.vizzavi.net/chargingandpayments/message/1.0");
 
     private String prefix;
     private String url;
