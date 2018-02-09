@@ -64,12 +64,15 @@ public class PropertiesAccessorIT {
         final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
         assertThat(url2).isEqualTo(expectedUrlDE);
 
-        final String url3 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR");
+        final String url3 = propertiesAccessor.getPropertyForOpco("erif.url", "FR");
         assertThat(url3).isEqualTo(expectedUrl);
+
+        final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR", "DEFAULT");
+        assertThat(url4).isEqualTo("DEFAULT");
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(7);
+        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(10);
     }
 
     @Test
