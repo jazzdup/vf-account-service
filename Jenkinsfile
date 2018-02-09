@@ -19,7 +19,7 @@
  *
  */
 pipeline {
-    agent { any }
+//    agent {
 //        docker {
             //image 'raghera/java8-maven3-git-versioned'
 //            image 'paasmule/java-maven-git-alpine'
