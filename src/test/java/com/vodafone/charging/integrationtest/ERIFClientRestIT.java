@@ -6,7 +6,7 @@ import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
-import com.vodafone.charging.data.builder.ERIFResponseData;
+import com.vodafone.charging.data.builder.IFResponseData;
 import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +72,7 @@ public class ERIFClientRestIT {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithAllFields() throws Exception {
         //given
-        final ERIFResponse erifResponse = ERIFResponseData.aERIFResponse();
+        final ERIFResponse erifResponse = IFResponseData.aERIFResponse();
 
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);

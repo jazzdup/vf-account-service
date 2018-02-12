@@ -6,7 +6,6 @@ import com.vodafone.charging.accountservice.domain.xml.*;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFXmlClient;
-import com.vodafone.charging.data.builder.EnvelopeData;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static com.vodafone.charging.data.builder.IFResponseData.anEnvelope;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -54,7 +54,7 @@ public class ERIFXmlClientTest {
     @Test
     public void shouldValidateAccountAndReturnOKWithJson() {
         //given
-        final Envelope requestEnvelope = EnvelopeData.anEnvelope();
+        final Envelope requestEnvelope = anEnvelope();
 
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(requestEnvelope.getBody().getResponse());

@@ -11,7 +11,6 @@ import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
-import com.vodafone.charging.data.builder.EnvelopeData;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -42,6 +41,7 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContext
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
+import static com.vodafone.charging.data.builder.IFResponseData.anEnvelope;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -120,7 +120,7 @@ public class VfAccountServiceIT {
         //given
         given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
 
-        final Envelope envelope = EnvelopeData.anEnvelope();
+        final Envelope envelope = anEnvelope();
         final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(envelope.getBody().getResponse());
         final ContextData contextData = aContextData();
         String accountJson = converter.toJson(contextData);

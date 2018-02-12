@@ -2,6 +2,7 @@ package com.vodafone.charging.mock;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.enums.ResponseType;
+import com.vodafone.charging.accountservice.domain.xml.Response;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.SOAP_NS;
@@ -41,6 +42,17 @@ public class WiremockDefaultPreparer {
         );
     }
 
+//    public static String aAccountValidationJsonResponse(){
+//        return "{
+//                "status": "ACCEPTED",
+//                "ban": "BAN_7777",
+//                "errId": "OK",
+//                "billingCycleDay": 18
+//                }""
+//
+//
+//    }
+
     public static void prepareForValidateSoap(final ChargingId chargingId, String ban) {
         String validateResponse = aAccountValidationSoapResponse(ResponseType.OK, ban, "OK", null);
         stubFor(post(urlEqualTo(IF_TEST_URL))
@@ -53,6 +65,21 @@ public class WiremockDefaultPreparer {
                                 .withHeader("Content-Type", "application/xml")
                                 .withHeader("transfer-encoding", "chunked")
                                 .withBody(validateResponse))
+        );
+    }
+
+    public static void prepareForValidateSoap(Response response) {
+        String validateResponse = aAccountValidationSoapResponse(response, ResponseType.OK);
+        stubFor(post(urlEqualTo(IF_TEST_URL))
+                .withRequestBody(matchingXPath(VALIDATE.path())
+                        .withXPathNamespace(SOAP_NS.prefix(), SOAP_NS.url())
+                        .withXPathNamespace(VODAFONE_NS.prefix(), VODAFONE_NS.url()))
+                .willReturn(aResponse()
+                        .withStatus(SC_OK)
+                        .withHeader("connection", "keep-alive")
+                        .withHeader("Content-Type", "application/xml")
+                        .withHeader("transfer-encoding", "chunked")
+                        .withBody(validateResponse))
         );
     }
 

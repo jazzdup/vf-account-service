@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.ERIFResponseData.aERIFResponse;
+import static com.vodafone.charging.data.builder.IFResponseData.aERIFResponse;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -92,11 +92,6 @@ public class ERIFClientTest {
 
         //validate actual request and response in full:
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
-//        isEqualToIgnoringGivenFields(enrichedAccountInfo
-//                , "validationStatus", "errorId", "errorDescription", "usergroups");
-//        assertThat(enrichedAccountInfo.getValidationStatus()).isEqualTo(erifResponse.getStatus());
-//        assertThat(enrichedAccountInfo.getErrorId()).isEqualTo(erifResponse.getErrId());
-//        assertThat(enrichedAccountInfo.getErrorDescription()).isEqualTo(erifResponse.getErrDescription());
 
         HttpHeaderValidator.validateHttpHeadersJson(headers, contextData);
     }
