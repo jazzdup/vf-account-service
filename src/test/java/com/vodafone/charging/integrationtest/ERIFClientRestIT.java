@@ -53,7 +53,8 @@ public class ERIFClientRestIT {
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
-        String url = propertiesAccessor.getProperty("erif.url");
+        String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 
@@ -76,7 +77,7 @@ public class ERIFClientRestIT {
 
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
-        String url = propertiesAccessor.getProperty("erif.url");
+        String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 

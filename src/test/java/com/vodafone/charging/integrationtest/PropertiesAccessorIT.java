@@ -30,8 +30,8 @@ public class PropertiesAccessorIT {
     @Test
     public void shouldGetERIFClientPropertyFromFile()
     {
-        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
-        final String url = propertiesAccessor.getProperty("erif.url");
+        final String expectedUrl = "http://localhost:8080/broker/router.jsp.GB";
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         assertThat(url).isEqualTo(expectedUrl );
     }
 
@@ -56,7 +56,7 @@ public class PropertiesAccessorIT {
     }
     @Test
     public void shouldGetPropertiesForOpcoFromFile(){
-        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
+        final String expectedUrl = "http://localhost:8080/broker/router.jsp";
         final String expectedUrlGB = expectedUrl + ".GB";
         final String expectedUrlDE = expectedUrl + ".DE";
 
@@ -66,11 +66,15 @@ public class PropertiesAccessorIT {
         final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
         assertThat(url2).isEqualTo(expectedUrlDE);
 
-        final String url3 = propertiesAccessor.getPropertyForOpco("erif.url", "FR");
-        assertThat(url3).isEqualTo(expectedUrl);
-
         final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR", "DEFAULT");
         assertThat(url4).isEqualTo("DEFAULT");
+
+        final String protocolDE = propertiesAccessor.getPropertyForOpco("erif.communication.protocol", "DE");
+        assertThat(protocolDE).isEqualTo("soap");
+
+        final String protocol = propertiesAccessor.getPropertyForOpco("erif.communication.protocol", "XX");
+        assertThat(protocol).isEqualTo("json");
+
     }
     @Test
     public void shouldValidateNumberOfPropsFromFile(){

@@ -44,7 +44,7 @@ public class ERIFXmlClient {
 
         final HttpEntity<Envelope> request = new HttpEntity<>(requestEnvelope, headers.getHttpHeaders());
         log.debug(request.toString());
-        final String url = propertiesAccessor.getProperty("erif.url", "http://127.0.0.1:8080");
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", contextData.getLocale().getCountry());
 
         final Optional<ResponseEntity<Envelope>> responseOptional =
                 Optional.ofNullable(xmlRestTemplate.postForEntity(url, request, Envelope.class));

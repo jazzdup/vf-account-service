@@ -66,7 +66,7 @@ public class VfAccountServiceHttpTest {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFJson() throws Exception {
         //given
-        given(propertiesAccessor.getProperty(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
         final ERIFResponse erifResponse = aERIFResponse();
         //set expectedInfo to be what we're setting in the mock
         final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
@@ -93,7 +93,7 @@ public class VfAccountServiceHttpTest {
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFSoap() throws Exception {
         //given
         given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
-        given(propertiesAccessor.getProperty(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
 
         final Response erifResponse = anXmlResponse();
         //set expectedInfo to be what we're setting in the mock
@@ -118,7 +118,7 @@ public class VfAccountServiceHttpTest {
     public void shouldAcceptJsonString() throws Exception {
 
         //given
-        given(propertiesAccessor.getProperty(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
         final ERIFResponse expectedResponse = aERIFResponse();
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);

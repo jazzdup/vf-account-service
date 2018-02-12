@@ -62,7 +62,7 @@ public class ERIFClientTest {
 
         ResponseEntity<ERIFResponse> responseEntity = new ResponseEntity<>(erifResponse, HttpStatus.OK);
 
-        given(propertiesAccessor.getProperty(eq("erif.url"), anyString())).willReturn(url);
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(url);
         given(restTemplate.postForEntity(eq(url), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
                 .willReturn(responseEntity);
 
@@ -74,7 +74,7 @@ public class ERIFClientTest {
 
         InOrder inOrder = Mockito.inOrder(propertiesAccessor, restTemplate);
 
-        inOrder.verify(propertiesAccessor).getProperty(anyString(), anyString());
+        inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString());
         inOrder.verify(restTemplate).postForEntity(urlCaptor.capture(), httpEntityCaptor.capture(), Matchers.<Class<ERIFResponse>>any());
         verifyNoMoreInteractions(restTemplate, propertiesAccessor);
 
@@ -102,7 +102,7 @@ public class ERIFClientTest {
         String message = "this is a test exception";
         ContextData contextData = aContextData();
 
-        given(propertiesAccessor.getProperty(anyString(), anyString()))
+        given(propertiesAccessor.getPropertyForOpco(anyString(), anyString()))
                 .willThrow(new RuntimeException(message));
         assertThatThrownBy(() -> erifClient.validate(contextData))
                 .isInstanceOf(Exception.class).hasMessage(message);

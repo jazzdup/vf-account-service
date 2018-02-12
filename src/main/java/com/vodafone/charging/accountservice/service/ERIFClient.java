@@ -36,7 +36,7 @@ public class ERIFClient {
         final HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), headers.getHttpHeaders());
 
         log.debug(request.toString());
-        final String url = propertiesAccessor.getProperty("erif.url", "http://127.0.0.1:8080");
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", contextData.getLocale().getCountry());
 
         final Optional<ResponseEntity<ERIFResponse>> responseOptional =
                 Optional.ofNullable(restTemplate.postForEntity(url, request, ERIFResponse.class));

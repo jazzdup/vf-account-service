@@ -62,7 +62,7 @@ public class ERIFXmlClientTest {
         final String url = "http://www.vodafone.com:8080";
         ResponseEntity<Envelope> responseEntity = new ResponseEntity<>(requestEnvelope, HttpStatus.OK);
 
-        given(propertiesAccessor.getProperty(eq("erif.url"), anyString())).willReturn(url);
+        given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(url);
         given(xmlRestTemplate.postForEntity(eq(url), any(HttpEntity.class), Matchers.<Class<Envelope>>any()))
                 .willReturn(responseEntity);
 
@@ -74,7 +74,7 @@ public class ERIFXmlClientTest {
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
 
         InOrder inOrder = Mockito.inOrder(propertiesAccessor, xmlRestTemplate);
-        inOrder.verify(propertiesAccessor).getProperty(anyString(), anyString());
+        inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString());
         inOrder.verify(xmlRestTemplate).postForEntity(urlCaptor.capture(), httpEntityCaptor.capture(), Matchers.<Class<Response>>any());
         verifyNoMoreInteractions(xmlRestTemplate, propertiesAccessor);
 
@@ -107,7 +107,7 @@ public class ERIFXmlClientTest {
         String message = "this is a test exception";
         ContextData contextData = aContextData();
 
-        given(propertiesAccessor.getProperty(anyString(), anyString()))
+        given(propertiesAccessor.getPropertyForOpco(anyString(), anyString()))
                 .willThrow(new RuntimeException(message));
         assertThatThrownBy(() -> erifXmlClient.validate(contextData))
                 .isInstanceOf(Exception.class).hasMessage(message);
