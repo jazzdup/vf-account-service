@@ -27,8 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
 
 @Component
 public class UlfLogger {
@@ -64,11 +62,13 @@ public class UlfLogger {
         }
 
         if (isEnabledLogWithoutPayload()) {
-            Map<String, String> loggerElements = new TreeMap();
-            loggerElements.putAll(obj.getEntryElements());
-            loggerElements.remove(ULFKeys.PAYLOAD.toString());
+//            Map<String, String> loggerElements = new TreeMap();
+//            loggerElements.putAll(obj.getEntryElements());
+//            loggerElements.remove(ULFKeys.PAYLOAD.toString());
+//            Logger logger = LoggerFactory.getLogger(AppConstants.ULF_WITHOUT_PAYLOAD_LOGGER_NAME);
+//            logger.info(getGson().toJson(loggerElements));
             Logger logger = LoggerFactory.getLogger(AppConstants.ULF_WITHOUT_PAYLOAD_LOGGER_NAME);
-            logger.info(getGson().toJson(loggerElements));
+            logger.info(getGson().toJson(obj.getEntryElements()));
         }
 
     }

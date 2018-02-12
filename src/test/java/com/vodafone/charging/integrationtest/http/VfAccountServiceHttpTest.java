@@ -33,6 +33,7 @@ import static com.vodafone.charging.data.builder.IFResponseData.aERIFResponse;
 import static com.vodafone.charging.data.builder.IFResponseData.anXmlResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -66,6 +67,9 @@ public class VfAccountServiceHttpTest {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFJson() throws Exception {
         //given
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.without.payload.enable"), anyBoolean())).willReturn(true);
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.payload.enable"), anyBoolean())).willReturn(true);
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
         final ERIFResponse erifResponse = aERIFResponse();
         //set expectedInfo to be what we're setting in the mock
@@ -92,6 +96,9 @@ public class VfAccountServiceHttpTest {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFSoap() throws Exception {
         //given
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.without.payload.enable"), anyBoolean())).willReturn(true);
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.payload.enable"), anyBoolean())).willReturn(true);
+        given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
 
