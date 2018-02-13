@@ -45,7 +45,7 @@ pipeline {
             steps {
 
                 println('Clean workspace')
-                deleteDir()
+//                deleteDir()
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -97,6 +97,9 @@ pipeline {
         stage('Publish') {
             steps {
                 echo 'Publish to Nexus ..'
+                echo 'Cleanup'
+
+
 //                publishToNexus()
             }
         }
