@@ -7,6 +7,7 @@ import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedEx
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFXmlClient;
 import com.vodafone.charging.validator.HttpHeaderValidator;
+import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,8 +52,7 @@ public class ERIFXmlClientTest {
         initMocks(this);
     }
 
-    @Test
-    public void shouldValidateAccountAndReturnOKWithJson() {
+    @Test public void shouldValidateAccountAndReturnOKWithXml() {
         //given
         final Envelope requestEnvelope = anEnvelope();
 
@@ -79,10 +79,6 @@ public class ERIFXmlClientTest {
         verifyNoMoreInteractions(xmlRestTemplate, propertiesAccessor);
 
         final HttpEntity<Envelope> request = httpEntityCaptor.getValue();
-        final Envelope envelope = responseEntity.getBody();
-        final Body body = envelope.getBody();
-        final Response response = body.getResponse();
-
         final Msgcontrol msgcontrol = request.getBody().getBody().getMessagegroup().getRequest().getMsgcontrol();
         final Validate validate = request.getBody().getBody().getMessagegroup().getRequest().getValidate();
         final HttpHeaders headers = request.getHeaders();
@@ -103,14 +99,12 @@ public class ERIFXmlClientTest {
 
     @Test
     public void shouldPropagateExceptionFromPropertiesAccessor() {
-
         String message = "this is a test exception";
         ContextData contextData = aContextData();
-
         given(propertiesAccessor.getPropertyForOpco(anyString(), anyString()))
-                .willThrow(new RuntimeException(message));
+                .willThrow(new MissingConfigurationException(message));
         assertThatThrownBy(() -> erifXmlClient.validate(contextData))
-                .isInstanceOf(Exception.class).hasMessage(message);
+                .isInstanceOf(MissingConfigurationException.class).hasMessage(message);
 
     }
 
@@ -118,12 +112,10 @@ public class ERIFXmlClientTest {
     public void shouldPropagateExceptionFromRestTemplate() {
         String message = "this is a test exception";
         ContextData contextData = aContextData();
-
         given(xmlRestTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<Response>>any()))
                 .willThrow(new RuntimeException(message));
-
         assertThatThrownBy(() -> erifXmlClient.validate(contextData))
-                .isInstanceOf(Exception.class).hasMessage(message);
+                .isInstanceOf(RuntimeException.class).hasMessage(message);
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -32,7 +33,7 @@ public class ERIFClient {
 
         final MessageControl messageControl = new MessageControl(contextData.getLocale());
         final Routable routable = new Routable(RoutableType.validate, contextData);
-        final ValidateHttpHeaders headers = new ValidateHttpHeaders(contextData);
+        final ValidateHttpHeaders headers = new ValidateHttpHeaders(contextData, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8);
         final HttpEntity<ERIFRequest> request = new HttpEntity<>(new ERIFRequest(messageControl, routable), headers.getHttpHeaders());
 
         log.debug(request.toString());

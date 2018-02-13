@@ -20,21 +20,12 @@ public class ValidateHttpHeaders {
     private static final String envTypeConfigPropName = "central.configuration.env.type";
     private static final String VALIDATE_REQUEST_CLASS = "VALIDATE";
 
-    public ValidateHttpHeaders(@NonNull ContextData contextData) {
+    public ValidateHttpHeaders(@NonNull ContextData contextData, @NonNull MediaType... mediaType) {
+        Assert.isTrue(TEXT_XML.equals(mediaType[0]) || APPLICATION_JSON.equals(mediaType[0])
+                , "media type must be application/json (optional;charset=UTF-8)for JSON or text/xml for SOAP-like XML");
         httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(APPLICATION_JSON);
-        httpHeaders.setAccept(newArrayList(APPLICATION_JSON, APPLICATION_JSON_UTF8));
-        setHttpHeaders(contextData);
-    }
-    public ValidateHttpHeaders(@NonNull ContextData contextData, @NonNull MediaType mediaType) {
-        Assert.isTrue(TEXT_XML.equals(mediaType), "media type must be text/xml for SOAP");
-        httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(mediaType);
+        httpHeaders.setContentType(mediaType[0]);
         httpHeaders.setAccept(newArrayList(mediaType));
-        setHttpHeaders(contextData);
-    }
-
-    private void setHttpHeaders(@NonNull ContextData contextData) {
         httpHeaders.set(COUNTRY_HEADER_NAME.getName(), contextData.getLocale().getCountry());
         httpHeaders.set(TARGET_HEADER_NAME.getName(), contextData.getTarget().getValue());
         httpHeaders.set(REQUEST_CHARGING_ID_HEADER_NAME.getName(), contextData.getChargingId().toIfString());

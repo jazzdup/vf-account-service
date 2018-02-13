@@ -6,6 +6,7 @@ import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedEx
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.validator.HttpHeaderValidator;
+import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,14 +99,12 @@ public class ERIFClientTest {
 
     @Test
     public void shouldPropagateExceptionFromPropertiesAccessor() {
-
         String message = "this is a test exception";
         ContextData contextData = aContextData();
-
         given(propertiesAccessor.getPropertyForOpco(anyString(), anyString()))
-                .willThrow(new RuntimeException(message));
+                .willThrow(new MissingConfigurationException(message));
         assertThatThrownBy(() -> erifClient.validate(contextData))
-                .isInstanceOf(Exception.class).hasMessage(message);
+                .isInstanceOf(MissingConfigurationException.class).hasMessage(message);
 
     }
 
@@ -113,12 +112,10 @@ public class ERIFClientTest {
     public void shouldPropagateExceptionFromRestTemplate() {
         String message = "this is a test exception";
         ContextData contextData = aContextData();
-
         given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
                 .willThrow(new RuntimeException(message));
-
         assertThatThrownBy(() -> erifClient.validate(contextData))
-                .isInstanceOf(Exception.class).hasMessage(message);
+                .isInstanceOf(RuntimeException.class).hasMessage(message);
     }
 
     @Test
