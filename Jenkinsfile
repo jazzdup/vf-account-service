@@ -162,7 +162,7 @@ def incrementApplicationVersion() {
     println "incrementing application version"
 
     withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                      credentialsId   : 'jenkins',
+                      credentialsId   : 'jenkinsGitlab',
                       usernameVariable: "GIT_USER",
                       passwordVariable: "GIT_ACC_TOKEN"]]) {
 
