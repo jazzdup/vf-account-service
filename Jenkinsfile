@@ -97,15 +97,18 @@ pipeline {
         stage('Publish') {
             steps {
                 echo 'Publish to Nexus ..'
-                echo 'Cleanup'
-
-
 //                publishToNexus()
             }
         }
         stage('Deploy to Dev') {
             steps {
                 echo "deploy to development ..."
+            }
+        }
+        post {
+            always {
+                echo 'Cleanup'
+                deleteDir()
             }
         }
     }
