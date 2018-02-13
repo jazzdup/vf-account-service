@@ -42,6 +42,7 @@ public class LoggingFilterTest {
     public void shouldTestEmptyMethodsForStatsOnly(){
         loggingFilter.init(null);
         loggingFilter.destroy();
+        Mockito.verifyZeroInteractions(ulfLogger);
     }
 
 }
