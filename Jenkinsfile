@@ -21,8 +21,9 @@
 pipeline {
     agent {
         docker {
-            image 'raghera/java8-maven3-git-versioned'
+//            image 'raghera/java8-maven3-git-versioned'
 //            image 'paasmule/java-maven-git-alpine'
+            image 'raghera/oracle-java8-161-env'
             args '-v /root/.m2:/root/.m2'
         }
     }
