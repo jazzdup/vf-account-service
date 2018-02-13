@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
@@ -79,7 +78,7 @@ public class UlfLogger {
         return getGson().toJson(obj.getEntryElements());
     }
 
-    protected void logHttpRequestIn(HttpServletRequest request, String useCaseId, String transactionId) {
+    protected void logHttpRequestIn(HttpServletRequest request, String payload, String useCaseId, String transactionId) {
         final ULFEntry.Builder builder = new ULFEntry.Builder()
                 .component(UlfConstants.ULF_LOG_COMPONENT)
                 .logpoint(ULFEntry.Logpoint.REQUEST_IN.toString())
@@ -107,27 +106,7 @@ public class UlfLogger {
                 .setValue(UlfConstants.ULF_SOURCE, ULFThreadLocal.getValue(UlfConstants.ULF_SOURCE));
 
         if (isEnabledLogWithPayload()) {
-            try {
-                ContentCachingRequestWrapper wrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
-                if (wrapper != null) {
-                    byte[] buf = wrapper.getContentAsByteArray();
-                    if (buf.length > 0) {
-                        String payload = new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
-                        builder.payload(payload);
-                    }
-                }
-
-//
-//                ResettableStreamHttpServletRequest wrappedRequest = new ResettableStreamHttpServletRequest(
-//                        (HttpServletRequest) request);
-//                // wrappedRequest.getInputStream().read();
-//                String body = IOUtils.toString(wrappedRequest.getReader());
-//                log.info(wrappedRequest.getRequestURI(), wrappedRequest.getUserPrincipal(), body);
-//                builder.payload(body);
-//                wrappedRequest.resetInputStream();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
+            builder.payload(payload);
         }
         log(builder.build());
     }
