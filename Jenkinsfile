@@ -45,7 +45,7 @@ pipeline {
             steps {
 
                 println('Clean workspace')
-//                deleteDir()
+                deleteDir()
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -105,11 +105,11 @@ pipeline {
                 echo "deploy to development ..."
             }
         }
-        post {
-            always {
-                echo 'Cleanup'
-                deleteDir()
-            }
+    }
+    post {
+        always {
+            echo 'Cleanup'
+            deleteDir()
         }
     }
 }
