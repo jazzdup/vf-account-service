@@ -166,18 +166,19 @@ def incrementApplicationVersion() {
                       usernameVariable: "GIT_USER",
                       passwordVariable: "GIT_ACC_TOKEN"]]) {
 
+//        sh "cd $env.WORKSPACE"
+        echo "$env.WORKSPACE"
+
         //These credentials need to be bound in the Jenkins credentials configuration
         //Otherwise the full string would have to be hardcoded here.
         sh "git clone https://$GIT_USER:$GIT_ACC_TOKEN" + "@$GIT_URL$GIT_GROUP_ID/$GIT_PROJECT_ID" + ".git $env.WORKSPACE"
 
-        sh "cd $env.WORKSPACE"
-
         sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
         sh "git checkout $DEVELOPMENT_BRANCH_NAME"
 
-        APP_VERSION = updatePomVersion()
+//        APP_VERSION = updatePomVersion()
 
-        sh "git commit -am 'Jenkins commit of new version ' "
+//        sh "git commit -am 'Jenkins commit of new version ' "
 
     }
 
