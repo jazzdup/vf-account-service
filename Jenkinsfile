@@ -176,9 +176,9 @@ def incrementApplicationVersion() {
         sh "git config user.name \"jenkins\" && git config user.email \"jenkins@example.com\""
         sh "git checkout $DEVELOPMENT_BRANCH_NAME"
 
-//        APP_VERSION = updatePomVersion()
+        APP_VERSION = updatePomVersion()
 
-//        sh "git commit -am 'Jenkins commit of new version ' "
+        sh "git commit -am 'Jenkins commit of new version ' "
 
     }
 
