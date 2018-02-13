@@ -33,7 +33,7 @@ public class LoggingFilterTest {
         MockFilterChain chain = new MockFilterChain();
         loggingFilter.doFilter(request, response, chain);
         InOrder inOrder = Mockito.inOrder(ulfLogger, ulfLogger);
-        inOrder.verify(ulfLogger).logHttpRequestIn(anyObject(), anyString(), anyString());
+        inOrder.verify(ulfLogger).logHttpRequestIn(anyObject(), anyString(), anyString(), anyString());
         inOrder.verify(ulfLogger).logHttpResponseOut(anyObject(), anyObject(), anyString(), anyString());
         inOrder.verifyNoMoreInteractions();
     }

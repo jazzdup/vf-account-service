@@ -30,7 +30,7 @@ public class PropertiesAccessorIT {
     @Test
     public void shouldGetERIFClientPropertyFromFile()
     {
-        final String expectedUrl = "http://localhost:8080/broker/router.jsp.GB";
+        final String expectedUrl = "http://localhost:8080/broker/router.jsp";
         final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         assertThat(url).isEqualTo(expectedUrl );
     }
@@ -57,14 +57,12 @@ public class PropertiesAccessorIT {
     @Test
     public void shouldGetPropertiesForOpcoFromFile(){
         final String expectedUrl = "http://localhost:8080/broker/router.jsp";
-        final String expectedUrlGB = expectedUrl + ".GB";
-        final String expectedUrlDE = expectedUrl + ".DE";
 
         final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
-        assertThat(url).isEqualTo(expectedUrlGB);
+        assertThat(url).isEqualTo(expectedUrl);
 
         final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
-        assertThat(url2).isEqualTo(expectedUrlDE);
+        assertThat(url2).isEqualTo(expectedUrl);
 
         final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR", "DEFAULT");
         assertThat(url4).isEqualTo("DEFAULT");

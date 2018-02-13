@@ -83,7 +83,7 @@ public class UlfLoggerTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        ulfLogger.logHttpRequestIn(request, UC_ID, TX_ID);
+        ulfLogger.logHttpRequestIn(request, "PAYLOAD", UC_ID, TX_ID);
         verify(loggerMock, times(2)).info(anyString());
         ulfLogger.logHttpRequestOut(httpRequest, bytes, UC_ID, TX_ID);
         verify(loggerMock, times(4)).info(anyString());//cumulative
