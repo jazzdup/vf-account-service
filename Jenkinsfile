@@ -24,7 +24,7 @@ pipeline {
 //            image 'raghera/java8-maven3-git-versioned'
 //            image 'paasmule/java-maven-git-alpine'
             image 'raghera/oracle-java8-161-env'
-//            args '-v /root/.m2:/root/.m2'
+            args '-v /root/.m2:/root/jenkins/.m2'
             args '-v /var/lib/jenkins/.m2/:/root/.m2'
         }
     }
