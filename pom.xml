@@ -34,7 +34,6 @@
     <dependencies>
 
         <!--Vodafone Application Dependencies-->
-        <!--ppe-common-config to be pulled from a nexus once configured and we know which one to use -->
         <dependency>
             <groupId>com.vodafone.ppe</groupId>
             <artifactId>ppe-common-config</artifactId>
@@ -227,6 +226,7 @@
             </plugin>
         </plugins>
     </build>
+
     <repositories>
         <repository>
             <id>ppe</id>
