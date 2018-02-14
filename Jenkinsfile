@@ -166,7 +166,7 @@ def incrementApplicationVersion() {
 
     println "incrementing application version"
 
-    sh "ls /var/lib/jenkins/.m2"
+    sh "ls /.m2"
 
     withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                       credentialsId   : 'jenkinsGitlab',
