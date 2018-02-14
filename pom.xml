@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.vodafone.charging</groupId>
-    <artifactId>vf-account-service</artifactId>
-    <version>0.0.28</version>
+    <artifactId>charging-account-service</artifactId>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>vf-account-service</name>
+    <name>charging-account-service</name>
     <description>Micro service for interacting with backend account services</description>
 
     <parent>
@@ -205,13 +205,13 @@
     </build>
     <repositories>
         <!--<repository>-->
-            <!--<id>er</id>-->
-            <!--<url>https://nexus.vfpartnerservices.com/repository/er/</url>-->
-            <!--<snapshots>-->
-                <!--<enabled>true</enabled>-->
-                <!--<updatePolicy>daily</updatePolicy>-->
-                <!--<checksumPolicy>fail</checksumPolicy>-->
-            <!--</snapshots>-->
+        <!--<id>er</id>-->
+        <!--<url>https://nexus.vfpartnerservices.com/repository/er/</url>-->
+        <!--<snapshots>-->
+        <!--<enabled>true</enabled>-->
+        <!--<updatePolicy>daily</updatePolicy>-->
+        <!--<checksumPolicy>fail</checksumPolicy>-->
+        <!--</snapshots>-->
         <!--</repository>-->
         <repository>
             <id>ppe</id>
@@ -223,5 +223,12 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-cas-releases</id>
+            <url>https://nexus.vfpartnerservices.com/repository/charging-account-service-release/</url>
+        </repository>
+    </distributionManagement>
 
 </project>

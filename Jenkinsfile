@@ -21,9 +21,11 @@
 pipeline {
     agent {
         docker {
-            //image 'raghera/java8-maven3-git-versioned'
-            image 'paasmule/java-maven-git-alpine'
+//            image 'paasmule/java-maven-git-alpine'
+            image 'raghera/oracle-java8-161-env'
             args '-v /root/.m2:/root/.m2'
+            args '-v /var/lib/jenkins/.m2:/root/.m2'
+//            args '-v $HOME/.m2:/root/.m2'
         }
     }
     options {
@@ -43,9 +45,6 @@ pipeline {
     stages {
         stage('Prepare Workspace') {
             steps {
-
-                println('Clean workspace')
-                deleteDir()
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -56,17 +55,21 @@ pipeline {
         stage('Build..') {
             steps {
                 echo 'Building..'
-                sh 'mvn -B -DskipTests clean package'
+                configFileProvider(
+                        [configFile(fileId: 'charging-maven-settings', variable: 'MAVEN_SETTINGS')]) {
+                    sh 'mvn -s $MAVEN_SETTINGS -B -DskipTests package'
+                }
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn test'
+                sh 'mvn -B test'
             }
             post {
                 always {
+                    echo 'Gather surefire reports.'
                     junit 'target/surefire-reports/*.xml'
                 }
             }
@@ -74,29 +77,38 @@ pipeline {
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-                sh 'mvn failsafe:integration-test'
+                sh 'mvn -B failsafe:integration-test'
             }
             post {
                 always {
+                    echo 'Gather failsafe Test reports'
                     junit 'target/failsafe-reports/*.xml'
                 }
             }
         }
         stage('Update Version') {
             steps {
-                gitCodecheckIn()
+                echo 'Update version ..'
+//                gitCodecheckIn()
             }
         }
         //Relies on Nexus being configured on Jenkins correctly
         stage('Publish') {
             steps {
-                publishToNexus()
+                echo 'Publish to Nexus ..'
+//                publishToNexus()
             }
         }
         stage('Deploy to Dev') {
             steps {
                 echo "deploy to development ..."
             }
+        }
+    }
+    post {
+        always {
+            echo 'Cleanup'
+            cleanWs()
         }
     }
 }
@@ -154,8 +166,10 @@ def incrementApplicationVersion() {
 
     println "incrementing application version"
 
+    sh "pwd"
+
     withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                      credentialsId   : 'jenkins',
+                      credentialsId   : 'jenkinsGitlab',
                       usernameVariable: "GIT_USER",
                       passwordVariable: "GIT_ACC_TOKEN"]]) {
 
@@ -176,7 +190,14 @@ def incrementApplicationVersion() {
 
 def publishToNexus() {
     println "Publishing artifact to Nexus version: $APP_VERSION"
+
+    sh "mvn -B deploy -DskipTests"
+
+}
+
+def publishToNexusUsingJenkinsPublisher() {
     Map pomInfo = populatePomValuesMap()
+
     nexusPublisher nexusInstanceId: 'localNexus',
             nexusRepositoryId: 'releases',
             packages: [[$class         : 'MavenPackage',
