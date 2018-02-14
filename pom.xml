@@ -214,4 +214,11 @@
         </repository>
     </repositories>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-cas-releases</id>
+            <url>https://nexus.vfpartnerservices.com/repository/charging-account-service-release/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
