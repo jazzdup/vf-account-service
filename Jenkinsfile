@@ -25,7 +25,7 @@ pipeline {
 //            image 'paasmule/java-maven-git-alpine'
             image 'raghera/oracle-java8-161-env'
 //            args '-v /root/.m2:/root/jenkins/.m2'
-            args '-v /var/lib/jenkins/workspace/charging-account-service-pipeline/.m2:/root/.m2'
+            args '-v /var/lib/jenkins/.m2:/root/.m2'
         }
     }
     options {
@@ -165,6 +165,8 @@ def gitCodecheckIn() {
 def incrementApplicationVersion() {
 
     println "incrementing application version"
+
+    sh "ls /var/lib/jenkins/.m2"
 
     withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                       credentialsId   : 'jenkinsGitlab',
