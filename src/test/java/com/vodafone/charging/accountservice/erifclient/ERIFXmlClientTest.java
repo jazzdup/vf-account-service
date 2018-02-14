@@ -1,10 +1,11 @@
 package com.vodafone.charging.accountservice.erifclient;
 
-import com.vodafone.charging.accountservice.domain.*;
-import com.vodafone.charging.accountservice.domain.enums.RoutableType;
+import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.xml.*;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
-import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.accountservice.service.ERIFXmlClient;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import org.junit.Before;
@@ -19,8 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.IFResponseData.aERIFResponse;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static com.vodafone.charging.data.builder.IFResponseData.anEnvelope;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -29,19 +30,19 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ERIFClientTest {
+public class ERIFXmlClientTest {
 
     @Mock
     private PropertiesAccessor propertiesAccessor;
 
     @Mock
-    private RestTemplate restTemplate;
+    private RestTemplate xmlRestTemplate;
 
     @InjectMocks
-    private ERIFClient erifClient;
+    private ERIFXmlClient erifXmlClient;
 
     @Captor
-    private ArgumentCaptor<HttpEntity<ERIFRequest>> httpEntityCaptor;
+    private ArgumentCaptor<HttpEntity<Envelope>> httpEntityCaptor;
 
     @Captor
     private ArgumentCaptor<String> urlCaptor;
@@ -51,50 +52,49 @@ public class ERIFClientTest {
         initMocks(this);
     }
 
-    @Test
-    public void shouldValidateAccountAndReturnOKWithJson() {
+    @Test public void shouldValidateAccountAndReturnOKWithXml() {
         //given
-        final ERIFResponse erifResponse = aERIFResponse();
+        final Envelope requestEnvelope = anEnvelope();
 
         //set expectedInfo to be what we're setting in the mock
-        EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(erifResponse);
+        EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo(requestEnvelope.getBody().getResponse());
         final ContextData contextData = aContextData();
         final String url = "http://www.vodafone.com:8080";
-
-        ResponseEntity<ERIFResponse> responseEntity = new ResponseEntity<>(erifResponse, HttpStatus.OK);
+        ResponseEntity<Envelope> responseEntity = new ResponseEntity<>(requestEnvelope, HttpStatus.OK);
 
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(url);
-        given(restTemplate.postForEntity(eq(url), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+        given(xmlRestTemplate.postForEntity(eq(url), any(HttpEntity.class), Matchers.<Class<Envelope>>any()))
                 .willReturn(responseEntity);
 
         //when
-        EnrichedAccountInfo enrichedAccountInfo = erifClient.validate(contextData);
+        final EnrichedAccountInfo enrichedAccountInfo = erifXmlClient.validate(contextData);
 
         //then
-        assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
-
-        InOrder inOrder = Mockito.inOrder(propertiesAccessor, restTemplate);
-
-        inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString());
-        inOrder.verify(restTemplate).postForEntity(urlCaptor.capture(), httpEntityCaptor.capture(), Matchers.<Class<ERIFResponse>>any());
-        verifyNoMoreInteractions(restTemplate, propertiesAccessor);
-
-        final HttpEntity<ERIFRequest> request = httpEntityCaptor.getValue();
-        final MessageControl messageControl = request.getBody().getMessageControl();
-        final Routable routable = request.getBody().getRoutable();
-        final HttpHeaders headers = request.getHeaders();
-
-        assertThat(urlCaptor.getValue()).isEqualTo(url);
-        assertThat(messageControl.getLocale()).isEqualTo(contextData.getLocale());
-        assertThat(routable.getKycCheck()).isEqualTo(contextData.isKycCheck());
-        assertThat(routable.getClientId()).isEqualTo(contextData.getClientId());
-        assertThat(routable.getChargingId()).isEqualTo(contextData.getChargingId());
-        assertThat(routable.getType()).isEqualTo(RoutableType.validate.name());
-
         //validate actual request and response in full:
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
 
-        HttpHeaderValidator.validateHttpHeadersJson(headers, contextData);
+        InOrder inOrder = Mockito.inOrder(propertiesAccessor, xmlRestTemplate);
+        inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString());
+        inOrder.verify(xmlRestTemplate).postForEntity(urlCaptor.capture(), httpEntityCaptor.capture(), Matchers.<Class<Response>>any());
+        verifyNoMoreInteractions(xmlRestTemplate, propertiesAccessor);
+
+        final HttpEntity<Envelope> request = httpEntityCaptor.getValue();
+        final Msgcontrol msgcontrol = request.getBody().getBody().getMessagegroup().getRequest().getMsgcontrol();
+        final Validate validate = request.getBody().getBody().getMessagegroup().getRequest().getValidate();
+        final HttpHeaders headers = request.getHeaders();
+
+        assertThat(urlCaptor.getValue()).isEqualTo(url);
+
+        assertThat(msgcontrol.getCountry()).isEqualTo(contextData.getLocale().getCountry());
+        assertThat(validate.isKycCheck()).isEqualTo(contextData.isKycCheck());
+        assertThat(validate.getClientId()).isEqualTo(contextData.getClientId());
+        assertThat(validate.getAccountId().getType()).isEqualTo(contextData.getChargingId().getType());
+        assertThat(validate.getPackageType()).isEqualTo(contextData.getPackageType().name());
+        assertThat(validate.getPartnerId()).isEqualTo(contextData.getPartnerId());
+        assertThat(validate.getServiceId()).isEqualTo(contextData.getServiceId());
+        assertThat(validate.getVendorId()).isEqualTo(contextData.getVendorId());
+
+        HttpHeaderValidator.validateHttpHeadersXml(headers, contextData);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ERIFClientTest {
         ContextData contextData = aContextData();
         given(propertiesAccessor.getPropertyForOpco(anyString(), anyString()))
                 .willThrow(new MissingConfigurationException(message));
-        assertThatThrownBy(() -> erifClient.validate(contextData))
+        assertThatThrownBy(() -> erifXmlClient.validate(contextData))
                 .isInstanceOf(MissingConfigurationException.class).hasMessage(message);
 
     }
@@ -112,9 +112,9 @@ public class ERIFClientTest {
     public void shouldPropagateExceptionFromRestTemplate() {
         String message = "this is a test exception";
         ContextData contextData = aContextData();
-        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+        given(xmlRestTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<Response>>any()))
                 .willThrow(new RuntimeException(message));
-        assertThatThrownBy(() -> erifClient.validate(contextData))
+        assertThatThrownBy(() -> erifXmlClient.validate(contextData))
                 .isInstanceOf(RuntimeException.class).hasMessage(message);
     }
 
@@ -123,10 +123,10 @@ public class ERIFClientTest {
         String message = "Received a null response from RestClient trying to call the IF";
         ContextData contextData = aContextData();
 
-        given(restTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<ERIFResponse>>any()))
+        given(xmlRestTemplate.postForEntity(anyString(), any(HttpEntity.class), Matchers.<Class<Response>>any()))
                 .willReturn(null);
 
-        assertThatThrownBy(() -> erifClient.validate(contextData))
+        assertThatThrownBy(() -> erifXmlClient.validate(contextData))
                 .isInstanceOf(NullRestResponseReceivedException.class)
                 .hasMessage(message);
     }

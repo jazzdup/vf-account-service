@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.ulf;
 
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -24,7 +25,7 @@ public class LoggingFilterTest {
     @InjectMocks
     private LoggingFilter loggingFilter;
     private MockHttpServletRequest request = new MockHttpServletRequest("POST",
-            "/account");
+            "/accounts");
     private MockHttpServletResponse response = new MockHttpServletResponse();
 
     @Test
@@ -32,9 +33,16 @@ public class LoggingFilterTest {
         MockFilterChain chain = new MockFilterChain();
         loggingFilter.doFilter(request, response, chain);
         InOrder inOrder = Mockito.inOrder(ulfLogger, ulfLogger);
-        inOrder.verify(ulfLogger).logHttpRequestIn(anyObject(), anyString(), anyString());
+        inOrder.verify(ulfLogger).logHttpRequestIn(anyObject(), anyString(), anyString(), anyString());
         inOrder.verify(ulfLogger).logHttpResponseOut(anyObject(), anyObject(), anyString(), anyString());
         inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void shouldTestEmptyMethodsForStatsOnly(){
+        loggingFilter.init(null);
+        loggingFilter.destroy();
+        Mockito.verifyZeroInteractions(ulfLogger);
     }
 
 }

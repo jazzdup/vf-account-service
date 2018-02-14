@@ -5,8 +5,8 @@ import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.ERIFClient;
-import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
-import com.vodafone.charging.data.builder.ERIFResponseData;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.data.builder.IFResponseData;
 import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +53,8 @@ public class ERIFClientRestIT {
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo.Builder(erifResponse.getStatus())
                 .ban(erifResponse.getBan()).errorId(erifResponse.getErrId()).billingCycleDay(erifResponse.getBillingCycleDay()).build();
-        String url = propertiesAccessor.getProperty("erif.url");
+        String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 
@@ -72,11 +73,11 @@ public class ERIFClientRestIT {
     @Test
     public void shouldValidateAccountAndReturnOKAgainstMockedERIFWithAllFields() throws Exception {
         //given
-        final ERIFResponse erifResponse = ERIFResponseData.aERIFResponse();
+        final ERIFResponse erifResponse = IFResponseData.aERIFResponse();
 
         //set expectedInfo to be what we're setting in the mock
         EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
-        String url = propertiesAccessor.getProperty("erif.url");
+        String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
 

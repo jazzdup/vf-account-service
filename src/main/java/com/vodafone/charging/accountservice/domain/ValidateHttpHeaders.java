@@ -2,13 +2,14 @@ package com.vodafone.charging.accountservice.domain;
 
 import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 
 import java.util.Optional;
 
 import static com.vodafone.application.util.Lists.newArrayList;
 import static com.vodafone.charging.accountservice.domain.enums.ValidateHttpHeaderName.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.*;
 
 /**
  * Collection to represent the headers required for ER IF
@@ -19,10 +20,12 @@ public class ValidateHttpHeaders {
     private static final String envTypeConfigPropName = "central.configuration.env.type";
     private static final String VALIDATE_REQUEST_CLASS = "VALIDATE";
 
-    public ValidateHttpHeaders(@NonNull ContextData contextData) {
+    public ValidateHttpHeaders(@NonNull ContextData contextData, @NonNull MediaType... mediaType) {
+        Assert.isTrue(TEXT_XML.equals(mediaType[0]) || APPLICATION_JSON.equals(mediaType[0])
+                , "media type must be application/json (optional;charset=UTF-8)for JSON or text/xml for SOAP-like XML");
         httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(APPLICATION_JSON);
-        httpHeaders.setAccept(newArrayList(APPLICATION_JSON, APPLICATION_JSON_UTF8));
+        httpHeaders.setContentType(mediaType[0]);
+        httpHeaders.setAccept(newArrayList(mediaType));
         httpHeaders.set(COUNTRY_HEADER_NAME.getName(), contextData.getLocale().getCountry());
         httpHeaders.set(TARGET_HEADER_NAME.getName(), contextData.getTarget().getValue());
         httpHeaders.set(REQUEST_CHARGING_ID_HEADER_NAME.getName(), contextData.getChargingId().toIfString());
@@ -33,8 +36,8 @@ public class ValidateHttpHeaders {
 //        httpHeaders.set(ValidateHttpHeaderName.REQUEST_PACKAGE_ID_HEADER_NAME.getName(), contextData.getPackageId());
         httpHeaders.set(REQUEST_CLASS_HEADER_NAME.getName(), VALIDATE_REQUEST_CLASS);
 //        httpHeaders.set(ENVIRONMENT_PROPERTY_SERVER_NAME.getName(), propertiesAccessor.getProperty(envTypeConfigPropName, ""));
-
     }
+
 
     /**
      * If ChargingId of type msisdn exists then return the value

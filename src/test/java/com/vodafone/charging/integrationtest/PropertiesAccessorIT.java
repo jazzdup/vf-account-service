@@ -1,7 +1,7 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.ulf.PropertiesAccessor;
+import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.ppe.common.configuration.CentralConfigurationService;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +22,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(classes = AccountServiceApplication.class)
 @Slf4j
 public class PropertiesAccessorIT {
+
+    public final int TOTAL_NUMBER_OF_PROPS = 11;
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
     @Test
     public void shouldGetERIFClientPropertyFromFile()
     {
-        final String expectedUrl = "http://localhost:8458/broker/router.jsp";
-        final String url = propertiesAccessor.getProperty("erif.url");
+        final String expectedUrl = "http://localhost:8080/broker/router.jsp";
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         assertThat(url).isEqualTo(expectedUrl );
     }
 
@@ -53,8 +55,28 @@ public class PropertiesAccessorIT {
         assertThat(bProp).isEqualTo(true);
     }
     @Test
+    public void shouldGetPropertiesForOpcoFromFile(){
+        final String expectedUrl = "http://localhost:8080/broker/router.jsp";
+
+        final String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
+        assertThat(url).isEqualTo(expectedUrl);
+
+        final String url2 = propertiesAccessor.getPropertyForOpco("erif.url", "DE");
+        assertThat(url2).isEqualTo(expectedUrl);
+
+        final String url4 = propertiesAccessor.getPropertyForOpco("erif.url.not.there", "FR", "DEFAULT");
+        assertThat(url4).isEqualTo("DEFAULT");
+
+        final String protocolDE = propertiesAccessor.getPropertyForOpco("erif.communication.protocol", "DE");
+        assertThat(protocolDE).isEqualTo("soap");
+
+        final String protocol = propertiesAccessor.getPropertyForOpco("erif.communication.protocol", "XX");
+        assertThat(protocol).isEqualTo("json");
+
+    }
+    @Test
     public void shouldValidateNumberOfPropsFromFile(){
-        assertThat(propertiesAccessor.getPropertiesList().size()).isEqualTo(7);
+        assertThat(propertiesAccessor.getPropertiesMap().size()).isEqualTo(TOTAL_NUMBER_OF_PROPS);
     }
 
     @Test

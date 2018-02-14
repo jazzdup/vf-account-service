@@ -1,6 +1,7 @@
 package com.vodafone.charging.mock;
 
 import com.vodafone.charging.accountservice.domain.enums.ResponseType;
+import com.vodafone.charging.accountservice.domain.xml.Response;
 import org.apache.commons.lang.StringUtils;
 
 //Possible SOAP responses we can get from the IF.
@@ -27,18 +28,29 @@ public class IFSoapResponseDataBuilder {
                 " </SOAP-ENV:Body>\n" +
                 "</SOAP-ENV:Envelope>";
     }
+    public static String aAccountValidationSoapResponse(Response response, ResponseType responseType) {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<SOAP-ENV:Envelope xmlns:v=\"http://www.vizzavi.net/chargingandpayments/message/1.0\" xmlns:SOAP-ENV=\"http://www.w3.org/2001/12/soap-envelope\">\n" +
+                " <SOAP-ENV:Body>\n" +
+                "  <Response>\n" +
+                "   <v:status>" + responseType.getStatus() + "</v:status>\n" +
+                "   <v:ban>" + response.getBan() + "</v:ban>\n" +
+                "   <v:errId>" + responseType + "</v:errId>\n" +
+                "   <v:errDescription>" + response.getErrDescription()+ "</v:errDescription>\n" +
+                "   <v:userGroups>\n" +
+                "    <v:item>" + response.getUserGroups().getItem().get(0) + "</v:item>\n" +
+                "    <v:item>" + response.getUserGroups().getItem().get(1) + "</v:item>\n" +
+                "   </v:userGroups>\n" +
+                "   <v:billingCycleDay>" + response.getBillingCycleDay() + "</v:billingCycleDay>\n" +
+                "   <v:spId>" + response.getSpId() + "</v:spId>" +
+                "   <v:isPrepay>" + response.getIsPrepay() + "</v:isPrepay>\n" +
+                "   <v:childSpId>" + response.getChildSpId() + "</v:childSpId>\n" +
+                "   <v:spType>" + response.getSpType() + "</v:spType>" +
+                "  </Response>\n" +
+                " </SOAP-ENV:Body>\n" +
+                "</SOAP-ENV:Envelope>";
+    }
 
-
-//    public static String aAccountValidationJsonResponse(){
-//        return "{
-//                "status": "ACCEPTED",
-//                "ban": "BAN_7777",
-//                "errId": "OK",
-//                "billingCycleDay": 18
-//                }""
-//
-//
-//    }
 
 
     public static String aValidateSoapResponse() {

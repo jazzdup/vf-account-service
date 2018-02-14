@@ -35,7 +35,7 @@ public class ContextData {
     private String vendorId;
     private String clientId;
     private boolean kycCheck;
-    private ERIFRequestTarget target;
+    private ERIFRequestTarget target = ERIFRequestTarget.LOCAL;//default is local
 
     protected ContextData() {
     }
