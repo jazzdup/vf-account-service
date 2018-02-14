@@ -110,7 +110,7 @@ pipeline {
     post {
         always {
             echo 'Cleanup'
-            deleteDir()
+            cleanWs()
         }
     }
 }
@@ -172,9 +172,6 @@ def incrementApplicationVersion() {
                       credentialsId   : 'jenkinsGitlab',
                       usernameVariable: "GIT_USER",
                       passwordVariable: "GIT_ACC_TOKEN"]]) {
-
-//        sh "cd $env.WORKSPACE"
-        echo "$env.WORKSPACE"
 
         //These credentials need to be bound in the Jenkins credentials configuration
         //Otherwise the full string would have to be hardcoded here.
