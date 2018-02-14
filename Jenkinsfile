@@ -24,7 +24,8 @@ pipeline {
 //            image 'raghera/java8-maven3-git-versioned'
 //            image 'paasmule/java-maven-git-alpine'
             image 'raghera/oracle-java8-161-env'
-            args '-v /root/.m2:/root/.m2'
+//            args '-v /root/.m2:/root/.m2'
+            args '-v /var/lib/jenkins/.m2/:/root/.m2'
         }
     }
     options {
@@ -46,7 +47,6 @@ pipeline {
             steps {
 
                 println('Clean workspace')
-//                deleteDir()
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
