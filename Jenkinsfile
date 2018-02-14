@@ -25,7 +25,7 @@ pipeline {
 //            image 'paasmule/java-maven-git-alpine'
             image 'raghera/oracle-java8-161-env'
 //            args '-v /root/.m2:/root/jenkins/.m2'
-            args '-v $HOME/.m2:/root/.m2'
+            args '-v /var/lib/jenkins/workspace/charging-account-service-pipeline/.m2:/root/.m2'
         }
     }
     options {
@@ -45,8 +45,6 @@ pipeline {
     stages {
         stage('Prepare Workspace') {
             steps {
-
-                println('Clean workspace')
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
                 echo "CURRENT APP VERSION=$APP_VERSION"
@@ -67,7 +65,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn test'
+                sh 'mvn -B test'
             }
             post {
                 always {
@@ -79,7 +77,7 @@ pipeline {
         stage('Integration Test') {
             steps {
                 echo 'Integration Test..'
-                sh 'mvn failsafe:integration-test'
+                sh 'mvn -B failsafe:integration-test'
             }
             post {
                 always {
