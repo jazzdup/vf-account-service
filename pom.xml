@@ -5,7 +5,7 @@
 
     <groupId>com.vodafone.charging</groupId>
     <artifactId>vf-account-service</artifactId>
-    <version>0.0.28</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>vf-account-service</name>
@@ -215,10 +215,10 @@
     </repositories>
 
     <distributionManagement>
-        <snapshotRepository>
+        <repository>
             <id>nexus-cas-releases</id>
             <url>https://nexus.vfpartnerservices.com/repository/charging-account-service-release/</url>
-        </snapshotRepository>
+        </repository>
     </distributionManagement>
 
 </project>
