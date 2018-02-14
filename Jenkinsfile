@@ -21,7 +21,6 @@
 pipeline {
     agent {
         docker {
-//            image 'raghera/java8-maven3-git-versioned'
 //            image 'paasmule/java-maven-git-alpine'
             image 'raghera/oracle-java8-161-env'
             args '-v /root/.m2:/root/.m2'
@@ -191,7 +190,14 @@ def incrementApplicationVersion() {
 
 def publishToNexus() {
     println "Publishing artifact to Nexus version: $APP_VERSION"
+
+    sh "mvn -B deploy -DskipTests"
+
+}
+
+def publishToNexusUsingJenkinsPublisher() {
     Map pomInfo = populatePomValuesMap()
+
     nexusPublisher nexusInstanceId: 'localNexus',
             nexusRepositoryId: 'releases',
             packages: [[$class         : 'MavenPackage',
