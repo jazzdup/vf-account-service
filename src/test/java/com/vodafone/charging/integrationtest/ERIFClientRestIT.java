@@ -2,7 +2,7 @@ package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;

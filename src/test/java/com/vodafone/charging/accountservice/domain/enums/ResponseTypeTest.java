@@ -1,6 +1,6 @@
 package com.vodafone.charging.accountservice.domain.enums;
 
-import com.vodafone.charging.accountservice.domain.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;

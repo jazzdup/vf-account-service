@@ -1,7 +1,7 @@
 package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 

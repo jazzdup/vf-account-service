@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

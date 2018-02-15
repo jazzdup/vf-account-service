@@ -1,6 +1,8 @@
-package com.vodafone.charging.accountservice.domain;
+package com.vodafone.charging.accountservice.dto.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
 import lombok.Getter;
 import lombok.NonNull;

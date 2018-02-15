@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
