@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.controller;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
@@ -15,16 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -45,9 +46,8 @@ public class AccountServiceController {
             notes = "If you provide some contextual information this operation will process the request and respond with enriched charging account data.  " +
                     "\n In particular properties such as usergroups, customer type, billing account number will be returned ",
             response = EnrichedAccountInfo.class, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            httpMethod = javax.ws.rs.HttpMethod.POST, nickname = "enrichAccountData"
+            httpMethod = javax.ws.rs.HttpMethod.POST, nickname = "enrichAccountData")
 
-    )
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
@@ -61,6 +61,34 @@ public class AccountServiceController {
         }
         return ResponseEntity.ok(accountInfo);
     }
+
+    @RequestMapping(path = "/{chargingType}/{chargingIdValue}", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+    public ResponseEntity<EnrichedAccountInfo> getAccount(@PathVariable String chargingType, @PathVariable String chargingIdValue) {
+
+        final ChargingId chargingId = new ChargingId.Builder().type(ChargingId.Type.valueOf(chargingType)).value(chargingIdValue).build();
+//        final EnrichedAccountInfo accountInfo = accountService.findAccountByChargingId(chargingId);
+
+        throw new UnsupportedOperationException();
+    }
+
+    @RequestMapping(path = "/{accountId}", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+    public ResponseEntity<EnrichedAccountInfo> getAccount(@PathVariable String accountId) {
+
+//        final EnrichedAccountInfo accountInfo = accountService.findAccountByChargingId(accountId);
+
+        throw new UnsupportedOperationException();
+    }
+
+    @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<String>> getUserGroups(@PathVariable long accountId) {
+        //Goes to the DB and retrieves a list of usergroups for the customer.  Returned as a list.  AccountId is the key
+        throw new UnsupportedOperationException();
+    }
+
+
 
     /*
     jsr303 Validation does not appear to work for the ChargingId object within contextInfo.
