@@ -3,6 +3,7 @@ package com.vodafone.charging.accountservice.controller;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
@@ -19,7 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.ws.rs.HttpMethod;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.logging.log4j.util.Strings.isNotEmpty;
@@ -62,23 +65,28 @@ public class AccountServiceController {
         return ResponseEntity.ok(accountInfo);
     }
 
-    @RequestMapping(path = "/{chargingType}/{chargingIdValue}", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+    @ApiOperation(value = "Get Account",
+            notes = "Get Account",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "getAccount")
+    @RequestMapping(path = "/{chargingIdType}/{chargingIdValue}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
-    public ResponseEntity<EnrichedAccountInfo> getAccount(@PathVariable String chargingType, @PathVariable String chargingIdValue) {
+    public ResponseEntity<Account> getAccount(@PathVariable String chargingIdType, @PathVariable String chargingIdValue) {
 
-        final ChargingId chargingId = new ChargingId.Builder().type(ChargingId.Type.valueOf(chargingType)).value(chargingIdValue).build();
-//        final EnrichedAccountInfo accountInfo = accountService.findAccountByChargingId(chargingId);
+        final Optional<ChargingId> chargingIdOpt = ChargingId.fromString(chargingIdType, chargingIdValue);
+        final ChargingId chargingId = chargingIdOpt
+                .orElseThrow(() -> new MethodArgumentValidationException("Incorrect ChargingIdType or ChargingIdValue in request"));
 
-        throw new UnsupportedOperationException();
+        return ResponseEntity.ok(accountService.getAccount(chargingId));
     }
 
-    @RequestMapping(path = "/{accountId}", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+    @RequestMapping(path = "/{accountId}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
-    public ResponseEntity<EnrichedAccountInfo> getAccount(@PathVariable String accountId) {
-
-//        final EnrichedAccountInfo accountInfo = accountService.findAccountByChargingId(accountId);
-
-        throw new UnsupportedOperationException();
+    public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
+        final Account account = accountService.getAccount(accountId);
+        return ResponseEntity.ok(account);
     }
 
     @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
@@ -87,8 +95,6 @@ public class AccountServiceController {
         //Goes to the DB and retrieves a list of usergroups for the customer.  Returned as a list.  AccountId is the key
         throw new UnsupportedOperationException();
     }
-
-
 
     /*
     jsr303 Validation does not appear to work for the ChargingId object within contextInfo.

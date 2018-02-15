@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @ApiModel(description = "Unique Identifier for Charging Customers")
 public class ChargingId {
@@ -76,6 +78,15 @@ public class ChargingId {
                 "type=" + type +
                 ", value='" + value + '\'' +
                 '}';
+    }
+
+    public static Optional<ChargingId> fromString(String string, String value) {
+        for(Type type : Type.values()) {
+            if (type.type().equalsIgnoreCase(string) ) {
+                return Optional.of(new ChargingId.Builder().type(type).value(value).build());
+            }
+        }
+        return Optional.empty();
     }
 
     public String toIfString() {
