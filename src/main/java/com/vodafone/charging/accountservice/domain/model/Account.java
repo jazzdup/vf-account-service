@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain.model;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 public class Account {
 
     private String accountId;
-    private String chargingId;
+    private ChargingId chargingId;
     private Date lastValidate;
 
 }
