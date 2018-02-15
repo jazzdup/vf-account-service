@@ -2,7 +2,10 @@ package com.vodafone.charging.accountservice.erifclient;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.domain.xml.*;
+import com.vodafone.charging.accountservice.dto.xml.Envelope;
+import com.vodafone.charging.accountservice.dto.xml.Msgcontrol;
+import com.vodafone.charging.accountservice.dto.xml.Response;
+import com.vodafone.charging.accountservice.dto.xml.Validate;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFXmlClient;

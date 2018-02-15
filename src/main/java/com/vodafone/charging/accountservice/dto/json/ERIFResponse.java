@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.domain;
+package com.vodafone.charging.accountservice.dto.json;
 
 import lombok.Builder;
 import lombok.ToString;

@@ -2,6 +2,10 @@ package com.vodafone.charging.accountservice.erifclient;
 
 import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
+import com.vodafone.charging.accountservice.dto.json.ERIFRequest;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.json.MessageControl;
+import com.vodafone.charging.accountservice.dto.json.Routable;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;

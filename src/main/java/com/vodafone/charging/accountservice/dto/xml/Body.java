@@ -6,7 +6,7 @@
 //
 
 
-package com.vodafone.charging.accountservice.domain.xml;
+package com.vodafone.charging.accountservice.dto.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

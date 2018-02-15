@@ -1,10 +1,10 @@
 package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.ERIFResponse;
-import com.vodafone.charging.accountservice.domain.xml.Body;
-import com.vodafone.charging.accountservice.domain.xml.Envelope;
-import com.vodafone.charging.accountservice.domain.xml.Response;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.xml.Body;
+import com.vodafone.charging.accountservice.dto.xml.Envelope;
+import com.vodafone.charging.accountservice.dto.xml.Response;
 
 import java.util.Calendar;
 import java.util.List;

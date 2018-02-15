@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.domain;
+package com.vodafone.charging.accountservice.dto.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
