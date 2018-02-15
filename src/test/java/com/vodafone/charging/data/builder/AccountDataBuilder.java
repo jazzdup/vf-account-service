@@ -10,7 +10,7 @@ import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.*;
 public class AccountDataBuilder {
 
     public static Account aAccount() {
-        return Account.builder().accountId(String.valueOf(new Random().nextInt()))
+        return Account.builder().id(String.valueOf(new Random().nextInt()))
                 .chargingId(aChargingId())
                 .lastValidate(new Date()).build();
     }
