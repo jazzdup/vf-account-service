@@ -3,7 +3,7 @@ package com.vodafone.charging.data.builder;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.domain.xml.Response;
+import com.vodafone.charging.accountservice.dto.xml.Response;
 
 import java.util.Arrays;
 import java.util.Calendar;

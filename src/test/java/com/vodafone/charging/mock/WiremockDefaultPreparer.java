@@ -2,7 +2,7 @@ package com.vodafone.charging.mock;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.enums.ResponseType;
-import com.vodafone.charging.accountservice.domain.xml.Response;
+import com.vodafone.charging.accountservice.dto.xml.Response;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.vodafone.charging.mock.IFRequestNamespaceEnum.SOAP_NS;
