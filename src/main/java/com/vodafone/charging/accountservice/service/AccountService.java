@@ -48,7 +48,7 @@ public class AccountService {
     public Account getAccount(ChargingId chargingId) {
         //TODO call Repository layer with chargingId
         return Account.builder()
-                .accountId(String.valueOf(new Random().nextInt()))
+                .id(String.valueOf(new Random().nextInt()))
                 .chargingId(chargingId)
                 .build();
     }
@@ -56,7 +56,7 @@ public class AccountService {
     public Account getAccount(String accountId) {
         //TODO call Repository layer with accountId
         return Account.builder()
-                .accountId(String.valueOf(new Random().nextInt()))
+                .id(String.valueOf(new Random().nextInt()))
                 .chargingId(new ChargingId.Builder()
                         .type(ChargingId.Type.VODAFONE_ID)
                         .value("test-msisdn").build())
