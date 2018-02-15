@@ -79,7 +79,13 @@ public class AccountServiceController {
         final ChargingId chargingId = chargingIdOpt
                 .orElseThrow(() -> new MethodArgumentValidationException("Incorrect ChargingIdType or ChargingIdValue in request"));
 
-        return ResponseEntity.ok(accountService.getAccount(chargingId));
+        Account account;
+        try {
+            account = accountService.getAccount(chargingId);
+        } catch (Exception e) {
+            throw new ApplicationLogicException(e.getMessage(), e);
+        }
+        return ResponseEntity.ok(account);
     }
 
     @RequestMapping(path = "/{accountId}", method = GET,
