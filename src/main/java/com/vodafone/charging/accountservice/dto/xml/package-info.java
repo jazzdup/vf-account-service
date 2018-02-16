@@ -12,7 +12,7 @@
         , elementFormDefault = XmlNsForm.QUALIFIED
         , namespace="http://www.w3.org/2001/12/soap-envelope"
 )
-package com.vodafone.charging.accountservice.domain.xml;
+package com.vodafone.charging.accountservice.dto.xml;
 
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlNsForm;

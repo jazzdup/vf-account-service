@@ -1,6 +1,9 @@
 package com.vodafone.charging.accountservice.domain;
 
 import com.vodafone.charging.accountservice.domain.enums.RoutableType;
+import com.vodafone.charging.accountservice.dto.json.ERIFRequest;
+import com.vodafone.charging.accountservice.dto.json.MessageControl;
+import com.vodafone.charging.accountservice.dto.json.Routable;
 import org.junit.Test;
 
 import java.util.Locale;
