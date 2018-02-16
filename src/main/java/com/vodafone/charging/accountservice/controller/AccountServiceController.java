@@ -51,7 +51,7 @@ public class AccountServiceController {
             response = EnrichedAccountInfo.class, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = javax.ws.rs.HttpMethod.POST, nickname = "enrichAccountData")
 
-    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+    @RequestMapping(method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
         this.checkContextData(contextData);
@@ -72,7 +72,7 @@ public class AccountServiceController {
             response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = HttpMethod.GET, nickname = "getAccount")
     @RequestMapping(path = "/{chargingIdType}/{chargingIdValue}", method = GET,
-            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String chargingIdType, @PathVariable String chargingIdValue) {
 
         final Optional<ChargingId> chargingIdOpt = ChargingId.fromString(chargingIdType, chargingIdValue);
@@ -95,7 +95,7 @@ public class AccountServiceController {
             response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = HttpMethod.GET, nickname = "getUserGroups")
     @RequestMapping(path = "/{accountId}", method = GET,
-            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
 
         Account account;
