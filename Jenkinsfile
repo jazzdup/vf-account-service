@@ -44,7 +44,7 @@ pipeline {
     stages {
         stage('Prepare Workspace') {
             steps {
-                slackSend (channel: "@micro-devs", color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                slackSend (channel: 'micro-devs', color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
