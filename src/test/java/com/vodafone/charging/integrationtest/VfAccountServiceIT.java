@@ -4,6 +4,7 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.dto.xml.Envelope;
@@ -47,6 +48,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -266,5 +268,21 @@ public class VfAccountServiceIT {
         assertThat(error.getStatus()).isEqualTo(ERCoreErrorStatus.ERROR.value());
         assertThat(error.getErrorId()).isEqualTo(ERCoreErrorId.SYSTEM_ERROR.value());
         assertThat(error.getErrorDescription()).isEqualTo("chargingId.type is compulsory but was empty");
+    }
+
+    @Test
+    public void shouldGetAccountUsingChargingId() throws Exception {
+
+        final ChargingId chargingId = aChargingId();
+
+        final MvcResult response = mockMvc.perform(get("/accounts/" + chargingId.getType() + "/" + chargingId.getValue() )
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        //TODO this is a dummy account being returned
+        final Account account = (Account) converter.fromJson(Account.class, response.getResponse().getContentAsString());
+        assertThat(account).isNotNull();
+        assertThat(account.getChargingId()).isEqualToComparingFieldByField(chargingId);
     }
 }
