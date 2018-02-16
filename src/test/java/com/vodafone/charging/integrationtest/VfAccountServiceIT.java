@@ -4,9 +4,9 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ContextData;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.dto.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
@@ -284,5 +284,23 @@ public class VfAccountServiceIT {
         final Account account = (Account) converter.fromJson(Account.class, response.getResponse().getContentAsString());
         assertThat(account).isNotNull();
         assertThat(account.getChargingId()).isEqualToComparingFieldByField(chargingId);
+    }
+
+
+    @Test
+    public void shouldGetUserGroupsUsingAccountId() throws Exception {
+
+        final String accountId = String.valueOf(new Random().nextInt());
+
+        final MvcResult response = mockMvc.perform(get("/accounts/" + accountId + "/profile/usergroups" )
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        //TODO this is a dummy list being returned
+        String [] userGroups = (String[]) converter.fromJson(String [].class , response.getResponse().getContentAsString());
+        assertThat(userGroups).isNotNull();
+        assertThat(userGroups).isNotEmpty();
+
     }
 }

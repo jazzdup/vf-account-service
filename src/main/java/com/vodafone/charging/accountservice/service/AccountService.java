@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * The main service object which routes logic
@@ -45,7 +48,7 @@ public class AccountService {
         }
     }
 
-    public Account getAccount(ChargingId chargingId) {
+    public Account getAccount(final ChargingId chargingId) {
         //TODO call Repository layer with chargingId
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))
@@ -53,7 +56,7 @@ public class AccountService {
                 .build();
     }
 
-    public Account getAccount(String accountId) {
+    public Account getAccount(final String accountId) {
         //TODO call Repository layer with accountId
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))
@@ -61,6 +64,12 @@ public class AccountService {
                         .type(ChargingId.Type.VODAFONE_ID)
                         .value("test-msisdn").build())
                 .build();
+    }
+
+    public List<String> getUserGroups(final String accountId) {
+
+        return newArrayList("userGroup1", "userGroup2", "userGroup3");
+
     }
 
 }

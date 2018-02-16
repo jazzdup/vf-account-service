@@ -95,11 +95,16 @@ public class AccountServiceController {
         return ResponseEntity.ok(account);
     }
 
-    @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+    @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
-    public ResponseEntity<List<String>> getUserGroups(@PathVariable long accountId) {
-        //Goes to the DB and retrieves a list of usergroups for the customer.  Returned as a list.  AccountId is the key
-        throw new UnsupportedOperationException();
+    public ResponseEntity<List<String>> getUserGroups(@PathVariable String accountId) {
+        List<String> userGroups;
+        try {
+            userGroups = accountService.getUserGroups(accountId);
+        } catch (Exception e) {
+            throw new ApplicationLogicException(e.getMessage(), e);
+        }
+        return ResponseEntity.ok(userGroups);
     }
 
     /*
