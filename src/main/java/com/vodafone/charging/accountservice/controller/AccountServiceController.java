@@ -68,7 +68,7 @@ public class AccountServiceController {
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
     @ApiOperation(value = "Get Account",
-            notes = "Get Account",
+            notes = "Get Account using ChargingId",
             response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = HttpMethod.GET, nickname = "getAccount")
     @RequestMapping(path = "/{chargingIdType}/{chargingIdValue}", method = GET,
@@ -88,18 +88,41 @@ public class AccountServiceController {
         return ResponseEntity.ok(account);
     }
 
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+    @ApiOperation(value = "Get UserGroups for an Account",
+            notes = "Get Account using AccountId",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "getUserGroups")
     @RequestMapping(path = "/{accountId}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
-        final Account account = accountService.getAccount(accountId);
+
+        Account account;
+        try {
+            account = accountService.getAccount(accountId);
+        } catch (Exception e) {
+            throw new ApplicationLogicException(e.getMessage(), e);
+        }
         return ResponseEntity.ok(account);
     }
 
-    @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET, consumes = APPLICATION_JSON_UTF8_VALUE,
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+    @ApiOperation(value = "Get UserGroups for an Account",
+            notes = "Get Usergroups for an Account",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "getUserGroups")
+    @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
-    public ResponseEntity<List<String>> getUserGroups(@PathVariable long accountId) {
-        //Goes to the DB and retrieves a list of usergroups for the customer.  Returned as a list.  AccountId is the key
-        throw new UnsupportedOperationException();
+    public ResponseEntity<List<String>> getUserGroups(@PathVariable String accountId) {
+        List<String> userGroups;
+        try {
+            userGroups = accountService.getUserGroups(accountId);
+        } catch (Exception e) {
+            throw new ApplicationLogicException(e.getMessage(), e);
+        }
+        return ResponseEntity.ok(userGroups);
     }
 
     /*
