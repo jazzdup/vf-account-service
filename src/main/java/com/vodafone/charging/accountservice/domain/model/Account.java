@@ -29,9 +29,9 @@ public class Account {
         this.profiles = profiles;
     }
 
-    public Account(ChargingId chargingId, EnrichedAccountInfo info){
+    public Account(ChargingId chargingId, EnrichedAccountInfo info, Date lastValidate){
         this.chargingId = chargingId;
-        this.lastValidate = new Date();
+        this.lastValidate = lastValidate;
         this.customerType = info.getCustomerType();
         Profile profile = Profile.builder()
                 .userGroups(info.getUsergroups())
