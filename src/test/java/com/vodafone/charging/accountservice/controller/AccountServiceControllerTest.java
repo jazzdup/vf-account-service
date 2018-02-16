@@ -3,9 +3,11 @@ package com.vodafone.charging.accountservice.controller;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
+import com.vodafone.charging.data.object.NullableChargingId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,11 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Locale;
 import java.util.Random;
 
+import static com.vodafone.charging.data.builder.AccountDataBuilder.aAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
@@ -27,7 +31,9 @@ import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHea
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -121,76 +127,57 @@ public class AccountServiceControllerTest {
                 .hasCauseInstanceOf(NullPointerException.class);
     }
 
-//    TODO HEADER TESTS PROBABLY NOT REQUIRED ANY MORE
+    @Test
+    public void shouldGetAccountSuccessfullyWhenChargingIdPassed() {
+        final ArgumentCaptor<ChargingId> chargingIdCaptor = ArgumentCaptor.forClass(ChargingId.class);
 
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsMissing() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList());
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-//    }
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsEmptyString() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList(""));
-//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-//    }
-//
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenCountryIsNull() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(null);
-//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList("local"));
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + COUNTRY_HEADER_NAME + " is mandatory");
-//    }
-//
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsMissing() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList());
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-//    }
-//
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsEmptyString() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-//        given(headers.get(TARGET_HEADER_NAME)).willReturn(newArrayList(""));
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-//    }
-//
-//    @Test
-//    public void shouldThrowMethodHeaderValidationExceptionWhenTargetIsNull() {
-//        HttpHeaders headers = mock(HttpHeaders.class);
-//        given(headers.get(COUNTRY_HEADER_NAME)).willReturn(newArrayList("GB"));
-//        given(headers.get(TARGET_HEADER_NAME)).willReturn(null);
-//
-//        assertThatThrownBy(() -> accountServiceController.checkMandatoryHeaders(headers))
-//                .isInstanceOf(MethodArgumentValidationException.class)
-//                .hasCauseInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("header: " + TARGET_HEADER_NAME + " is mandatory");
-//    }
+        final Account expectedAccount = aAccount();
+        final ChargingId chargingId = expectedAccount.getChargingId();
+
+        given(accountService.getAccount(any(ChargingId.class)))
+                .willReturn(expectedAccount);
+
+        final ResponseEntity<Account> response =
+                accountServiceController.getAccount(chargingId.getType(), chargingId.getValue());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualToComparingFieldByField(expectedAccount);
+
+        verify(accountService).getAccount(chargingIdCaptor.capture());
+        verifyNoMoreInteractions(accountService);
+
+        assertThat(chargingIdCaptor.getValue().getValue()).isEqualTo(chargingId.getValue());
+        assertThat(chargingIdCaptor.getValue().getType()).isEqualTo(chargingId.getType());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIncorrectChargingIdTypePathParameter() {
+
+        final Account expectedAccount = aAccount();
+        final ChargingId chargingId = new NullableChargingId("incorrect-charging-id", "test-id");
+
+        given(accountService.getAccount(any(ChargingId.class)))
+                .willReturn(expectedAccount);
+
+        assertThatThrownBy(() ->
+                accountServiceController.getAccount(chargingId.getType(), chargingId.getValue()))
+                .isInstanceOf(MethodArgumentValidationException.class)
+                .hasMessageContaining("ChargingIdType");
+
+    }
+
+    @Test
+    public void shouldWrapExceptionIntoApplicationLogicExWhenCallingGetAccount() {
+        ChargingId chargingId = aChargingId();
+
+        final String message = "This is a test exception";
+        given(accountService.getAccount(any(ChargingId.class)))
+                .willThrow(new NullPointerException(message));
+
+        assertThatThrownBy(() -> accountServiceController.getAccount(chargingId.getType(), chargingId.getValue()))
+                .isInstanceOf(ApplicationLogicException.class)
+                .hasMessage(message)
+                .hasCauseInstanceOf(NullPointerException.class);
+    }
 
 }
