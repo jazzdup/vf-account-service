@@ -1,11 +1,12 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.dto.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
@@ -73,6 +74,9 @@ public class VfAccountServiceIT {
     @MockBean
     PropertiesAccessor propertiesAccessor;
 
+    @MockBean
+    private AccountRepository repository;
+
     @Before
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
@@ -114,6 +118,7 @@ public class VfAccountServiceIT {
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+
     }
     @Test
     public void shouldValidateAccountXmlAndReturnOK() throws Exception {
@@ -142,6 +147,7 @@ public class VfAccountServiceIT {
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+
     }
     @Test
     public void shouldReturnNotFound404() throws Exception {

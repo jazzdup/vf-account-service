@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.mongo;
+package com.vodafone.charging.accountservice.repository;
 
 import com.vodafone.charging.accountservice.domain.model.Account;
 import org.springframework.data.mongodb.repository.MongoRepository;
