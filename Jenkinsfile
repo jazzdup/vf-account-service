@@ -36,7 +36,7 @@ pipeline {
         DEVELOPMENT_BRANCH_NAME = 'develop'
 
         GIT_GROUP_ID = 'charging-platform'
-        GIT_PROJECT_ID = 'charging-account-service'
+        GIT_PROJECT_ID = 'vf-account-service'
         GIT_URL = "ci2.vfpartnerservices.com/"
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
