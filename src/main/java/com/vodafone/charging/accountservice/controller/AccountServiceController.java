@@ -97,7 +97,13 @@ public class AccountServiceController {
     @RequestMapping(path = "/{accountId}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
-        final Account account = accountService.getAccount(accountId);
+
+        Account account;
+        try {
+            account = accountService.getAccount(accountId);
+        } catch (Exception e) {
+            throw new ApplicationLogicException(e.getMessage(), e);
+        }
         return ResponseEntity.ok(account);
     }
 
