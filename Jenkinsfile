@@ -36,7 +36,7 @@ pipeline {
         DEVELOPMENT_BRANCH_NAME = 'develop'
 
         GIT_GROUP_ID = 'charging-platform'
-        GIT_PROJECT_ID = 'vf-account-service'
+        GIT_PROJECT_ID = 'charging-account-service'
         GIT_URL = "ci2.vfpartnerservices.com/"
         JENKINS_BUILD_BRANCH_NAME = buildBranchName()
     }
@@ -44,7 +44,7 @@ pipeline {
     stages {
         stage('Prepare Workspace') {
             steps {
-                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                slackSend (channel: '@micro-devs', color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 
                 incrementApplicationVersion()
                 echo "JENKINS BRANCH NAME=$JENKINS_BUILD_BRANCH_NAME"
@@ -108,10 +108,10 @@ pipeline {
     }
     post {
         success {
-            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (channel: '@micro-devs', color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
-            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (channel: '@micro-devs', color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         always {
             echo 'Cleanup'
