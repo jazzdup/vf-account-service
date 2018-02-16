@@ -68,7 +68,7 @@ public class AccountServiceController {
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
     @ApiOperation(value = "Get Account",
-            notes = "Get Account",
+            notes = "Get Account using ChargingId",
             response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = HttpMethod.GET, nickname = "getAccount")
     @RequestMapping(path = "/{chargingIdType}/{chargingIdValue}", method = GET,
@@ -88,6 +88,12 @@ public class AccountServiceController {
         return ResponseEntity.ok(account);
     }
 
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+    @ApiOperation(value = "Get UserGroups for an Account",
+            notes = "Get Account using AccountId",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "getUserGroups")
     @RequestMapping(path = "/{accountId}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
@@ -95,6 +101,12 @@ public class AccountServiceController {
         return ResponseEntity.ok(account);
     }
 
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+    @ApiOperation(value = "Get UserGroups for an Account",
+            notes = "Get Usergroups for an Account",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "getUserGroups")
     @RequestMapping(path = "/{accountId}/profile/usergroups", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<List<String>> getUserGroups(@PathVariable String accountId) {
