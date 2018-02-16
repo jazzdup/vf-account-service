@@ -1,17 +1,18 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ChargingId.Type;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.dto.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;

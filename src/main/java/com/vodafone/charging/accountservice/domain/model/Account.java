@@ -19,6 +19,8 @@ public class Account {
     private String customerType;//PRE/POST
     private List<Profile> profiles;
 
+    public Account(){}
+
     public Account(String id, ChargingId chargingId, Date lastValidate, String customerType, List<Profile> profiles) {
         this.id = id;
         this.chargingId = chargingId;
