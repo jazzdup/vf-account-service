@@ -2,10 +2,11 @@ package com.vodafone.charging.integrationtest.http;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
@@ -33,9 +34,7 @@ import static com.vodafone.charging.data.builder.IFResponseData.aERIFResponse;
 import static com.vodafone.charging.data.builder.IFResponseData.anXmlResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -57,6 +56,9 @@ public class VfAccountServiceHttpTest {
 
     @MockBean
     PropertiesAccessor propertiesAccessor;
+
+    @MockBean
+    private AccountRepository repository;
 
     @Autowired
     private TestRestTemplate testRestTemplate;

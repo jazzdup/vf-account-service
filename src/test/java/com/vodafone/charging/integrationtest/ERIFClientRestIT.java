@@ -1,11 +1,12 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.service.ERIFClient;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.data.builder.IFResponseData;
 import com.vodafone.charging.data.message.JsonConverter;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -29,6 +31,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @SpringBootTest(classes = AccountServiceApplication.class)
 @RestClientTest(ERIFClient.class)
 public class ERIFClientRestIT {
+    @MockBean
+    private AccountRepository repository;
+
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 

@@ -1,13 +1,16 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
@@ -15,14 +18,16 @@ import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountServiceTest {
+    @Mock
+    private AccountRepository repository;
+
     @Mock
     private PropertiesAccessor propertiesAccessor;
 
@@ -54,7 +59,7 @@ public class AccountServiceTest {
         //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
         verify(erifClient).validate(any(ContextData.class));
-
+        verify(repository, Mockito.times(1)).save(any(Account.class));
     }
     @Test
     public void shouldCallERIFXmlClientWithoutChangingContextData() throws Exception {
@@ -70,6 +75,7 @@ public class AccountServiceTest {
         //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(info);
         verify(erifXmlClient).validate(any(ContextData.class));
+        verify(repository, Mockito.times(1)).save(any(Account.class));
     }
 
     @Test
@@ -85,6 +91,7 @@ public class AccountServiceTest {
                 .hasMessage(message);
 
         verify(erifClient).validate(any(ContextData.class));
+        verifyZeroInteractions(repository);
     }
 
     @Test
@@ -100,6 +107,7 @@ public class AccountServiceTest {
                 .hasMessage(message);
 
         verify(erifXmlClient).validate(any(ContextData.class));
+        verifyZeroInteractions(repository);
     }
 
 }
