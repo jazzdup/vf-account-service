@@ -22,19 +22,17 @@ import org.springframework.http.ResponseEntity;
 import java.util.Locale;
 import java.util.Random;
 
-import static com.vodafone.charging.data.builder.AccountDataBuilder.aAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
+import static com.vodafone.charging.data.builder.MongoData.anAccount;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -131,7 +129,7 @@ public class AccountServiceControllerTest {
     public void shouldGetAccountSuccessfullyWhenChargingIdPassed() {
         final ArgumentCaptor<ChargingId> chargingIdCaptor = ArgumentCaptor.forClass(ChargingId.class);
 
-        final Account expectedAccount = aAccount();
+        final Account expectedAccount = anAccount();
         final ChargingId chargingId = expectedAccount.getChargingId();
 
         given(accountService.getAccount(any(ChargingId.class)))
@@ -153,7 +151,7 @@ public class AccountServiceControllerTest {
     @Test
     public void shouldThrowExceptionWhenIncorrectChargingIdTypePathParameter() {
 
-        final Account expectedAccount = aAccount();
+        final Account expectedAccount = anAccount();
         final ChargingId chargingId = new NullableChargingId("incorrect-charging-id", "test-id");
 
         given(accountService.getAccount(any(ChargingId.class)))

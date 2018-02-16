@@ -4,14 +4,14 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
-import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -33,14 +33,14 @@ public class AccountService {
     private PropertiesAccessor propertiesAccessor;
 
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountRepository repository;
 
     public AccountService() {
     }
 
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
         log.debug("contextData={}", contextData);
-        EnrichedAccountInfo info = null;
+        EnrichedAccountInfo info;
         String protocol = propertiesAccessor.getPropertyForOpco("erif.communication.protocol"
                 , contextData.getLocale().getCountry(), "json");
         if ("soap".equalsIgnoreCase(protocol)) {
@@ -50,33 +50,22 @@ public class AccountService {
             log.info("doing json");
             info = erifClient.validate(contextData);
         }
-        accountRepository.save(new Account(contextData.getChargingId(), info));
+        repository.save(new Account(contextData.getChargingId(), info, new Date()));
         log.info("Account Data for chargingId={} saved", contextData.getChargingId().getValue());
         return info;
     }
 
     public Account getAccount(final ChargingId chargingId) {
-        //TODO call Repository layer with chargingId
-        return Account.builder()
-                .id(String.valueOf(new Random().nextInt()))
-                .chargingId(chargingId)
-                .build();
+        return repository.findByChargingId(chargingId);
     }
 
     public Account getAccount(final String accountId) {
-        //TODO call Repository layer with accountId
-        return Account.builder()
-                .id(String.valueOf(new Random().nextInt()))
-                .chargingId(new ChargingId.Builder()
-                        .type(ChargingId.Type.VODAFONE_ID)
-                        .value("test-msisdn").build())
-                .build();
+        return repository.findOne(accountId);
     }
 
     public List<String> getUserGroups(final String accountId) {
-
-        return newArrayList("userGroup1", "userGroup2", "userGroup3");
-
+        Account account = repository.findOne(accountId);
+        return newArrayList(account.getProfiles().get(0).getUserGroups());
     }
 
 }

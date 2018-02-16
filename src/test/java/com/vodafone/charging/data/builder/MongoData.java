@@ -7,6 +7,7 @@ import com.vodafone.charging.accountservice.domain.model.Transaction;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Random;
 
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 
@@ -16,9 +17,9 @@ public class MongoData {
     }
     public static Account anAccount(){
         return Account.builder()
-                .id("1")
+                .id(String.valueOf(new Random().nextInt()))
                 .lastValidate(aFixedDate())
-                .chargingId(aChargingId("100"))
+                .chargingId(aChargingId())
                 .customerType("PRE")
                 .profiles(Arrays.asList(aProfile()))
                 .build();
@@ -33,8 +34,8 @@ public class MongoData {
     }
     public static Transaction aTransaction(){
         return Transaction.builder()
-                .erTransactionId(10)
-                .id(100)
+                .erTransactionId(new Random().nextLong())
+                .id(new Random().nextLong())
                 .build();
     }
 }
