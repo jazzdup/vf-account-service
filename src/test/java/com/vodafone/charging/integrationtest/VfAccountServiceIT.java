@@ -286,6 +286,20 @@ public class VfAccountServiceIT {
         assertThat(account.getChargingId()).isEqualToComparingFieldByField(chargingId);
     }
 
+    @Test
+    public void shouldGetAccountUsingAccountId() throws Exception {
+
+        final String accountId = String.valueOf(new Random().nextInt());
+
+        final MvcResult response = mockMvc.perform(get("/accounts/" + accountId )
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        //TODO this is a dummy account being returned
+        final Account account = (Account) converter.fromJson(Account.class, response.getResponse().getContentAsString());
+        assertThat(account).isNotNull();
+    }
 
     @Test
     public void shouldGetUserGroupsUsingAccountId() throws Exception {
