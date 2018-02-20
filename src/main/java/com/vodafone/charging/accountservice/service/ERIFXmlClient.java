@@ -5,7 +5,7 @@ import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.ValidateHttpHeaders;
 import com.vodafone.charging.accountservice.dto.xml.*;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

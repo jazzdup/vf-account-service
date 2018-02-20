@@ -7,7 +7,7 @@ import com.vodafone.charging.accountservice.dto.xml.Msgcontrol;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.dto.xml.Validate;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFXmlClient;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;

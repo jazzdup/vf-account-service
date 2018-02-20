@@ -11,7 +11,7 @@ import com.vodafone.charging.accountservice.dto.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;

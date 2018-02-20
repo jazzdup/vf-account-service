@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.ulf;
 
 public final class UlfConstants {
     public static final String USECASE_ID = "uid";

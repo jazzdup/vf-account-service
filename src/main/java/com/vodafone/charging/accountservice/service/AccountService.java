@@ -4,7 +4,7 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

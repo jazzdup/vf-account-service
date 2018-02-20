@@ -53,7 +53,7 @@
         <!--<Logger name="com.vodafone.global.er.util.FrameworkUtil.UltimateLog" additivity="false" level="ERROR">-->
             <!--<AppenderRef ref="ultimate-log"/>-->
         <!--</Logger>-->
-        <!--<Logger name="com.vodafone.charging.accountservice.ulf.UlfLogInterceptor" additivity="false" level="DEBUG">-->
+        <!--<Logger name="com.vodafone.charging.ulf.UlfLogInterceptor" additivity="false" level="DEBUG">-->
             <!--<AppenderRef ref="Console"/>-->
             <!--<AppenderRef ref="ultimate-log"/>-->
         <!--</Logger>-->

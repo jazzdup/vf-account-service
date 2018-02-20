@@ -3,7 +3,7 @@ package com.vodafone.charging.integrationtest.e2e;
 import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
