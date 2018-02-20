@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.ulf;
 
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;

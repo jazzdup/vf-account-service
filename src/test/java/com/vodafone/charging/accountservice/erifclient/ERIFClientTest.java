@@ -8,7 +8,7 @@ import com.vodafone.charging.accountservice.dto.json.MessageControl;
 import com.vodafone.charging.accountservice.dto.json.Routable;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.accountservice.service.ERIFClient;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import org.junit.Before;

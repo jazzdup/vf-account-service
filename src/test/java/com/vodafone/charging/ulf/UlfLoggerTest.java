@@ -1,6 +1,6 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.ulf;
 
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.ulf;
+package com.vodafone.charging.ulf;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,7 +6,7 @@ import com.vodafone.application.AppConstants;
 import com.vodafone.application.logging.ULFEntry;
 import com.vodafone.application.logging.ULFKeys;
 import com.vodafone.application.util.ULFThreadLocal;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

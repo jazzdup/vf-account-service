@@ -5,7 +5,7 @@ import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
-import com.vodafone.charging.accountservice.properties.PropertiesAccessor;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFClient;
 import com.vodafone.charging.data.builder.IFResponseData;
 import com.vodafone.charging.data.message.JsonConverter;

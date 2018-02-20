@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.ulf.ValidateHttpHeaders;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;

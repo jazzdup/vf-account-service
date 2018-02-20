@@ -1,5 +1,7 @@
-package com.vodafone.charging.accountservice.domain;
+package com.vodafone.charging.ulf;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.ContextData;
 import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
