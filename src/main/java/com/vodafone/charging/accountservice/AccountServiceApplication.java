@@ -1,5 +1,9 @@
 package com.vodafone.charging.accountservice;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.model.Account;
+import com.vodafone.charging.accountservice.repository.AccountRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +23,8 @@ import springfox.documentation.swagger.web.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -59,6 +65,21 @@ public class AccountServiceApplication {
                 .description("REST Api to enrich Vodafone Account Information via interaction with OPCO and Partner Services")
                 .build();
 
+    }
+
+    @Bean
+    CommandLineRunner init(AccountRepository accountRepository) {
+        return (args) ->
+                newArrayList("al-pacino-" + new Random().nextInt(),
+                        "robert-deniro-" + new Random().nextInt(),
+                        "joe-pesci" + new Random().nextInt()).forEach(id ->
+                        accountRepository.save(Account.builder()
+                                .id(id)
+                                .chargingId(new ChargingId.Builder().type(ChargingId.Type.MSISDN)
+                                        .value(String.valueOf(new Random().nextInt())).build())
+                                .customerType("PRE")
+                                .lastValidate(new Date())
+                                .build()));
     }
 
     @Bean

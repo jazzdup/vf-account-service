@@ -3,11 +3,13 @@ package com.vodafone.charging.accountservice.controller;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
+import com.vodafone.charging.accountservice.service.SpendLimitService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.ws.rs.HttpMethod;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +45,9 @@ public class AccountServiceController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private SpendLimitService spendLimitService;
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
@@ -123,6 +129,16 @@ public class AccountServiceController {
             throw new ApplicationLogicException(e.getMessage(), e);
         }
         return ResponseEntity.ok(userGroups);
+    }
+
+
+    @RequestMapping(path = "/{accountId}/profile/spendlimits", method = POST,
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
+                                                       @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
+        spendLimitService.putSpendLimits(accountId, spendLimitsInfo);
+        return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
+                .build();
     }
 
     /*

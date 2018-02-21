@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
-import static com.vodafone.charging.data.builder.IFResponseData.anEnvelope;
+import static com.vodafone.charging.data.builder.IFResponseDataBuilder.anEnvelope;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;

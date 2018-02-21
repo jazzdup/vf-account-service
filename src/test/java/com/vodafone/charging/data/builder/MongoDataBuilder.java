@@ -11,7 +11,7 @@ import java.util.Random;
 
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 
-public class MongoData {
+public class MongoDataBuilder {
     public static Date aFixedDate(){
         return new GregorianCalendar(2018, 1, 1, 1, 1, 1).getTime();
     }

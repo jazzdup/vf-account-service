@@ -11,7 +11,7 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-public class IFResponseData {
+public class IFResponseDataBuilder {
 
     public static ERIFResponse aERIFResponse(){
         return ERIFResponse.builder()

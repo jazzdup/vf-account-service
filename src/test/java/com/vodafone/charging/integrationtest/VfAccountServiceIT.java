@@ -42,8 +42,8 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContext
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullableContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
-import static com.vodafone.charging.data.builder.IFResponseData.anEnvelope;
-import static com.vodafone.charging.data.builder.MongoData.anAccount;
+import static com.vodafone.charging.data.builder.IFResponseDataBuilder.anEnvelope;
+import static com.vodafone.charging.data.builder.MongoDataBuilder.anAccount;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;

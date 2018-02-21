@@ -14,5 +14,6 @@ public class Profile {
     private Date lastUpdatedUserGroups;
     private List<Transaction> transactions;
     private Date lastUpdatedTransactions;
+    private SpendLimits spendLimits;
 //    private List<Subscriptions> subscriptions;
 }

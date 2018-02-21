@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.IFResponseData.aERIFResponse;
+import static com.vodafone.charging.data.builder.IFResponseDataBuilder.aERIFResponse;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
