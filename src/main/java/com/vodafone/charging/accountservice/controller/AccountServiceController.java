@@ -136,9 +136,10 @@ public class AccountServiceController {
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
                                                        @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
-        spendLimitService.putSpendLimits(accountId, spendLimitsInfo);
+        Account account = spendLimitService.updateSpendLimits(accountId, spendLimitsInfo);
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
-                .build();
+                .body(account);
+
     }
 
     /*

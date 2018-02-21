@@ -26,7 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
@@ -72,7 +72,7 @@ public class SpendLimitIT {
         SpendLimitService spendLimitService = Mockito.mock(SpendLimitService.class);
 
 
-        mockMvc.perform(put("/accounts/" + account.getId() + "/profile/spendlimits")
+        mockMvc.perform(post("/accounts/" + account.getId() + "/profile/spendlimits")
                 .content(content)
                 .contentType(contentType)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
