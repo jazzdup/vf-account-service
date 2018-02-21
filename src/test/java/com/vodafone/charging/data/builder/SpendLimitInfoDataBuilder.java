@@ -12,15 +12,15 @@ public class SpendLimitInfoDataBuilder {
 
     public static List<SpendLimitInfo> aSpendLimitList() {
         return newArrayList(SpendLimitInfo.builder()
-                        .limit(new Random().nextInt(10))
+                        .limit(new Random().nextInt(1))
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_DAY).build(),
                 SpendLimitInfo.builder()
-                        .limit(new Random().nextInt(10))
+                        .limit(new Random().nextInt(12))
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_TX).build(),
                 SpendLimitInfo.builder()
-                        .limit(new Random().nextInt(10))
+                        .limit(new Random().nextInt(13))
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_MONTH).build());
     }
