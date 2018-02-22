@@ -6,7 +6,6 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
-import com.vodafone.charging.data.builder.MongoDataBuilder;
 import com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.REPOSITORY_RESOURCE_NOT_FOUND_ERROR;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
+import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfileWithoutSpendLimits;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -63,8 +64,7 @@ public class SpendLimitIT {
 
     @Test
     public void shouldAddSpendLimitsInProfile() throws Exception {
-
-        Account account = MongoDataBuilder.anAccount();
+        Account account = anAccount(aProfileWithoutSpendLimits());
 
         final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
         final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitInfo(spendLimitInfo);

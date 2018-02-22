@@ -11,9 +11,9 @@ import com.vodafone.charging.accountservice.dto.xml.Envelope;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
-import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.data.message.JsonConverter;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +36,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.*;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.*;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
@@ -43,7 +44,6 @@ import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aNullabl
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static com.vodafone.charging.data.builder.IFResponseDataBuilder.anEnvelope;
-import static com.vodafone.charging.data.builder.MongoDataBuilder.anAccount;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;

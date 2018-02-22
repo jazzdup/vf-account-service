@@ -22,12 +22,12 @@ import org.springframework.http.ResponseEntity;
 import java.util.Locale;
 import java.util.Random;
 
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullableChargingId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
-import static com.vodafone.charging.data.builder.MongoDataBuilder.anAccount;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
