@@ -7,8 +7,8 @@ import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
-import com.vodafone.charging.accountservice.exception.ConsumerWrapper;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
+import com.vodafone.charging.accountservice.exception.ResponseSupplierWrapper;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.accountservice.service.SpendLimitService;
 import io.swagger.annotations.Api;
@@ -49,6 +49,9 @@ public class AccountServiceController {
 
     @Autowired
     private SpendLimitService spendLimitService;
+
+    @Autowired
+    private ResponseSupplierWrapper wrapper;
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
@@ -135,18 +138,16 @@ public class AccountServiceController {
 
 
     @RequestMapping(path = "/{accountId}/profile/spendlimits", method = POST,
+            consumes = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE},
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
                                                        @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
 
-
-
-        final Account account = ConsumerWrapper.wrapper(() ->
+        final Account account = wrapper.wrap(() ->
                 spendLimitService.updateSpendLimits(accountId, spendLimitsInfo)).get();
 
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
                 .body(account);
-
     }
 
     /*

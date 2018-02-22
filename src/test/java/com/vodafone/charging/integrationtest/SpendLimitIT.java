@@ -4,6 +4,7 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
+import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.data.builder.MongoDataBuilder;
 import com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder;
@@ -27,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static com.vodafone.charging.accountservice.errors.ApplicationErrors.REPOSITORY_RESOURCE_NOT_FOUND_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -64,7 +66,7 @@ public class SpendLimitIT {
 
         Account account = MongoDataBuilder.anAccount();
 
-        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitList();
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
         final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitInfo(spendLimitInfo);
         final String content = jsonConverter.toJson(spendLimitInfo);
 
@@ -98,7 +100,7 @@ public class SpendLimitIT {
     @Test
     public void shouldReturn404WhenTryingToUpdateSpendLimitsForNonExistingAccountId() throws Exception {
 
-        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitList();
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
         final String content = jsonConverter.toJson(spendLimitInfo);
 
         log.info("xml= {}", content);
@@ -110,6 +112,12 @@ public class SpendLimitIT {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value())).andReturn();
+
+        AccountServiceError errorResponse =
+                (AccountServiceError) jsonConverter.fromJson(AccountServiceError.class, result.getResponse().getContentAsString());
+        assertThat(errorResponse.getStatus()).isEqualTo(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.status().value());
+        assertThat(errorResponse.getErrorId()).isEqualTo(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorId().value());
+        assertThat(errorResponse.getErrorDescription()).startsWith(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorDesciption());
     }
 
 }

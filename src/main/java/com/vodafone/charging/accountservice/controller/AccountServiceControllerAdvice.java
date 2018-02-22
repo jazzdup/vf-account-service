@@ -1,6 +1,5 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
@@ -48,9 +47,10 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                                                                                RepositoryResourceNotFoundException ex) {
         log.error("Handling RepositoryResourceNotFoundException with message: {}", ex.getMessage());
         return new ResponseEntity<>(AccountServiceError.builder()
-                .status(ERCoreErrorStatus.ERROR.value())
+                .status(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.status().value())
                 .errorId(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorId().value())
-                .errorDescription(ex.getMessage()).build(),
+                .errorDescription(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorDesciption() +
+                        " message: "+ ex.getMessage()).build(),
                 HttpStatus.NOT_FOUND);
     }
 
