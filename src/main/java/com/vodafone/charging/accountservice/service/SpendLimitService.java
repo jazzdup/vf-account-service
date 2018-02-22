@@ -17,10 +17,10 @@ public class SpendLimitService {
     private AccountRepository repository;
 
     //TODO
-    //Get Account Profile Info - see if Spend Limit applies
+    //Get Account Info - see if Spend Limit applies
     //Call DecouplingAdapter to get transactions
     //Calculate whether SpendLimit is Breached
-    //Respond with a SpendLimit response
+    //Respond with a PaymentValidation response i.e. paymentValidated / paymentNotValidated
     public PaymentValidation paymentValidation() {
         throw new UnsupportedOperationException();
     }
