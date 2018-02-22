@@ -5,7 +5,6 @@ import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
-import com.vodafone.charging.accountservice.service.SpendLimitService;
 import com.vodafone.charging.data.builder.MongoDataBuilder;
 import com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -72,10 +70,6 @@ public class SpendLimitIT {
 
         log.info("xml= {}", content);
 
-        final Account savedAccount = repository.save(account);
-
-        SpendLimitService spendLimitService = Mockito.mock(SpendLimitService.class);
-
         MvcResult result = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/spendlimits")
                 .content(content)
                 .contentType(contentType)
@@ -86,21 +80,31 @@ public class SpendLimitIT {
 
         Account accountResult = (Account) jsonConverter.fromJson(Account.class, result.getResponse().getContentAsString());
         assertThat(accountResult.getProfiles().get(0).getSpendLimits()).isNotEmpty();
-//        forEach(spendLimit -> {
-//            assertThat(expectedLimits).containsOnlyElementsOf(spendLimit);
-//
-//        });
         final List<SpendLimit> resultLimits = accountResult.getProfiles().get(0).getSpendLimits();
-//        assertThat(accountResult.getProfiles().get(0).getSpendLimits().get(1)).isEqualToComparingFieldByField(expectedLimits.get(1));
-
         IntStream.range(0, resultLimits.size())
                 .forEach(i -> assertThat(resultLimits.get(i)).isEqualToComparingFieldByField(expectedLimits.get(i)));
 
     }
 
     @Test
-    public void shouldUpdateExistingSpendLimitsInProfile() throws Exception {
+    public void shouldNonUpdateExistingSpendLimitsInAccountProfile() throws Exception {
+    }
 
+    @Test
+    public void shouldReturn404WhenTryingToUpdateSpendLimitsForNonExistingAccountId() throws Exception {
+
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitList();
+        final String content = jsonConverter.toJson(spendLimitInfo);
+
+        log.info("xml= {}", content);
+
+        MvcResult result = mockMvc.perform(post("/accounts/NON-EXISTING-ACCOUNT-ID/profile/spendlimits")
+                .content(content)
+                .contentType(contentType)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value())).andReturn();
     }
 
 }

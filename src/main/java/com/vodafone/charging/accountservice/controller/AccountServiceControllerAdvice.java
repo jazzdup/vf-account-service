@@ -1,8 +1,10 @@
 package com.vodafone.charging.accountservice.controller;
 
+import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
+import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,18 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
                 .errorId(APPLICATION_LOGIC_ERROR.errorId().value())
                 .errorDescription(APPLICATION_LOGIC_ERROR.errorDesciption()).build(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RepositoryResourceNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request,
+                                                                               RepositoryResourceNotFoundException ex) {
+        log.error("Handling RepositoryResourceNotFoundException with message: {}", ex.getMessage());
+        return new ResponseEntity<>(AccountServiceError.builder()
+                .status(ERCoreErrorStatus.ERROR.value())
+                .errorId(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorId().value())
+                .errorDescription(ex.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentValidationException.class)

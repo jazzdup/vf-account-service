@@ -5,7 +5,8 @@ package com.vodafone.charging.accountservice.errors;
  */
 public enum ERCoreErrorId {
 
-    SYSTEM_ERROR("SYSTEM_ERROR");
+    SYSTEM_ERROR("SYSTEM_ERROR"),
+    CLIENT_ERROR("CLIENT_ERROR");
 
     private String value;
 
