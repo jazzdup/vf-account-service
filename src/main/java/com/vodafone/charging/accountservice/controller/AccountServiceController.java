@@ -7,6 +7,7 @@ import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.ConsumerWrapper;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.accountservice.service.SpendLimitService;
@@ -125,7 +126,8 @@ public class AccountServiceController {
         List<String> userGroups;
         try {
             userGroups = accountService.getUserGroups(accountId);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ApplicationLogicException(e.getMessage(), e);
         }
         return ResponseEntity.ok(userGroups);
@@ -137,7 +139,10 @@ public class AccountServiceController {
     public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
                                                        @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
 
-        Account account = spendLimitService.updateSpendLimits(accountId, spendLimitsInfo);
+
+
+        final Account account = ConsumerWrapper.wrapper(() ->
+                spendLimitService.updateSpendLimits(accountId, spendLimitsInfo)).get();
 
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
                 .body(account);

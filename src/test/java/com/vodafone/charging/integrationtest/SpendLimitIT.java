@@ -70,6 +70,11 @@ public class SpendLimitIT {
 
         log.info("xml= {}", content);
 
+        final Account savedAccount = repository.save(account);
+        assertThat(savedAccount).isNotNull();
+        assertThat(savedAccount).isEqualToComparingFieldByField(account);
+
+
         MvcResult result = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/spendlimits")
                 .content(content)
                 .contentType(contentType)
