@@ -11,7 +11,7 @@ import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 
 public class AccountDataBuilder {
 
-    public static Account anAccount(){
+    public static Account anAccount() {
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))
                 .lastValidate(MongoDataBuilder.aFixedDate())
@@ -21,13 +21,22 @@ public class AccountDataBuilder {
                 .build();
     }
 
-    public static Account anAccount(Profile profile){
+    public static Account anAccount(Profile profile) {
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
                 .profiles(newArrayList(aProfile()))
+                .build();
+    }
+
+    public static Account anAccountWithNullProfile() {
+        return Account.builder()
+                .id(String.valueOf(new Random().nextInt()))
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(aChargingId())
+                .customerType("PRE")
                 .build();
     }
 }

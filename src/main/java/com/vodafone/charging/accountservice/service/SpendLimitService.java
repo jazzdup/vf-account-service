@@ -23,7 +23,7 @@ public class SpendLimitService {
     //Call DecouplingAdapter to get transactions
     //Calculate whether SpendLimit is Breached
     //Respond with a PaymentValidation response i.e. paymentValidated / paymentNotValidated
-    public PaymentValidation paymentValidation() {
+    public PaymentValidation validatePayment() {
         throw new UnsupportedOperationException();
     }
 
