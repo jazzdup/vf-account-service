@@ -32,28 +32,6 @@
     </properties>
 
     <dependencies>
-
-        <!--Vodafone Application Dependencies-->
-        <dependency>
-            <groupId>com.vodafone.ppe</groupId>
-            <artifactId>ppe-common-config</artifactId>
-            <version>r18-01-1v3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>findbugs</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!--Spring dependencies-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -88,6 +66,45 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+
+
+        <!--Vodafone Application Dependencies-->
+        <dependency>
+            <groupId>com.vodafone.ppe</groupId>
+            <artifactId>ppe-common-config</artifactId>
+            <version>r18-01-1v3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>findbugs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.slf4j</artifactId>
+                    <groupId>slf4j-log4j12</groupId>
+                </exclusion>
+                <!--<exclusion>-->
+                    <!--<artifactId>log4j</artifactId>-->
+                    <!--<groupId>log4j</groupId>-->
+                <!--</exclusion>-->
+                <exclusion>
+                    <artifactId>org.slf4j</artifactId>
+                    <groupId>slf4j-ext</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.slf4j</artifactId>
+                    <groupId>jcl-over-slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
         <!--open source dependencies-->
         <dependency>
