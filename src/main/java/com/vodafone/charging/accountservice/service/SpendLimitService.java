@@ -6,6 +6,7 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class SpendLimitService {
 
-    @Autowired
+
     private AccountRepository repository;
+
+    @Autowired
+    public SpendLimitService(AccountRepository repository) {
+        this.repository = repository;
+    }
 
     //TODO
     //Get Account Info - see if Spend Limit applies

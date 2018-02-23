@@ -7,7 +7,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -32,9 +31,9 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 /**
  * Spring Boot Application class
  */
-@ComponentScan(basePackages = "com.vodafone.charging")
 @SpringBootApplication
 @Configuration
+//@ComponentScan(basePackages = "com.vodafone.charging")
 @EnableSwagger2
 public class AccountServiceApplication {
 
@@ -102,3 +101,4 @@ public class AccountServiceApplication {
     }
 
 }
+

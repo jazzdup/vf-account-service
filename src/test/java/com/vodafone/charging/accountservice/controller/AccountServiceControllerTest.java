@@ -6,7 +6,9 @@ import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
+import com.vodafone.charging.accountservice.exception.ResponseSupplierWrapper;
 import com.vodafone.charging.accountservice.service.AccountService;
+import com.vodafone.charging.accountservice.service.SpendLimitService;
 import com.vodafone.charging.data.object.NullableChargingId;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Locale;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
@@ -41,6 +44,12 @@ public class AccountServiceControllerTest {
     @Mock
     private AccountService accountService;
 
+    @Mock
+    private ResponseSupplierWrapper responseSupplierWrapper;
+
+    @Mock
+    private SpendLimitService spendLimitService;
+
     @InjectMocks
     private AccountServiceController accountServiceController;
 
@@ -51,7 +60,7 @@ public class AccountServiceControllerTest {
 
     @Test
     public void shouldPassCorrectDataAndReturnOkWhenCorrectDataIsReceived() {
-        ArgumentCaptor<ContextData> captor = ArgumentCaptor.forClass(ContextData.class);
+        ArgumentCaptor<Supplier> captor = ArgumentCaptor.forClass(Supplier.class);
         //given
         final EnrichedAccountInfo expectedAccountInfo = aEnrichedAccountInfo();
         final ContextData contextData = aContextData();
@@ -60,15 +69,18 @@ public class AccountServiceControllerTest {
                 contextData.getChargingId());
 
         given(accountService.enrichAccountData(contextData)).willReturn(expectedAccountInfo);
+        given(responseSupplierWrapper.wrap(any())).willReturn(() -> expectedAccountInfo);
 
         //when
         final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
                 accountServiceController.enrichAccountData(headers, contextData);
 
         //then
-        verify(accountService).enrichAccountData(captor.capture());
-        ContextData arg = captor.getValue();
-        assertThat(arg).isEqualToComparingFieldByField(contextData);
+        verify(responseSupplierWrapper).wrap(captor.capture());
+        final Supplier supplier = captor.getValue();
+        assertThat(supplier.get()).isInstanceOf(EnrichedAccountInfo.class);
+
+        assertThat(supplier.get()).isEqualToComparingFieldByField(expectedAccountInfo);
 
         assertThat(ResponseEntity.ok(expectedAccountInfo))
                 .isEqualToIgnoringGivenFields(enrichedAccountInfoResponse, "body");
@@ -109,20 +121,22 @@ public class AccountServiceControllerTest {
     }
 
     @Test
-    public void shouldWrapExceptionIntoApplicationLogicException() {
+    public void shouldNotWrapExceptionFromExceptionWrapper() {
         final ContextData contextData = aContextData();
         final HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
                 contextData.getLocale(),
                 contextData.getChargingId());
 
         final String message = "This is a test exception";
-        given(accountService.enrichAccountData(contextData))
-                .willThrow(new NullPointerException(message));
+
+        given(responseSupplierWrapper.wrap(any(Supplier.class))).willThrow(new NullPointerException(message));
 
         assertThatThrownBy(() -> accountServiceController.enrichAccountData(headers, contextData))
-                .isInstanceOf(ApplicationLogicException.class)
-                .hasMessage(message)
-                .hasCauseInstanceOf(NullPointerException.class);
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage(message);
+
+        verify(responseSupplierWrapper).wrap(any());
+        verifyZeroInteractions(accountService);
     }
 
     @Test

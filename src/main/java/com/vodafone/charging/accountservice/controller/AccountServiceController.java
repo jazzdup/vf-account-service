@@ -44,14 +44,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @Slf4j
 public class AccountServiceController {
 
-    @Autowired
     private AccountService accountService;
-
-    @Autowired
     private SpendLimitService spendLimitService;
+    private ResponseSupplierWrapper responseSupplierWrapper;
 
     @Autowired
-    private ResponseSupplierWrapper wrapper;
+    public AccountServiceController(AccountService accountService,
+                                    SpendLimitService spendLimitService,
+                                    ResponseSupplierWrapper responseSupplierWrapper) {
+        this.accountService = accountService;
+        this.spendLimitService = spendLimitService;
+        this.responseSupplierWrapper = responseSupplierWrapper;
+    }
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
@@ -65,13 +69,9 @@ public class AccountServiceController {
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
         this.checkContextData(contextData);
+        final EnrichedAccountInfo accountInfo = responseSupplierWrapper
+                .wrap(() -> accountService.enrichAccountData(contextData)).get();
 
-        EnrichedAccountInfo accountInfo;
-        try {
-            accountInfo = accountService.enrichAccountData(contextData);
-        } catch (Exception e) {
-            throw new ApplicationLogicException(e.getMessage(), e);
-        }
         return ResponseEntity.ok(accountInfo);
     }
 
@@ -129,8 +129,7 @@ public class AccountServiceController {
         List<String> userGroups;
         try {
             userGroups = accountService.getUserGroups(accountId);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ApplicationLogicException(e.getMessage(), e);
         }
         return ResponseEntity.ok(userGroups);
@@ -143,7 +142,7 @@ public class AccountServiceController {
     public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
                                                        @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
 
-        final Account account = wrapper.wrap(() ->
+        final Account account = responseSupplierWrapper.wrap(() ->
                 spendLimitService.updateSpendLimits(accountId, spendLimitsInfo)).get();
 
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
