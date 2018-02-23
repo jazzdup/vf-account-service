@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.io.IOException;
 
 //@SpringBootTest(classes = AccountServiceApplication.class)
-@Component("converter")
+@Component
 @ContextConfiguration(classes = AccountServiceApplication.class)
 public class JsonConverter {
 
