@@ -9,9 +9,9 @@ import java.util.function.Supplier;
 @Primary
 @Component
 @Slf4j
-public class ServiceCallerSupplier {
+public class ServiceCallSupplier {
 
-    public <T> Supplier<T> wrap(Supplier<T> supplier) {
+    public <T> Supplier<T> call(Supplier<T> supplier) {
         return () -> {
             try {
                 return supplier.get();

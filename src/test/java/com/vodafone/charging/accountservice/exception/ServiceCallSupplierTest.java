@@ -18,10 +18,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ServiceCallerSupplierTest {
+public class ServiceCallSupplierTest {
 
     @InjectMocks
-    private ServiceCallerSupplier serviceCallerSupplier;
+    private ServiceCallSupplier serviceCallSupplier;
 
     @Mock
     private AccountService accountService;
@@ -35,7 +35,7 @@ public class ServiceCallerSupplierTest {
 
         //when
         final Supplier<EnrichedAccountInfo> accountInfo =
-                serviceCallerSupplier.wrap(() -> accountService.enrichAccountData(contextData));
+                serviceCallSupplier.call(() -> accountService.enrichAccountData(contextData));
         //then
         assertThat(accountInfo.get()).isEqualToComparingFieldByField(expected);
     }
@@ -68,7 +68,7 @@ public class ServiceCallerSupplierTest {
         final ContextData contextData = aContextData();
         given(accountService.enrichAccountData(contextData)).willThrow(expectedCause);
 
-        assertThatThrownBy(serviceCallerSupplier.wrap(() -> accountService.enrichAccountData(contextData))::get)
+        assertThatThrownBy(serviceCallSupplier.call(() -> accountService.enrichAccountData(contextData))::get)
                 .isInstanceOf(expectedType)
                 .hasMessage(expectedCause.getMessage())
                 .hasCauseInstanceOf(expectedCause.getClass());
@@ -78,7 +78,7 @@ public class ServiceCallerSupplierTest {
         final ContextData contextData = aContextData();
         given(accountService.enrichAccountData(contextData)).willThrow(expectedType);
 
-        assertThatThrownBy(serviceCallerSupplier.wrap(() -> accountService.enrichAccountData(contextData))::get)
+        assertThatThrownBy(serviceCallSupplier.call(() -> accountService.enrichAccountData(contextData))::get)
                 .isInstanceOf(expectedType.getClass())
                 .hasMessage(expectedType.getMessage())
                 .hasNoCause();

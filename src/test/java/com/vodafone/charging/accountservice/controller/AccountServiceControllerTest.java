@@ -3,12 +3,12 @@ package com.vodafone.charging.accountservice.controller;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
-import com.vodafone.charging.accountservice.exception.ServiceCallerSupplier;
+import com.vodafone.charging.accountservice.exception.ServiceCallSupplier;
 import com.vodafone.charging.accountservice.service.AccountService;
-import com.vodafone.charging.accountservice.service.SpendLimitService;
 import com.vodafone.charging.data.object.NullableChargingId;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -32,6 +33,7 @@ import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullable
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
+import static com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder.aSpendLimitInfoList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -46,10 +48,10 @@ public class AccountServiceControllerTest {
     private AccountService accountService;
 
     @Mock
-    private ServiceCallerSupplier serviceCallerSupplier;
+    private ServiceCallSupplier serviceCallSupplier;
 
     @Mock
-    private SpendLimitService spendLimitService;
+    private Supplier<Account> supplier;
 
     @InjectMocks
     private AccountServiceController accountServiceController;
@@ -70,14 +72,14 @@ public class AccountServiceControllerTest {
                 contextData.getChargingId());
 
         given(accountService.enrichAccountData(contextData)).willReturn(expectedAccountInfo);
-        given(serviceCallerSupplier.wrap(any())).willReturn(() -> expectedAccountInfo);
+        given(serviceCallSupplier.call(any())).willReturn(() -> expectedAccountInfo);
 
         //when
         final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
                 accountServiceController.enrichAccountData(headers, contextData);
 
         //then
-        verify(serviceCallerSupplier).wrap(captor.capture());
+        verify(serviceCallSupplier).call(captor.capture());
         final Supplier supplier = captor.getValue();
         assertThat(supplier.get()).isInstanceOf(EnrichedAccountInfo.class);
 
@@ -130,13 +132,13 @@ public class AccountServiceControllerTest {
 
         final String message = "This is a test exception";
 
-        given(serviceCallerSupplier.wrap(Matchers.<Supplier<EnrichedAccountInfo>>any())).willThrow(new NullPointerException(message));
+        given(serviceCallSupplier.call(Matchers.<Supplier<EnrichedAccountInfo>>any())).willThrow(new NullPointerException(message));
 
         assertThatThrownBy(() -> accountServiceController.enrichAccountData(headers, contextData))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage(message);
 
-        verify(serviceCallerSupplier).wrap(any());
+        verify(serviceCallSupplier).call(any());
         verifyZeroInteractions(accountService);
     }
 
@@ -191,6 +193,52 @@ public class AccountServiceControllerTest {
                 .isInstanceOf(ApplicationLogicException.class)
                 .hasMessage(message)
                 .hasCauseInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    public void shouldCallSupplierSuccessfully() {
+        final Account expectedAccount = anAccount();
+        final List<SpendLimitInfo> spendLimitInfoList = aSpendLimitInfoList();
+        final String accountId = String.valueOf(new Random().nextInt());
+
+        given(serviceCallSupplier.call((Matchers.<Supplier<Account>>any()))).willReturn(supplier);
+        given(supplier.get()).willReturn(expectedAccount);
+
+        final ResponseEntity<Account> accountResponseEntity = accountServiceController.updateAccountSpentLimit(accountId, spendLimitInfoList);
+
+        assertThat(accountResponseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(accountResponseEntity.getBody()).isEqualToComparingFieldByField(expectedAccount);
+
+        verify(serviceCallSupplier).call(any());
+        verify(supplier).get();
+        verifyNoMoreInteractions(serviceCallSupplier, supplier);
+
+    }
+
+    @Test
+    public void shouldPropogateExceptionWhenCallingServiceCaller() {
+        final List<SpendLimitInfo> spendLimitInfoList = aSpendLimitInfoList();
+        final String accountId = String.valueOf(new Random().nextInt());
+        String message = String.valueOf(this.hashCode());
+        given(serviceCallSupplier.call(any())).willThrow(new NullPointerException(message));
+
+        assertThatThrownBy(() -> accountServiceController.updateAccountSpentLimit(accountId, spendLimitInfoList))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage(message).hasNoCause();
+    }
+
+    @Test
+    public void shouldPropogateExceptionWhenCallingServiceCallerGetMethod() {
+        final List<SpendLimitInfo> spendLimitInfoList = aSpendLimitInfoList();
+        final String accountId = String.valueOf(new Random().nextInt());
+        String message = String.valueOf(this.hashCode());
+        given(serviceCallSupplier.call((Matchers.<Supplier<Account>>any()))).willReturn(supplier);
+        given(supplier.get()).willThrow(new NullPointerException(message));
+
+        assertThatThrownBy(() -> accountServiceController.updateAccountSpentLimit(accountId, spendLimitInfoList))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage(message).hasNoCause();
+
     }
 
 }

@@ -8,7 +8,7 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
-import com.vodafone.charging.accountservice.exception.ServiceCallerSupplier;
+import com.vodafone.charging.accountservice.exception.ServiceCallSupplier;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.accountservice.service.SpendLimitService;
 import io.swagger.annotations.Api;
@@ -46,15 +46,15 @@ public class AccountServiceController {
 
     private AccountService accountService;
     private SpendLimitService spendLimitService;
-    private ServiceCallerSupplier serviceCallerSupplier;
+    private ServiceCallSupplier serviceCallSupplier;
 
     @Autowired
     public AccountServiceController(AccountService accountService,
                                     SpendLimitService spendLimitService,
-                                    ServiceCallerSupplier serviceCallerSupplier) {
+                                    ServiceCallSupplier serviceCallSupplier) {
         this.accountService = accountService;
         this.spendLimitService = spendLimitService;
-        this.serviceCallerSupplier = serviceCallerSupplier;
+        this.serviceCallSupplier = serviceCallSupplier;
     }
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
@@ -69,8 +69,8 @@ public class AccountServiceController {
     public ResponseEntity<EnrichedAccountInfo> enrichAccountData(@RequestHeader HttpHeaders headers,
                                                                  @Valid @RequestBody ContextData contextData) {
         this.checkContextData(contextData);
-        final EnrichedAccountInfo accountInfo = serviceCallerSupplier
-                .wrap(() -> accountService.enrichAccountData(contextData)).get();
+        final EnrichedAccountInfo accountInfo = serviceCallSupplier
+                .call(() -> accountService.enrichAccountData(contextData)).get();
 
         return ResponseEntity.ok(accountInfo);
     }
@@ -139,11 +139,12 @@ public class AccountServiceController {
     @RequestMapping(path = "/{accountId}/profile/spendlimits", method = POST,
             consumes = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE},
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
-    public ResponseEntity<Object> putAccountSpentLimit(@PathVariable String accountId,
-                                                       @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
+    public ResponseEntity<Account> updateAccountSpentLimit(@PathVariable String accountId,
+                                                           @Valid @RequestBody List<SpendLimitInfo> spendLimitsInfo) {
 
-        final Account account = serviceCallerSupplier.wrap(() ->
-                spendLimitService.updateSpendLimits(accountId, spendLimitsInfo)).get();
+        final Account account = serviceCallSupplier.call(() ->
+                spendLimitService.updateSpendLimits(accountId, spendLimitsInfo))
+                .get();
 
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
                 .body(account);
