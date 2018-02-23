@@ -28,7 +28,6 @@ public class ServiceCallerSupplierTest {
 
     @Test
     public void shouldReturnSupplierWithCorrectType() {
-
         //given
         final ContextData contextData = aContextData();
         EnrichedAccountInfo expected = aEnrichedAccountInfo();
@@ -50,7 +49,7 @@ public class ServiceCallerSupplierTest {
     @Test
     public void shouldWrapNullPointerExceptionToApplicationLogicException() {
         final String message = "This is a test Exception" + this.getClass().hashCode();
-        checkResult(ApplicationLogicException.class, new RuntimeException(message));
+        checkResult(ApplicationLogicException.class, new NullPointerException(message));
     }
 
     @Test
@@ -86,8 +85,4 @@ public class ServiceCallerSupplierTest {
 
     }
 
-
-    public void shouldNotWrapApplicationLogicExcption() {
-
-    }
 }

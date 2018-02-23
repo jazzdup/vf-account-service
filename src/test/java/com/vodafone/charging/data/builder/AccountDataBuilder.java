@@ -27,7 +27,7 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
-                .profiles(newArrayList(aProfile()))
+                .profiles(newArrayList(profile))
                 .build();
     }
 
@@ -37,6 +37,15 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
+                .build();
+    }
+    public static Account anAccountWithEmptyProfile() {
+        return Account.builder()
+                .id(String.valueOf(new Random().nextInt()))
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(aChargingId())
+                .customerType("PRE")
+                .profiles(newArrayList())
                 .build();
     }
 }
