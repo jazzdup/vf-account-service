@@ -6,7 +6,7 @@ import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
-import com.vodafone.charging.accountservice.exception.ResponseSupplierWrapper;
+import com.vodafone.charging.accountservice.exception.ServiceCallerSupplier;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.accountservice.service.SpendLimitService;
 import com.vodafone.charging.data.object.NullableChargingId;
@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +46,7 @@ public class AccountServiceControllerTest {
     private AccountService accountService;
 
     @Mock
-    private ResponseSupplierWrapper responseSupplierWrapper;
+    private ServiceCallerSupplier serviceCallerSupplier;
 
     @Mock
     private SpendLimitService spendLimitService;
@@ -69,14 +70,14 @@ public class AccountServiceControllerTest {
                 contextData.getChargingId());
 
         given(accountService.enrichAccountData(contextData)).willReturn(expectedAccountInfo);
-        given(responseSupplierWrapper.wrap(any())).willReturn(() -> expectedAccountInfo);
+        given(serviceCallerSupplier.wrap(any())).willReturn(() -> expectedAccountInfo);
 
         //when
         final ResponseEntity<EnrichedAccountInfo> enrichedAccountInfoResponse =
                 accountServiceController.enrichAccountData(headers, contextData);
 
         //then
-        verify(responseSupplierWrapper).wrap(captor.capture());
+        verify(serviceCallerSupplier).wrap(captor.capture());
         final Supplier supplier = captor.getValue();
         assertThat(supplier.get()).isInstanceOf(EnrichedAccountInfo.class);
 
@@ -129,13 +130,13 @@ public class AccountServiceControllerTest {
 
         final String message = "This is a test exception";
 
-        given(responseSupplierWrapper.wrap(any(Supplier.class))).willThrow(new NullPointerException(message));
+        given(serviceCallerSupplier.wrap(Matchers.<Supplier<EnrichedAccountInfo>>any())).willThrow(new NullPointerException(message));
 
         assertThatThrownBy(() -> accountServiceController.enrichAccountData(headers, contextData))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage(message);
 
-        verify(responseSupplierWrapper).wrap(any());
+        verify(serviceCallerSupplier).wrap(any());
         verifyZeroInteractions(accountService);
     }
 

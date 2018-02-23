@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 @Primary
 @Component
 @Slf4j
-public class ResponseSupplierWrapper {
+public class ServiceCallerSupplier {
 
     public <T> Supplier<T> wrap(Supplier<T> supplier) {
         return () -> {
