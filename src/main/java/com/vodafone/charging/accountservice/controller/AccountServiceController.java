@@ -1,9 +1,6 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
+import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
@@ -135,7 +132,6 @@ public class AccountServiceController {
         return ResponseEntity.ok(userGroups);
     }
 
-
     @RequestMapping(path = "/{accountId}/profile/spendlimits", method = POST,
             consumes = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE},
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
@@ -148,6 +144,16 @@ public class AccountServiceController {
 
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
                 .body(account);
+    }
+
+    @RequestMapping(path = "/{accountId}/profile/transactions/payments", method = POST,
+            consumes = APPLICATION_JSON_UTF8_VALUE,
+            produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
+    public ResponseEntity<PaymentValidation> validatePayment(@PathVariable String accountId,
+                                                             @Valid @RequestBody PaymentContext paymentContext) {
+        final PaymentValidation paymentValidation = serviceCallSupplier.call(() ->
+                spendLimitService.validatePayment(accountId, paymentContext)).get();
+        return ResponseEntity.ok(paymentValidation);
     }
 
     /*

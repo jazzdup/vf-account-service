@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.PaymentValidation;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
@@ -32,7 +33,10 @@ public class SpendLimitService {
     //Call DecouplingAdapter to get transactions
     //Calculate whether SpendLimit is Breached
     //Respond with a PaymentValidation response i.e. paymentValidated / paymentNotValidated
-    public PaymentValidation validatePayment() {
+    public PaymentValidation validatePayment(String accountId, PaymentContext paymentContext) {
+
+        //TODO Get the SpendLimits info for the accountId.  If no account, fail, if no SpendLimit
+        //Get the transactions
         throw new UnsupportedOperationException();
     }
 
