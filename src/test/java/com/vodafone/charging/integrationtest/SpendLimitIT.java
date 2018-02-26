@@ -1,6 +1,7 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
+import com.vodafone.charging.accountservice.domain.PaymentValidation;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
@@ -53,7 +54,7 @@ public class SpendLimitIT {
     private JsonConverter jsonConverter;
 
     @Autowired
-    AccountRepository repository;
+    private AccountRepository repository;
 
     @Before
     public void setUp() {
@@ -151,6 +152,77 @@ public class SpendLimitIT {
                 .forEach(i -> assertThat(resultLimits.get(i)).isEqualToComparingFieldByField(expectedLimits.get(i)));
     }
 
+
+    @Test
+    public void shouldValidatePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExists() throws Exception {
+
+        /*
+        - get account using accountId
+            if not found then return validationFailed
+        - see if account has a spend limit associated with it
+                - if not then see if request has a default spend limit
+                        - if not the return a validationFailed
+                        - if yes then get the transactions for the account for the last month
+                          Calculate whether spend limit breached
+                          - if not then return validationSuccess
+                          - if breached return validationFailed
+        - if yes then get the transactions for the account for the last month.
+            Calculate whether the limit is breached for any of the limits set.
+            - if not then return validationSuccess
+                - if breached return validationFailed
+         */
+
+//        final Account expectedAccount = anAccount();
+//        final ChargingId expectedChargingId = expectedAccount.getChargingId();
+//        Account savedAccount = repository.save(expectedAccount);
+//        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
+
+        final Account account = anAccount();
+        saveAccountAndCheck(account);
+
+        final String json = jsonConverter.toJson(account);
+
+        final MvcResult response =  mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        final PaymentValidation validation =
+                (PaymentValidation) jsonConverter.fromJson(PaymentValidation.class, response.getResponse().getContentAsString());
+
+        assertThat(validation).isNotNull();
+        assertThat(validation.isSuccess()).isTrue();
+
+    }
+
+    public void shouldValidatePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExists() {
+    }
+
+    public void shouldValidatePaymentWhenDefaultSuppliedAndAccountSpendLimitExists() {
+    }
+
+    public void shouldValidatePaymentUsingAccountSpendLimitWhenDefaultSuppliedAndAccountSpendLimitExists() {
+    }
+
+    public void shouldNotValidatePaymentWhenNoAccountExists() {
+    }
+
+    public void shouldNotValidatePaymentWhenNoDefaultOrNoAccountSpendLimitExists() {
+    }
+
+    public void shouldNotValidatePaymentWhenErrorReceivedFromTransactionService() {
+    }
+
+    public void shouldValidatePaymentWhenEmptyTransactionListReceivedFromService() {
+    }
+
+    public void shouldReturnHttpErrorWhenNoBodyPassedInRequest() {
+    }
+
+    public void shouldReturnHttpErrorWhenNoAccountIdPassedInRequest() {
+    }
 
 
 }

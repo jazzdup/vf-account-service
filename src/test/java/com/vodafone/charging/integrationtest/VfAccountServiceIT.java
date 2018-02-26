@@ -280,7 +280,8 @@ public class VfAccountServiceIT {
     public void shouldGetAccountUsingChargingId() throws Exception {
         final Account expectedAccount = anAccount();
         final ChargingId expectedChargingId = expectedAccount.getChargingId();
-        repository.save(expectedAccount);
+        Account savedAccount = repository.save(expectedAccount);
+        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
 
         final MvcResult response = mockMvc.perform(get("/accounts/" + expectedChargingId.getType() + "/" + expectedChargingId.getValue() )
                 .accept(MediaType.APPLICATION_JSON_UTF8))
@@ -295,7 +296,8 @@ public class VfAccountServiceIT {
     @Test
     public void shouldGetAccountUsingAccountId() throws Exception {
         final Account expectedAccount = anAccount();
-        repository.save(expectedAccount);
+        final Account savedAccount = repository.save(expectedAccount);
+        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
         final String accountId = expectedAccount.getId();
 
         final MvcResult response = mockMvc.perform(get("/accounts/" + accountId )
@@ -313,7 +315,9 @@ public class VfAccountServiceIT {
     public void shouldSaveAndFindByChargingId() throws Exception {
         final Account expectedAccount = anAccount();
         final ChargingId expectedChargingId = expectedAccount.getChargingId();
-        repository.save(expectedAccount);
+        final Account savedAccount = repository.save(expectedAccount);
+
+        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
         final Account account = repository.findByChargingId(expectedChargingId);
         assertThat(account).isEqualToComparingFieldByFieldRecursively(expectedAccount);
     }
@@ -371,7 +375,9 @@ public class VfAccountServiceIT {
     @Test
     public void shouldGetUserGroupsUsingAccountId() throws Exception {
         final Account expectedAccount = anAccount();
-        repository.save(expectedAccount);
+        final Account savedAccount = repository.save(expectedAccount);
+        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
+
         final String accountId = expectedAccount.getId();
 
         final MvcResult response = mockMvc.perform(get("/accounts/" + accountId + "/profile/usergroups" )
