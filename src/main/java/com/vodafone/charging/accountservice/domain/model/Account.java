@@ -5,12 +5,16 @@ import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Entity;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Entity
 @Getter @ToString
+@Document(collection = "account")
 public class Account {
     @Id
     private String id;

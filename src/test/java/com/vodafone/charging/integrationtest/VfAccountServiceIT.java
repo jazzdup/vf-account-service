@@ -308,16 +308,6 @@ public class VfAccountServiceIT {
         assertThat(account).isEqualToComparingFieldByFieldRecursively(expectedAccount);
     }
 
-    //TODO: move to separate repository test if more repository tests needed
-    @Test
-    public void shouldSaveAndFindByChargingId() throws Exception {
-        final Account expectedAccount = anAccount();
-        final ChargingId expectedChargingId = expectedAccount.getChargingId();
-        repository.save(expectedAccount);
-        final Account account = repository.findByChargingId(expectedChargingId);
-        assertThat(account).isEqualToComparingFieldByFieldRecursively(expectedAccount);
-    }
-
     //TODO: decide whether worth keeping
     @Test
     public void shouldEnrichAccountSaveAccountThenGetAccountUsingChargingId() throws Exception {

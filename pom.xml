@@ -153,7 +153,7 @@
             <version>${springfox.version}</version>
         </dependency>
 
-        <!--mongo db dependencies-->
+        <!--embedded mongo db dependencies, comment out to use non-embedded mongo db-->
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
