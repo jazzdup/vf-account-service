@@ -4,5 +4,5 @@ public enum SpendLimitType {
 
     ACCOUNT_TX,
     ACCOUNT_DAY,
-    ACCOUNT_MONTH;
+    ACCOUNT_MONTH
 }

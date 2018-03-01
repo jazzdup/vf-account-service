@@ -1,4 +1,4 @@
-package com.vodafone.charging.accountservice.domain;
+package com.vodafone.charging.accountservice.dto;
 
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import lombok.Builder;
@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 @Getter
 public class SpendLimitResult {
 
-    private boolean spendLimitBreached;
+    private boolean success;
     private SpendLimitType failureCauseType;
     private String failureReason;
+    private double totalTransactionsAmount;
+    private double appliedLimitValue;
 
 }

@@ -8,6 +8,7 @@ import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
+import com.vodafone.charging.accountservice.dto.SpendLimitResult;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
 import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
@@ -112,17 +113,21 @@ public class SpendLimitService {
 
         //Go through all limit types and check if breached
 
-        List<Boolean> results =  Stream.of(SpendLimitType.values()).map(spendLimitType -> {
+        List<SpendLimitResult> results = Stream.of(SpendLimitType.values()).map(spendLimitType -> {
+            SpendLimitResult result = null;
             if (spendLimitType.equals(SpendLimitType.ACCOUNT_TX)) {
-                return spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits, newArrayList(paymentContext.getTransactionInfo()));
+                result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits, newArrayList(paymentContext.getTransactionInfo()));
             } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
-                return spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions, paymentContext.getTransactionInfo().getAmount());
+                result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
+                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_DAY);
             } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_MONTH)) {
-                return checkMonthLimit(spendLimits, defaultSpendLimits, erTransactions);
+                result = checkMonthLimit(spendLimits, defaultSpendLimits, erTransactions);
             }
-            return false;
+            return result;
         }).collect(Collectors.toList());
-        final Optional<Boolean> failures = results.stream().filter(aBoolean -> !aBoolean).findFirst();
+
+        //TODO Map result to approval response
+        final Optional<SpendLimitResult> failures = results.stream().filter(result -> !result.isSuccess()).findFirst();
 
         PaymentApproval approval;
 
@@ -148,7 +153,7 @@ public class SpendLimitService {
         return LocalDateTime.of(firstOfMonth, LocalTime.MIDNIGHT);
     }
 
-    public boolean checkMonthLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx) {
+    public SpendLimitResult checkMonthLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx) {
 
         final Optional<BigDecimal> totalTxAmount = tx.stream().map(ERTransaction::getAmount)
                 .reduce(BigDecimal::add);
@@ -159,7 +164,7 @@ public class SpendLimitService {
 
         if (totalTxAmount.isPresent() && !limits.isEmpty() && limits.size() == 1
                 && limits.get(0).getLimit() < Double.valueOf(totalTxAmount.get().toString())) {
-            return false;
+            return SpendLimitResult.builder().success(false).build();
         } else {
             final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(SpendLimitType.ACCOUNT_MONTH))
@@ -167,10 +172,10 @@ public class SpendLimitService {
 
             if (!defaultLimits.isEmpty() && defaultLimits.size() != 1
                     && defaultLimits.get(0).getLimit() < Double.valueOf(totalTxAmount.toString())) {
-                return false;
+                return SpendLimitResult.builder().success(false).build();
             }
         }
-        return true;
+        return SpendLimitResult.builder().success(true).build();
 
     }
 

@@ -2,6 +2,7 @@ package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
+import com.vodafone.charging.accountservice.dto.SpendLimitResult;
 import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
@@ -13,6 +14,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +38,7 @@ public class SpendLimitChecker {
      * Check the current transaction does not breach the transaction limit.
      * If no transaction limit is set then check if a default transaction limit has been set.
      */
-    public boolean checkTransactionLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<TransactionInfo> transactions) {
+    public SpendLimitResult checkTransactionLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<TransactionInfo> transactions) {
 
         final BigDecimal totalTxAmount = transactions.stream()
                 .filter(Objects::nonNull)
@@ -49,27 +52,41 @@ public class SpendLimitChecker {
         //Check standard SpendLimit
         if (null != totalTxAmount && !limits.isEmpty() && limits.size() == 1
                 && limits.get(0).getLimit() < Double.valueOf(totalTxAmount.toString())) {
-            return false; //breached!
+            return SpendLimitResult.builder().success(false).failureCauseType(SpendLimitType.ACCOUNT_DAY)
+                    .failureReason(SpendLimitType.ACCOUNT_TX.name() + "spend limit breached").build();
         } else if (null != totalTxAmount) {
             //Check Default
             final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(SpendLimitType.ACCOUNT_TX))
                     .collect(toList());
 
-            return defaultLimits.isEmpty() || defaultLimits.get(0).getLimit() != 1
-                    || defaultLimits.get(0).getLimit() >= Double.valueOf(totalTxAmount.toString());
+            if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < Double.valueOf(totalTxAmount.toString()))
+                return SpendLimitResult.builder().success(false).failureCauseType(SpendLimitType.ACCOUNT_DAY)
+                        .failureReason(SpendLimitType.ACCOUNT_TX.name() + "spend limit breached").build();
         }
-        return true;
+        return SpendLimitResult.builder().success(true).failureCauseType(SpendLimitType.ACCOUNT_DAY)
+                .failureReason("").build();
     }
 
     /**
      * Check the currentTransction plus all transactions in a given duration do not breach the limit set for that duration.
      * If no duration limit has been set, check if a default limit has been set for that duration.
      */
-    public boolean checkDurationLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx, BigDecimal currentTransactionAmount) {
+    public SpendLimitResult checkDurationLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits,
+                                               List<ERTransaction> tx, BigDecimal currentTransactionAmount,
+                                               final SpendLimitType spendLimitType) {
 
-        final LocalDateTime start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
-        final LocalDateTime end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
+        LocalDateTime start, end;
+        if(spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
+            start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
+            end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
+        } else {
+            int billingCycleDay = 1; //TODO should come from client
+            LocalDate today = LocalDate.now(ZoneId.of("CET"));
+            LocalDate firstOfMonth = today.withDayOfMonth(billingCycleDay);
+            start = LocalDateTime.of(firstOfMonth, LocalTime.MIDNIGHT);
+            end = LocalDateTime.of(today.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MIDNIGHT);
+        }
 
         //Collect relevant payments
         List<ERTransaction> payments =
@@ -100,25 +117,27 @@ public class SpendLimitChecker {
 
         //find relevant limit to apply
         final List<SpendLimit> limits = spendLimits.stream()
-                .filter(limit -> limit.getSpendLimitType().equals(SpendLimitType.ACCOUNT_DAY))
+                .filter(limit -> limit.getSpendLimitType().equals(spendLimitType))
                 .collect(toList());
 
         //check limit if exists otherwise check default
         if (!limits.isEmpty()
                 && limits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
-            return false;
+            return SpendLimitResult.builder().success(false).failureCauseType(spendLimitType)
+                    .failureReason(spendLimitType.name() + " spend limit breached").build();
         } else if (limits.isEmpty()) {//apply a default
 
             //get default
             final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
-                    .filter(l -> l.getSpendLimitType().equals(SpendLimitType.ACCOUNT_DAY))
+                    .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
             if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
-                return false;
+                return SpendLimitResult.builder().success(false).failureCauseType(spendLimitType)
+                        .failureReason(spendLimitType.name() + " default spend limit breached").build();
             }
         }
-        return true;
+        return SpendLimitResult.builder().success(true).failureReason("").build();
     }
 
 
