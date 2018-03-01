@@ -22,6 +22,16 @@ public class AccountDataBuilder {
                 .build();
     }
 
+    public static Account anAccountWithEmptyId() {
+        return Account.builder()
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(aChargingId())
+                .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
+                .profiles(newArrayList(aProfile()))
+                .build();
+    }
+
     public static Account anAccount(Profile profile) {
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))

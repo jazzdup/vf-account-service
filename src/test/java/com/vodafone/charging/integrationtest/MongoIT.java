@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWithEmptyId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -34,4 +35,19 @@ public class MongoIT {
         final List l = repository.findAll();
         assertThat(l.size()).isEqualTo(1);
     }
+
+    @Test
+    public void shouldGenerateAccountIdKeyOnSaveAtleast24Chars() throws Exception {
+        repository.deleteAll();
+        final Account expectedAccount = anAccountWithEmptyId();
+        assertThat(expectedAccount.getId()).isNull();
+        final ChargingId expectedChargingId = expectedAccount.getChargingId();
+        repository.save(expectedAccount);
+        assertThat(expectedAccount.getId().length()).isGreaterThanOrEqualTo(24);
+        final Account account = repository.findByChargingId(expectedChargingId);
+        assertThat(account).isEqualToComparingFieldByFieldRecursively(expectedAccount);
+        final List l = repository.findAll();
+        assertThat(l.size()).isEqualTo(1);
+    }
+
 }
