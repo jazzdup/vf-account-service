@@ -8,9 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Entity
 @Getter @ToString
@@ -20,16 +19,18 @@ public class Account {
     private String id;
     private ChargingId chargingId;
     private Date lastValidate;
-    private String customerType;//PRE/POST
+    private String customerType;//TODO: add constraint PRE/POST
+    private int billingCycleDay;
     private List<Profile> profiles;
 
     public Account(){}
 
-    public Account(String id, ChargingId chargingId, Date lastValidate, String customerType, List<Profile> profiles) {
+    public Account(String id, ChargingId chargingId, Date lastValidate, String customerType, int billingCycleDay, List<Profile> profiles) {
         this.id = id;
         this.chargingId = chargingId;
         this.lastValidate = lastValidate;
         this.customerType = customerType;
+        this.billingCycleDay = billingCycleDay;
         this.profiles = profiles;
     }
 
@@ -37,10 +38,22 @@ public class Account {
         this.chargingId = chargingId;
         this.lastValidate = lastValidate;
         this.customerType = info.getCustomerType();
+        this.billingCycleDay = info.getBillingCycleDay();
         Profile profile = Profile.builder()
                 .userGroups(info.getUsergroups())
                 .build();
         this.profiles = Arrays.asList(profile);
+    }
+
+    public Map<String, Object> asMap() throws IllegalAccessException {
+        Map<String, Object> values = new HashMap<>();
+
+        Field[] fieldsArr = this.getClass().getDeclaredFields();
+
+        for (Field field : fieldsArr) {
+            values.put(field.getName(), field.get(this));
+        }
+        return values;
     }
 
     public static AccountBuilder builder() {
@@ -52,6 +65,7 @@ public class Account {
         private ChargingId chargingId;
         private Date lastValidate;
         private String customerType;
+        private int billingCycleDay;
         private List<Profile> profiles;
 
         AccountBuilder() {
@@ -77,17 +91,31 @@ public class Account {
             return this;
         }
 
+        public AccountBuilder billingCycleDay(int billingCycleDay) {
+            this.billingCycleDay = billingCycleDay;
+            return this;
+        }
+
         public AccountBuilder profiles(List<Profile> profiles) {
             this.profiles = profiles;
             return this;
         }
 
         public Account build() {
-            return new Account(id, chargingId, lastValidate, customerType, profiles);
+            return new Account(id, chargingId, lastValidate, customerType, billingCycleDay, profiles);
         }
 
+        @Override
         public String toString() {
-            return "Account.AccountBuilder(id=" + this.id + ", chargingId=" + this.chargingId + ", lastValidate=" + this.lastValidate + ", customerType=" + this.customerType + ", profiles=" + this.profiles + ")";
+            return "AccountBuilder{" +
+                    "id='" + id + '\'' +
+                    ", chargingId=" + chargingId +
+                    ", lastValidate=" + lastValidate +
+                    ", customerType='" + customerType + '\'' +
+                    ", billingCycleDay=" + billingCycleDay +
+                    ", profiles=" + profiles +
+                    '}';
         }
+
     }
 }
