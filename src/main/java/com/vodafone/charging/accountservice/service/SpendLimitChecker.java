@@ -116,7 +116,7 @@ public class SpendLimitChecker {
         BigDecimal transactionsIncludingCurrent = totalValue.add(currentTransactionAmount);
 
         //find relevant limit to apply
-        final List<SpendLimit> limits = spendLimits.stream()
+        List<SpendLimit> limits = spendLimits.stream()
                 .filter(limit -> limit.getSpendLimitType().equals(spendLimitType))
                 .collect(toList());
 
@@ -130,21 +130,22 @@ public class SpendLimitChecker {
                     .build();
         } else if (limits.isEmpty()) {//apply a default
             //get default
-            final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
+            limits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
-            if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
+            if (!limits.isEmpty() && limits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
                 return SpendLimitResult.builder().success(false)
                         .failureCauseType(spendLimitType)
-                        .appliedLimitValue(defaultLimits.get(0).getLimit())
+                        .appliedLimitValue(limits.get(0).getLimit())
                         .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                         .failureReason(spendLimitType.name() + " default spend limit breached").build();
             }
         }
+
         return SpendLimitResult.builder().success(true)
                 .failureReason("")
-                .appliedLimitValue(limits.get(0).getLimit())
+                .appliedLimitValue(limits.isEmpty() ? 0.0 : limits.get(0).getLimit())
                 .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                 .build();
     }

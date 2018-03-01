@@ -19,7 +19,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -79,11 +78,11 @@ public class SpendLimitCheckerTest {
 
 
     @Test
-    public void shouldNotBreachWhenAccountTxIsEqualToTxLimit() {
-
+    public void shouldNotBreachWhenTxLimitDefinedAndAccountTxIsEqualToTxLimit() {
         //given
-        final List<TransactionInfo> transactionInfo = newArrayList(TransactionInfo.builder().amount(new BigDecimal(2.0))
-                .build());
+        final List<TransactionInfo> transactionInfo =
+                newArrayList(TransactionInfo.builder().amount(new BigDecimal(2.0))
+                        .build());
 
         //when
         SpendLimitResult success = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits, transactionInfo);
@@ -91,6 +90,15 @@ public class SpendLimitCheckerTest {
         //then
         assertThat(success.isSuccess()).isTrue();
 
+    }
+
+    public void shouldBreachWhenTxLimitDefinedAndAccountTxIsOverTxLimit() {
+    }
+
+    public void shouldNotBreachDefaultWhenNoTxLimitDefinedAndAccountTxUnderTxLimit() {
+    }
+
+    public void shouldBreachDefaultWhenNoTxLimitDefinedDefinedAndAccountTxIsOverTxLimit() {
     }
 
     //DAY LIMITS TESTS
@@ -170,7 +178,7 @@ public class SpendLimitCheckerTest {
     }
 
     @Test
-    public void shouldBreachWhenDayLimitNotDefinedButDefaultIs() {
+    public void shouldBreachDefaultWhenDayLimitNotDefinedButDefaultIs() {
 
         final List<ERTransaction> transactions = newArrayList(
                 anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
@@ -199,7 +207,7 @@ public class SpendLimitCheckerTest {
 
     }
 
-    public void shouldBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimitThenCurrentTxOverLimit() {
+    public void shouldBreachWhenDayLimitDefinedAndPaymentsOverLimitRefundsLowerTotalToBelowLimitThenCurrentTxOverLimit() {
 
         //Include
 
@@ -239,16 +247,39 @@ public class SpendLimitCheckerTest {
     @Test
     public void shouldNotBreachWhenMonthLimitDefinedAndBillingCycleDayDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimit() {
 
-        //TODO test that
-        int billingCycleDay = 7;
+        //given
+        LocalDate now = LocalDate.now();
+        LocalDateTime fifthOfthisMonth = LocalDateTime.of(now, LocalTime.MIDNIGHT).withDayOfMonth(5);
+        LocalDateTime fifthOfNextMonth = LocalDateTime.of(now, LocalTime.MAX).plusMonths(1).withDayOfMonth(5);
+        Map<String, LocalDateTime> billingCycleDates = Maps.newHashMap();
+        String startKey = "startDate";
+        String endKey = "endDate";
+        billingCycleDates.put(startKey, fifthOfthisMonth);
+        billingCycleDates.put(endKey, fifthOfNextMonth);
+
+        //payments=60.0 current Tx 0.3 refunds 10.0  (should calculate to 50.3) - spend limit = 50
         final List<ERTransaction> transactions = newArrayList(
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().withDayOfMonth(8), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().withDayOfMonth(9), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), LocalDateTime.now().withDayOfMonth(6), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().withDayOfMonth(7), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().withDayOfMonth(10), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusMinutes(10), ERTransactionType.REFUND));//include and subtract
+                anErTransaction(new BigDecimal(19.7), billingCycleDates.get(startKey).plusMinutes(5), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(20.0), billingCycleDates.get(startKey).plusDays(20), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(endKey).minusSeconds(1), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).plusMinutes(5), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).minusSeconds(1), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(endKey).plusMinutes(5), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).plusHours(5), ERTransactionType.REFUND));//include
+
+        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
+
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 5);
+
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getAppliedLimitValue()).isEqualTo(50.0);
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(50.0);
 
     }
 
@@ -294,7 +325,7 @@ public class SpendLimitCheckerTest {
         LocalDate now = LocalDate.now();
         LocalDateTime fifthOfthisMonth = LocalDateTime.of(now, LocalTime.MIDNIGHT).withDayOfMonth(5);
         LocalDateTime fifthOfNextMonth = LocalDateTime.of(now, LocalTime.MAX).plusMonths(1).withDayOfMonth(5);
-        Map<String, LocalDateTime> billingCycleDates =  Maps.newHashMap();
+        Map<String, LocalDateTime> billingCycleDates = Maps.newHashMap();
         String startKey = "startDate";
         String endKey = "endDate";
         billingCycleDates.put(startKey, fifthOfthisMonth);
@@ -326,16 +357,56 @@ public class SpendLimitCheckerTest {
 
     }
 
+    //TODO Add some default scenarios around monthly account limits
     @Test
-    public void shouldBreachWhenNoMonthLimitDefinedButDefaultIsAndPaymentsGoOver() {
+    public void shouldNotBreachDefaultWhenNoMonthLimitDefinedButDefaultIsAndPaymentsGoOver() {
+    }
 
+    @Test
+    public void shouldNotBreachMonthlyIfNoLimitsSet() {
+    }
+
+    @Test
+    public void shouldBreachDefaultWhenNoMonthLimitDefinedButDefaultIsAndPaymentsGoOver() {
+        //given
+        LocalDate now = LocalDate.now();
+        LocalDateTime fifthOfthisMonth = LocalDateTime.of(now, LocalTime.MIDNIGHT).withDayOfMonth(5);
+        LocalDateTime fifthOfNextMonth = LocalDateTime.of(now, LocalTime.MAX).plusMonths(1).withDayOfMonth(5);
+        Map<String, LocalDateTime> billingCycleDates = Maps.newHashMap();
+        String startKey = "startDate";
+        String endKey = "endDate";
+        billingCycleDates.put(startKey, fifthOfthisMonth);
+        billingCycleDates.put(endKey, fifthOfNextMonth);
+
+        //payments=60.0 current Tx 0.3 refunds 10.0  (should calculate to 50.3) - spend limit = 50
+        final List<ERTransaction> transactions = newArrayList(
+                anErTransaction(new BigDecimal(25.0), billingCycleDates.get(startKey).plusMinutes(5), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(20.0), billingCycleDates.get(startKey).plusDays(20), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(endKey).minusSeconds(1), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).plusMinutes(5), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).minusSeconds(1), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(endKey).plusMinutes(5), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(10.0), billingCycleDates.get(startKey).plusHours(5), ERTransactionType.REFUND));//include
+
+        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
+
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(newArrayList(), defaultSpendLimits, transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 5);
+
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureCauseType()).isEqualTo(SpendLimitType.ACCOUNT_MONTH);
+        assertThat(result.getFailureReason()).startsWith(SpendLimitType.ACCOUNT_MONTH.name());
+        assertThat(result.getAppliedLimitValue()).isEqualTo(55.0);
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(55.3);
 
 
     }
 
     @Ignore
     public void shouldGroupTransactions() {
-
         //DataSet
         final List<ERTransaction> transactions = newArrayList(
                 anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
@@ -350,12 +421,4 @@ public class SpendLimitCheckerTest {
                 spendLimitChecker.groupTransactions(spendLimits, defaultSpendLimits, transactions);
 
     }
-
-    private static BigDecimal toScaledBigDecimal(double amount) {
-        BigDecimal bdAmount = new BigDecimal(amount);
-        bdAmount.setScale(2, RoundingMode.HALF_UP);
-        return bdAmount;
-    }
-
-
 }
