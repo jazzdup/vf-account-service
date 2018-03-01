@@ -98,7 +98,8 @@ public class SpendLimitService {
                                                 final List<SpendLimitInfo> defaultSpendLimitInfos,
                                                 final PaymentContext paymentContext) {
 
-        boolean spendLimitBreached = false;
+        //TODO - This value must be stored in and come from the Account. If not there then it should be 1.
+        int billingCycleDay = ofNullable(1).orElse(1);
         //Create a TransactionSearchCriteria - TransactionTypes, TransactionsPeriod(convenience methods of month)
         //Get Transactions from ER Core
         //Calculate Limits if you get any Transactions
@@ -106,7 +107,7 @@ public class SpendLimitService {
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true)
                 .transactionTypes(transactionTypes)
                 .fromDate(calculateTransactionFromDate(account))
-                .toDate(LocalDateTime.now().withDayOfMonth(1))
+                .toDate(LocalDateTime.now())
                 .build();
         final List<SpendLimit> defaultSpendLimits = SpendLimit.fromSpendLimitsInfo(defaultSpendLimitInfos);
         final List<ERTransaction> erTransactions = erService.getTransactions(paymentContext, criteria);
@@ -119,9 +120,10 @@ public class SpendLimitService {
                 result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits, newArrayList(paymentContext.getTransactionInfo()));
             } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
                 result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
-                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_DAY);
+                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_DAY, billingCycleDay);
             } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_MONTH)) {
-                result = checkMonthLimit(spendLimits, defaultSpendLimits, erTransactions);
+                result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
+                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_MONTH, billingCycleDay);
             }
             return result;
         }).collect(Collectors.toList());

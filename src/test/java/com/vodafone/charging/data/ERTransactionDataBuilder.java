@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Random;
 
-public class ERTransactionDateBuilder {
+public class ERTransactionDataBuilder {
 
     public static ERTransaction anErTransaction() {
         return ERTransaction.builder().amount(BigDecimal.valueOf(new Random().nextDouble()).setScale(2, RoundingMode.HALF_UP))

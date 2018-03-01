@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.vodafone.charging.accountservice.service.ERDateCalculator;
 import com.vodafone.charging.ulf.ERIFClientHttpRequestInterceptor;
 import com.vodafone.charging.ulf.LoggingFilter;
 import com.vodafone.charging.ulf.UlfLogger;
@@ -32,7 +33,6 @@ import java.util.TimeZone;
  * Spring Bean configuration file
  */
 @Configuration
-//@EnableSwagger2
 public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
     private static final int DECIMAL_SCALE = 2;
@@ -101,6 +101,12 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public TimeZone timeZone() {
         return TimeZone.getTimeZone("CET");
     }
+
+    @Bean
+    public ERDateCalculator erDateCalculator() {
+        return new ERDateCalculator();
+    }
+
 
     public Filter loggingFilter(UlfLogger ulfLogger){
         return new LoggingFilter(ulfLogger);

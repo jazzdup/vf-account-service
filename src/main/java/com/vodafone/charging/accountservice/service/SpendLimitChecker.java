@@ -14,8 +14,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +31,9 @@ public class SpendLimitChecker {
 
     @Autowired
     private TimeZone timeZone;
+
+    @Autowired
+    private ERDateCalculator erDateCalculator;
 
     /**
      * Check the current transaction does not breach the transaction limit.
@@ -74,18 +75,17 @@ public class SpendLimitChecker {
      */
     public SpendLimitResult checkDurationLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits,
                                                List<ERTransaction> tx, BigDecimal currentTransactionAmount,
-                                               final SpendLimitType spendLimitType) {
+                                               final SpendLimitType spendLimitType, int billingCycleDay) {
 
-        LocalDateTime start, end;
-        if(spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
+        LocalDateTime start;
+        LocalDateTime end;
+        if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
             start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
             end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
         } else {
-            int billingCycleDay = 1; //TODO should come from client
-            LocalDate today = LocalDate.now(ZoneId.of("CET"));
-            LocalDate firstOfMonth = today.withDayOfMonth(billingCycleDay);
-            start = LocalDateTime.of(firstOfMonth, LocalTime.MIDNIGHT);
-            end = LocalDateTime.of(today.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MIDNIGHT);
+            Map<String, LocalDateTime> dates = erDateCalculator.calculateBillingCycleDates(billingCycleDay);
+            start = dates.get("startDate");
+            end = dates.get("endDate");
         }
 
         //Collect relevant payments
@@ -124,22 +124,30 @@ public class SpendLimitChecker {
         if (!limits.isEmpty()
                 && limits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
             return SpendLimitResult.builder().success(false).failureCauseType(spendLimitType)
-                    .failureReason(spendLimitType.name() + " spend limit breached").build();
+                    .failureReason(spendLimitType.name() + " spend limit breached")
+                    .appliedLimitValue(limits.get(0).getLimit())
+                    .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
+                    .build();
         } else if (limits.isEmpty()) {//apply a default
-
             //get default
             final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
             if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
-                return SpendLimitResult.builder().success(false).failureCauseType(spendLimitType)
+                return SpendLimitResult.builder().success(false)
+                        .failureCauseType(spendLimitType)
+                        .appliedLimitValue(defaultLimits.get(0).getLimit())
+                        .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                         .failureReason(spendLimitType.name() + " default spend limit breached").build();
             }
         }
-        return SpendLimitResult.builder().success(true).failureReason("").build();
+        return SpendLimitResult.builder().success(true)
+                .failureReason("")
+                .appliedLimitValue(limits.get(0).getLimit())
+                .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
+                .build();
     }
-
 
     public Map<String, List<ERTransaction>> groupTransactions(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx) {
 

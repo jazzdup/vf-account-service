@@ -13,7 +13,7 @@ public class SpendLimitResult {
     private boolean success;
     private SpendLimitType failureCauseType;
     private String failureReason;
-    private double totalTransactionsAmount;
+    private double totalTransactionsValue;
     private double appliedLimitValue;
 
 }
