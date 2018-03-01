@@ -33,7 +33,7 @@ import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aNullable
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
 import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
-import static com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder.aSpendLimitInfoList;
+import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitInfoList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;

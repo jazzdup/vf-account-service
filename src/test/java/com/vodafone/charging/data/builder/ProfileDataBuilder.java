@@ -13,7 +13,7 @@ public class ProfileDataBuilder {
                 .lastUpdatedTransactions(MongoDataBuilder.aFixedDate())
                 .lastUpdatedUserGroups(MongoDataBuilder.aFixedDate())
                 .transactions(Arrays.asList(MongoDataBuilder.aTransaction()))
-                .spendLimits(SpendLimitInfoDataBuilder.aSpendLimitList())
+                .spendLimits(SpendLimitDataBuilder.aSpendLimitList())
                 .build();
     }
 

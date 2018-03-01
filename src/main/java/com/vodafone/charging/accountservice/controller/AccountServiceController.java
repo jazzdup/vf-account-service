@@ -104,7 +104,6 @@ public class AccountServiceController {
     @RequestMapping(path = "/{accountId}", method = GET,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<Account> getAccount(@PathVariable String accountId) {
-
         Account account;
         try {
             account = accountService.getAccount(accountId);
@@ -149,11 +148,11 @@ public class AccountServiceController {
     @RequestMapping(path = "/{accountId}/profile/transactions/payments", method = POST,
             consumes = APPLICATION_JSON_UTF8_VALUE,
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
-    public ResponseEntity<PaymentValidation> validatePayment(@PathVariable String accountId,
-                                                             @Valid @RequestBody PaymentContext paymentContext) {
-        final PaymentValidation paymentValidation = serviceCallSupplier.call(() ->
-                spendLimitService.validatePayment(accountId, paymentContext)).get();
-        return ResponseEntity.ok(paymentValidation);
+    public ResponseEntity<PaymentApproval> approvePayment(@PathVariable String accountId,
+                                                          @Valid @RequestBody PaymentContext paymentContext) {
+        final PaymentApproval paymentApproval = serviceCallSupplier.call(() ->
+                spendLimitService.approvePayment(accountId, paymentContext)).get();
+        return ResponseEntity.ok(paymentApproval);
     }
 
     /*

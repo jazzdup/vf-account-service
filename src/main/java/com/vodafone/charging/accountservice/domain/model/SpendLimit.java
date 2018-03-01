@@ -18,17 +18,16 @@ import static com.google.common.collect.Lists.newArrayList;
 public class SpendLimit {
 
     private SpendLimitType spendLimitType;
-    private Integer limit;
+    private Double limit;
     private boolean active;
 
-    public static List<SpendLimit> fromSpendLimitInfo(List<SpendLimitInfo> spendLimitInfo) {
+    public static List<SpendLimit> fromSpendLimitsInfo(List<SpendLimitInfo> spendLimitsInfo) {
         return newArrayList(
-                spendLimitInfo.stream().filter(Objects::nonNull)
+                spendLimitsInfo.stream().filter(Objects::nonNull)
                         .map(limitInfo -> SpendLimit.builder()
                                 .limit(limitInfo.getLimit())
                                 .spendLimitType(limitInfo.getSpendLimitType())
                                 .active(limitInfo.isActive()).build())
                         .collect(Collectors.toList()));
     }
-
 }

@@ -22,9 +22,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.Filter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Spring Bean configuration file
@@ -33,6 +35,7 @@ import java.util.List;
 //@EnableSwagger2
 public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
+    private static final int DECIMAL_SCALE = 2;
 
     @Bean
     @Primary
@@ -79,6 +82,12 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    public BigDecimal transactionAmount() {
+        BigDecimal decimal = BigDecimal.ZERO;
+        return decimal.setScale(DECIMAL_SCALE, BigDecimal.ROUND_HALF_UP);
+    }
+
+    @Bean
     public FilterRegistrationBean loggingFilterRegistration(UlfLogger ulfLogger){
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(loggingFilter(ulfLogger));
@@ -86,6 +95,11 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         registration.setName("loggingFilter");
         registration.setOrder(1);
         return registration;
+    }
+
+    @Bean
+    public TimeZone timeZone() {
+        return TimeZone.getTimeZone("CET");
     }
 
     public Filter loggingFilter(UlfLogger ulfLogger){

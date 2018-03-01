@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,7 @@ import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWithEmptyProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfileWithoutSpendLimits;
-import static com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder.aSpendLimitInfoList;
+import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitInfoList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -99,5 +100,17 @@ public class SpendLimitServiceTest {
 
         assertThatThrownBy(() -> spendLimitService.updateSpendLimits(accountId, aSpendLimitInfoList()))
                 .isInstanceOf(RepositoryResourceNotFoundException.class).hasMessageContaining("No Profile not found using account id ");
+    }
+
+    @Test
+    public void shouldCalculateFromDateCorrectly() {
+
+        Account account = anAccount();
+
+        final LocalDateTime fromDate = spendLimitService.calculateTransactionFromDate(account);
+
+
+        System.out.println("Date: " + fromDate);
+
     }
 }

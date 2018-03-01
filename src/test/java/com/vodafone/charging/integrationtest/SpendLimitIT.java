@@ -1,13 +1,15 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.domain.PaymentValidation;
+import com.vodafone.charging.accountservice.domain.PaymentApproval;
+import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
+import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
-import com.vodafone.charging.data.builder.SpendLimitInfoDataBuilder;
+import com.vodafone.charging.data.builder.SpendLimitDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -23,7 +25,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import static com.vodafone.charging.accountservice.errors.ApplicationErrors.APPLICATION_LOGIC_ERROR;
@@ -78,7 +82,7 @@ public class SpendLimitIT {
     @Test
     public void shouldReturn404WhenTryingToUpdateSpendLimitsForNonExistingAccountId() throws Exception {
 
-        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitDataBuilder.aSpendLimitInfoList();
         final String content = jsonConverter.toJson(spendLimitInfo);
 
         log.info("xml= {}", content);
@@ -103,8 +107,8 @@ public class SpendLimitIT {
         Account account = anAccountWithNullProfile();
         saveAccountAndCheck(account);
 
-        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
-        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitInfo(spendLimitInfo);
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitDataBuilder.aSpendLimitInfoList();
+        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitsInfo(spendLimitInfo);
         final String content = jsonConverter.toJson(spendLimitInfo);
 
         log.info("xml= {}", content);
@@ -131,8 +135,8 @@ public class SpendLimitIT {
 
     private void successfulUpdateSpendLimitScenario(final Account account) throws Exception {
 
-        final List<SpendLimitInfo> spendLimitInfo = SpendLimitInfoDataBuilder.aSpendLimitInfoList();
-        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitInfo(spendLimitInfo);
+        final List<SpendLimitInfo> spendLimitInfo = SpendLimitDataBuilder.aSpendLimitInfoList();
+        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitsInfo(spendLimitInfo);
         final String content = jsonConverter.toJson(spendLimitInfo);
 
         log.info("xml= {}", content);
@@ -153,10 +157,7 @@ public class SpendLimitIT {
     }
 
 
-    @Test
-    public void shouldValidatePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExists() throws Exception {
-
-        /*
+            /* --- FEATURE ---
         - get account using accountId
             if not found then return validationFailed
         - see if account has a spend limit associated with it
@@ -172,29 +173,36 @@ public class SpendLimitIT {
                 - if breached return validationFailed
          */
 
-//        final Account expectedAccount = anAccount();
-//        final ChargingId expectedChargingId = expectedAccount.getChargingId();
-//        Account savedAccount = repository.save(expectedAccount);
-//        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
+    @Test
+    public void shouldValidatePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExists() throws Exception {
 
         final Account account = anAccount();
         saveAccountAndCheck(account);
+        account.getProfiles().stream()
+                .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNotEmpty());
 
-        final String json = jsonConverter.toJson(account);
+        PaymentContext paymentContext = PaymentContext.builder()
+//                .catalogInfo(CatalogInfo.builder().build())
+                .locale(Locale.UK)
+                .chargingId(account.getChargingId())
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("5.55")).build()).build();
 
-        final MvcResult response =  mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
+        final String json = jsonConverter.toJson(paymentContext);
+
+        final MvcResult response = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-        final PaymentValidation validation =
-                (PaymentValidation) jsonConverter.fromJson(PaymentValidation.class, response.getResponse().getContentAsString());
+        final PaymentApproval validation =
+                (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
 
         assertThat(validation).isNotNull();
         assertThat(validation.isSuccess()).isTrue();
-
+        assertThat(validation.getResponseCode()).isEqualTo(1);
+        assertThat(validation.getDescription()).isEqualTo("payment validated");
     }
 
     public void shouldValidatePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExists() {
@@ -222,6 +230,10 @@ public class SpendLimitIT {
     }
 
     public void shouldReturnHttpErrorWhenNoAccountIdPassedInRequest() {
+    }
+
+    public void shouldNotAllowTransactionAmountToMoreThan2DecimalPlaces() {
+
     }
 
 
