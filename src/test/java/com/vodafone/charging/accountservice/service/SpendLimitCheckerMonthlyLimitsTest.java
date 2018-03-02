@@ -43,7 +43,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
                 anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(4), ERTransactionType.REFUND));//exclude
 
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(dates);
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -112,7 +112,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 
         //expected calculations given data
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(dates);
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =

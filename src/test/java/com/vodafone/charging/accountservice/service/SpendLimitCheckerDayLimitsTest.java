@@ -1,13 +1,16 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
+import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
+import com.vodafone.charging.data.builder.SpendLimitDataBuilder;
+import com.vodafone.charging.data.builder.SpendLimitDataProvider;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -21,33 +24,20 @@ import static org.mockito.Matchers.anyInt;
  */
 public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
+
     /*
     under dayLimit
      */
     @Test
     public void shouldNotBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimit() {
         //given
-        //purchases total 15.3, with refund reduces to 5.2 txAmount 0.3
+        //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
 
-        final List<ERTransaction> transactions = newArrayList(
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(10), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now(), ERTransactionType.REFUND),//include and subtract
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(2), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(3), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(4), ERTransactionType.REFUND));//exclude
-
-        //expected calculations given data
-        double previousTxAmount = 5.2;
-        double prevousTxAmountPlusCurrentAmount = 5.5;
-
+        double expectedTxTotal = 10.00;
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(dates);
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -57,62 +47,71 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getFailureCauseType()).isNull();
         assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(1).getLimit());
     }
 
     /*
-    under dayLimit
+    over dayLimit
     */
     @Test
     public void shouldBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimitCurrentTxMakesOverLimit() {
         //given
-        //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
-        final List<ERTransaction> transactions = newArrayList(
-                anErTransaction(new BigDecimal(5.0), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.5), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.5), LocalDateTime.now(), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(10), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(6.3), LocalDateTime.now(), ERTransactionType.REFUND),//include and subtract
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(2), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(3), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(4), ERTransactionType.REFUND));//exclude
+        //purchases total 16, current tx = 0.4 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
 
-        //expected calculations given data
-        double previousTxAmount = 5.2;
-        double prevousTxAmountPlusCurrentAmount = 5.5;
-
-        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(dates);
+        BigDecimal currentTransactionAmount = new BigDecimal(0.4);
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
                 spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
 
         //then
-        assertThat(result.isSuccess()).isTrue();
-        assertThat(result.getFailureCauseType()).isNull();
-        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureCauseType()).isEqualTo(SpendLimitType.ACCOUNT_DAY);
+        assertThat(result.getFailureReason()).startsWith(SpendLimitType.ACCOUNT_DAY.name());
+        assertThat(result.getFailureReason()).doesNotContain("default");
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(10.1);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(10.0);
 
     }
 
     @Test
-    public void shouldBreachDefaultWhenDayLimitNotDefinedButDefaultIs() {
+    public void shouldNotBreachDefaultWhenNoDayLimitDefinedAndPaymentsOverDefault() {
 
-        final List<ERTransaction> transactions = newArrayList(
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(3), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(4), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(10), ERTransactionType.REFUND),//exclude
-//                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusMinutes(10), ERTransactionType.REFUND),//include and subtract
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(2), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(3), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(20.1), LocalDateTime.now().minusMonths(4), ERTransactionType.REFUND));//exclude
-        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
+        //given
+        //purchases total 16, current tx = 5.0 refunds 6.3 limit = 15
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(dates);
+        double expectedTxTotal = 14.7;
+        BigDecimal currentTransactionAmount = new BigDecimal(5.0);
+
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(Lists.emptyList(), defaultSpendLimits, transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(defaultSpendLimits.get(1).getLimit().doubleValue());
+    }
+
+    @Test
+    public void shouldBreachDefaultWhenDayLimitNotDefinedAndPaymentsOver() {
+
+        //given
+        //purchases total 16, current tx = 6.0 refunds 6.3 limit = 15
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+
+        BigDecimal currentTransactionAmount = new BigDecimal(6.00);
+        double expectedTotalTx = 15.7;
+
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -123,18 +122,80 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         assertThat(result.getFailureCauseType()).isEqualTo(SpendLimitType.ACCOUNT_DAY);
         assertThat(result.getFailureReason()).startsWith(SpendLimitType.ACCOUNT_DAY.name());
         assertThat(result.getFailureReason()).contains("default spend limit");
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTotalTx);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(defaultSpendLimits.get(1).getLimit().doubleValue());
+    }
+
+
+    @Test
+    public void shouldNotBreachDefaultWhenDayLimitDefinedAndPaymentsOverDefault() {
+        //given
+        //purchases total 16, current tx = 4.0 refunds 11.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        transactions.add(anErTransaction(new BigDecimal(5.0), todayDates.get("startDate").plusHours(1), ERTransactionType.REFUND));
+
+        SpendLimit limit = SpendLimitDataBuilder.aSpendLimit(10, SpendLimitType.ACCOUNT_DAY);
+        SpendLimit defaultLimit = SpendLimitDataBuilder.aSpendLimit(1, SpendLimitType.ACCOUNT_DAY);
+
+        double expectedTxTotal = 8.7;
+        BigDecimal currentTransactionAmount = new BigDecimal(4.0);
+
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(newArrayList(limit), newArrayList(defaultLimit), transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(limit.getLimit().doubleValue());
 
     }
 
-    public void shouldBreachWhenDayLimitDefinedAndPaymentsOverLimitRefundsLowerTotalToBelowLimitThenCurrentTxOverLimit() {
+    @Test
+    public void shouldNotBreachWhenNoLimitsDefined() {
 
-        //Include
+        //given
+        //purchases total 16, current tx = 5000.0 refunds 6.3 limit = none
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        BigDecimal currentTransactionAmount = new BigDecimal(5000.0);
+        double expectedTxTotal = 5009.7;
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(newArrayList(), newArrayList(), transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(0.0);
 
     }
 
-    public void shouldNotBreachWhenWithinSpendLimitButOverDefaultLimit() {
+    @Test
+    public void shouldNotBreachWhenDayLimitDefinedAndNoDefaultLimit() {
 
-        //Include
+        //given
+        //purchases total 16, current tx = 0.11 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        BigDecimal currentTransactionAmount = new BigDecimal(0.11);
+        double expectedTxTotal = 9.81;
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(spendLimits, newArrayList(), transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(1).getLimit().doubleValue());
 
     }
 

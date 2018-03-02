@@ -30,7 +30,8 @@ public class SpendLimitCheckerBase {
 
     List<SpendLimit> spendLimits;
     List<SpendLimit> defaultSpendLimits;
-    Map<String, LocalDateTime> dates = Maps.newHashMap();
+    Map<String, LocalDateTime> monthDates = Maps.newHashMap();
+    Map<String, LocalDateTime> todayDates = Maps.newHashMap();
 
     @InjectMocks
     SpendLimitChecker spendLimitChecker;
@@ -50,13 +51,21 @@ public class SpendLimitCheckerBase {
                 aSpendLimit(15.0, ACCOUNT_DAY),
                 aSpendLimit(55.0, ACCOUNT_MONTH));
 
+        //For testing these are always from 1st to end of current month
         LocalDate now = LocalDate.now();
         LocalDateTime firstOfMonth = LocalDateTime.of(now, LocalTime.MIDNIGHT).withDayOfMonth(1);
         LocalDateTime endOfMonth = LocalDateTime.of(now, LocalTime.MAX);
         String startKey = "startDate";
         String endKey = "endDate";
-        dates.put(startKey, firstOfMonth);
-        dates.put(endKey, endOfMonth);
+        monthDates.put(startKey, firstOfMonth);
+        monthDates.put(endKey, endOfMonth);
+
+        LocalDateTime startOfDay = now.atStartOfDay();
+        LocalDateTime endOfDay = LocalDateTime.of(now, LocalTime.MAX);
+
+        todayDates.put(startKey, startOfDay);
+        todayDates.put(endKey, endOfDay);
+
     }
 
 
