@@ -1,11 +1,14 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
 import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
+import lombok.NonNull;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,43 +42,70 @@ public class SpendLimitChecker {
      * Check the current transaction does not breach the transaction limit.
      * If no transaction limit is set then check if a default transaction limit has been set.
      */
-    public SpendLimitResult checkTransactionLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<TransactionInfo> transactions) {
+    public SpendLimitResult checkTransactionLimit(@NonNull List<SpendLimit> spendLimits,
+                                                  @NonNull List<SpendLimit> defaultSpendLimits,
+                                                  @NonNull @NotEmpty List<TransactionInfo> transactions,
+                                                  @NonNull @NotEmpty SpendLimitType spendLimitType) {
 
         final BigDecimal totalTxAmount = transactions.stream()
                 .filter(Objects::nonNull)
                 .map(TransactionInfo::getAmount)
-                .reduce(BigDecimal::add).orElse(null);
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
+
+        List<SpendLimit> defaultLimits = Lists.newArrayList();
 
         final List<SpendLimit> limits = spendLimits.stream()
-                .filter(l -> l.getSpendLimitType().equals(SpendLimitType.ACCOUNT_TX))
+                .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                 .collect(toList());
 
         //Check standard SpendLimit
-        if (null != totalTxAmount && !limits.isEmpty() && limits.size() == 1
-                && limits.get(0).getLimit() < Double.valueOf(totalTxAmount.toString())) {
-            return SpendLimitResult.builder().success(false).failureCauseType(SpendLimitType.ACCOUNT_DAY)
-                    .failureReason(SpendLimitType.ACCOUNT_TX.name() + "spend limit breached").build();
-        } else if (null != totalTxAmount) {
-            //Check Default
-            final List<SpendLimit> defaultLimits = defaultSpendLimits.stream()
-                    .filter(l -> l.getSpendLimitType().equals(SpendLimitType.ACCOUNT_TX))
+        if (!limits.isEmpty() && limits.get(0).getLimit() < totalTxAmount.doubleValue()) {
+            return SpendLimitResult.builder().success(false)
+                    .failureCauseType(spendLimitType)
+                    .failureReason(spendLimitType.name() + " spend limit breached")
+                    .appliedLimitValue(limits.get(0).getLimit())
+                    .totalTransactionsValue(totalTxAmount.setScale(2, RoundingMode.HALF_UP).doubleValue())
+                    .build();
+        } else if (limits.isEmpty()) {
+            //Check default limit
+            defaultLimits = defaultSpendLimits.stream()
+                    .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
-            if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < Double.valueOf(totalTxAmount.toString()))
-                return SpendLimitResult.builder().success(false).failureCauseType(SpendLimitType.ACCOUNT_DAY)
-                        .failureReason(SpendLimitType.ACCOUNT_TX.name() + "spend limit breached").build();
+            if (!defaultLimits.isEmpty() && defaultLimits.get(0).getLimit() < totalTxAmount.doubleValue())
+                return SpendLimitResult.builder().success(false)
+                        .failureCauseType(spendLimitType)
+                        .failureReason(spendLimitType.name() + " default spend limit breached")
+                        .appliedLimitValue(defaultLimits.get(0).getLimit())
+                        .totalTransactionsValue(totalTxAmount.setScale(2, RoundingMode.HALF_UP).doubleValue())
+                        .build();
         }
-        return SpendLimitResult.builder().success(true).failureCauseType(SpendLimitType.ACCOUNT_DAY)
-                .failureReason("").build();
+
+        BigDecimal totalTxValue = Objects.nonNull(totalTxAmount) ? totalTxAmount : BigDecimal.ZERO;
+        double appliedLimitValue;
+
+        if (!limits.isEmpty()) {
+            appliedLimitValue = limits.get(0).getLimit();
+        } else if (limits.isEmpty() && !defaultLimits.isEmpty()) {
+            appliedLimitValue = defaultLimits.get(0).getLimit();
+        } else {
+            appliedLimitValue = 0.0;
+        }
+
+        return SpendLimitResult.successResponse(appliedLimitValue, totalTxValue.setScale(2, RoundingMode.HALF_UP).doubleValue());
     }
 
     /**
      * Check the currentTransction plus all transactions in a given duration do not breach the limit set for that duration.
      * If no duration limit has been set, check if a default limit has been set for that duration.
      */
-    public SpendLimitResult checkDurationLimit(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits,
-                                               List<ERTransaction> tx, BigDecimal currentTransactionAmount,
-                                               final SpendLimitType spendLimitType, int billingCycleDay) {
+    public SpendLimitResult checkDurationLimit(@NonNull List<SpendLimit> spendLimits,
+                                               @NonNull List<SpendLimit> defaultSpendLimits,
+                                               @NonNull List<ERTransaction> tx,
+                                               @NonNull BigDecimal currentTransactionAmount,
+                                               @NonNull final SpendLimitType spendLimitType,
+                                               int billingCycleDay) {
 
         LocalDateTime start;
         LocalDateTime end;

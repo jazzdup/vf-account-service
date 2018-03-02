@@ -117,7 +117,8 @@ public class SpendLimitService {
         List<SpendLimitResult> results = Stream.of(SpendLimitType.values()).map(spendLimitType -> {
             SpendLimitResult result = null;
             if (spendLimitType.equals(SpendLimitType.ACCOUNT_TX)) {
-                result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits, newArrayList(paymentContext.getTransactionInfo()));
+                result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits,
+                        newArrayList(paymentContext.getTransactionInfo()), SpendLimitType.ACCOUNT_DAY);
             } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
                 result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
                         paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_DAY, billingCycleDay);

@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,7 +15,6 @@ import java.math.BigDecimal;
 public class TransactionInfo {
 
     @NonNull
-    @Qualifier("transactionAmount")
     private BigDecimal amount;
 
 }

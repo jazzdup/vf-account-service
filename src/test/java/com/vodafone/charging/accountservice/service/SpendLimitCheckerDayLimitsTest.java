@@ -21,8 +21,6 @@ import static org.mockito.Matchers.anyInt;
  */
 public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
-    //DAY LIMITS TESTS
-
     /*
     under dayLimit
      */
@@ -30,6 +28,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     public void shouldNotBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimit() {
         //given
         //purchases total 15.3, with refund reduces to 5.2 txAmount 0.3
+
         final List<ERTransaction> transactions = newArrayList(
                 anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
                 anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.PURCHASE),//include
@@ -128,6 +127,12 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     }
 
     public void shouldBreachWhenDayLimitDefinedAndPaymentsOverLimitRefundsLowerTotalToBelowLimitThenCurrentTxOverLimit() {
+
+        //Include
+
+    }
+
+    public void shouldNotBreachWhenWithinSpendLimitButOverDefaultLimit() {
 
         //Include
 
