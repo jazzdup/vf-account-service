@@ -107,6 +107,11 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         return new ERDateCalculator();
     }
 
+    @Bean
+    public boolean defaultBoolean() {
+        return false;
+    }
+
 
     public Filter loggingFilter(UlfLogger ulfLogger){
         return new LoggingFilter(ulfLogger);

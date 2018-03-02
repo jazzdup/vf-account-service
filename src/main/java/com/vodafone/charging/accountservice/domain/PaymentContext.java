@@ -6,14 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
 /**
  * Context information about a payment (e.g. transaction details, any account attributes required, catalogInfo)
  */
-@Component
 @Builder @Getter
 public class PaymentContext {
 

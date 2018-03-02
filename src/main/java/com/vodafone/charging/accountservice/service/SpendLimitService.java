@@ -9,6 +9,7 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
+import com.vodafone.charging.accountservice.dto.client.CatalogInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
 import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
@@ -76,7 +77,10 @@ public class SpendLimitService {
                 .orElseThrow(() -> new RepositoryResourceNotFoundException("No Profile found using account id " + accountId));
 
         final List<SpendLimit> spendLimits = ofNullable(profile.getSpendLimits()).orElse(newArrayList());
-        final List<SpendLimitInfo> defaultSpendLimits = ofNullable(paymentContext.getCatalogInfo().getDefaultSpendLimitInfo()).orElse(newArrayList());
+        final Optional<CatalogInfo> catalogInfoOpt = ofNullable(paymentContext.getCatalogInfo());
+        List<SpendLimitInfo> defaultSpendLimits = catalogInfoOpt.map(CatalogInfo::getDefaultSpendLimitInfo).orElse(newArrayList());
+
+//        final List<SpendLimitInfo> defaultSpendLimits = ofNullable(paymentContext.getCatalogInfo().getDefaultSpendLimitInfo()).orElse(newArrayList());
 
         return calculateSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
     }
@@ -115,7 +119,7 @@ public class SpendLimitService {
         //Go through all limit types and check if breached
 
         List<SpendLimitResult> results = Stream.of(SpendLimitType.values()).map(spendLimitType -> {
-            SpendLimitResult result = null;
+            SpendLimitResult result = SpendLimitResult.builder().build();
             if (spendLimitType.equals(SpendLimitType.ACCOUNT_TX)) {
                 result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits,
                         newArrayList(paymentContext.getTransactionInfo()), SpendLimitType.ACCOUNT_DAY);

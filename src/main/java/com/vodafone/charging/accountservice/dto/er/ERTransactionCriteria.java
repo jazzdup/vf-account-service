@@ -4,7 +4,6 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Locale;
 /**
  * Criteria used to search Transactions from ER Core
  */
-@Component
 @Builder
 @Getter
 @Setter

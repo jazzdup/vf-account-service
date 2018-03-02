@@ -8,7 +8,6 @@ import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
 import lombok.NonNull;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +43,8 @@ public class SpendLimitChecker {
      */
     public SpendLimitResult checkTransactionLimit(@NonNull List<SpendLimit> spendLimits,
                                                   @NonNull List<SpendLimit> defaultSpendLimits,
-                                                  @NonNull @NotEmpty List<TransactionInfo> transactions,
-                                                  @NonNull @NotEmpty SpendLimitType spendLimitType) {
+                                                  @NonNull List<TransactionInfo> transactions,
+                                                  @NonNull SpendLimitType spendLimitType) {
 
         final BigDecimal totalTxAmount = transactions.stream()
                 .filter(Objects::nonNull)
