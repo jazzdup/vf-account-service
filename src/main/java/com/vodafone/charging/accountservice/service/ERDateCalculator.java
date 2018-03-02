@@ -17,6 +17,14 @@ public class ERDateCalculator {
     @Autowired
     private TimeZone timeZone;
 
+    public String getStartDateKey() {
+        return "startDate";
+    }
+
+    public String getEndDateKey() {
+        return "endDate";
+    }
+
     /**
      * If billingCycleDay == 1 then return the dateTime of the first day of the month at midnight
      * If biillingCycleDay > 1 then return either that day of this month or the previous month.  This month if

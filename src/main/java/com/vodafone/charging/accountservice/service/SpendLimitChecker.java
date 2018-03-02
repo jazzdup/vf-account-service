@@ -82,15 +82,7 @@ public class SpendLimitChecker {
         }
 
         BigDecimal totalTxValue = Objects.nonNull(totalTxAmount) ? totalTxAmount : BigDecimal.ZERO;
-        double appliedLimitValue;
-
-        if (!limits.isEmpty()) {
-            appliedLimitValue = limits.get(0).getLimit();
-        } else if (limits.isEmpty() && !defaultLimits.isEmpty()) {
-            appliedLimitValue = defaultLimits.get(0).getLimit();
-        } else {
-            appliedLimitValue = 0.0;
-        }
+        double appliedLimitValue = findAppliedLimit(limits, defaultLimits);
 
         return SpendLimitResult.successResponse(appliedLimitValue, totalTxValue.setScale(2, RoundingMode.HALF_UP).doubleValue());
     }
@@ -101,7 +93,7 @@ public class SpendLimitChecker {
      */
     public SpendLimitResult checkDurationLimit(@NonNull List<SpendLimit> spendLimits,
                                                @NonNull List<SpendLimit> defaultSpendLimits,
-                                               @NonNull List<ERTransaction> tx,
+                                               @NonNull List<ERTransaction> erTransList,
                                                @NonNull BigDecimal currentTransactionAmount,
                                                @NonNull final SpendLimitType spendLimitType,
                                                int billingCycleDay) {
@@ -113,19 +105,19 @@ public class SpendLimitChecker {
             end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
         } else {
             Map<String, LocalDateTime> dates = erDateCalculator.calculateBillingCycleDates(billingCycleDay);
-            start = dates.get("startDate");
-            end = dates.get("endDate");
+            start = dates.get(erDateCalculator.getStartDateKey());
+            end = dates.get(erDateCalculator.getEndDateKey());
         }
 
         //Collect relevant payments
         List<ERTransaction> payments =
-                tx.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
+                erTransList.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
                         && transaction.getDateTime().isBefore(end)
                         && !transaction.getType().equalsIgnoreCase(ERTransactionType.REFUND.name()))
                         .collect(toList());
 
         List<ERTransaction> refundTransactions =
-                tx.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
+                erTransList.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
                         && transaction.getDateTime().isBefore(end)
                         && transaction.getType().equalsIgnoreCase(ERTransactionType.REFUND.name()))
                         .collect(toList());
@@ -133,19 +125,19 @@ public class SpendLimitChecker {
         //total payments
         final BigDecimal totalPaymentAmount = payments.stream().map(ERTransaction::getAmount)
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+
         //total refunds
         final BigDecimal totalRefundAmount = refundTransactions.stream().map(ERTransaction::getAmount)
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
 
         //calculate
         BigDecimal totalValue = totalPaymentAmount.subtract(totalRefundAmount);
-        totalValue = totalValue.setScale(2, RoundingMode.HALF_UP);
 
         //Add the current transaction value including all previous transactions
         BigDecimal transactionsIncludingCurrent = totalValue.add(currentTransactionAmount);
 
         //find relevant limit to apply
-        List<SpendLimit> limits = spendLimits.stream()
+        final List<SpendLimit> limits = spendLimits.stream()
                 .filter(limit -> limit.getSpendLimitType().equals(spendLimitType))
                 .collect(toList());
 
@@ -159,24 +151,38 @@ public class SpendLimitChecker {
                     .build();
         } else if (limits.isEmpty()) {//apply a default
             //get default
-            limits = defaultSpendLimits.stream()
+            defaultSpendLimits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
-            if (!limits.isEmpty() && limits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
+            if (!defaultSpendLimits.isEmpty() && defaultSpendLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
                 return SpendLimitResult.builder().success(false)
                         .failureCauseType(spendLimitType)
-                        .appliedLimitValue(limits.get(0).getLimit())
+                        .appliedLimitValue(defaultSpendLimits.get(0).getLimit())
                         .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                         .failureReason(spendLimitType.name() + " default spend limit breached").build();
             }
         }
 
+        double appliedLimitValue = findAppliedLimit(limits, defaultSpendLimits);
+
         return SpendLimitResult.builder().success(true)
                 .failureReason("")
-                .appliedLimitValue(limits.isEmpty() ? 0.0 : limits.get(0).getLimit())
+                .appliedLimitValue(appliedLimitValue)
                 .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                 .build();
+    }
+
+    private double findAppliedLimit(List<SpendLimit> limits, List<SpendLimit> defaultLimits) {
+        double appliedLimitValue;
+        if (!limits.isEmpty()) {
+            appliedLimitValue = limits.get(0).getLimit();
+        } else if (!defaultLimits.isEmpty()) {
+            appliedLimitValue = defaultLimits.get(0).getLimit();
+        } else {
+            appliedLimitValue = 0.0;
+        }
+        return appliedLimitValue;
     }
 
     public Map<String, List<ERTransaction>> groupTransactions(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx) {

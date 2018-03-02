@@ -17,6 +17,7 @@ import static com.vodafone.charging.data.ERTransactionDataBuilder.anErTransactio
 import static com.vodafone.charging.data.builder.SpendLimitDataProvider.anERTransactionListWithinDates;
 import static com.vodafone.charging.data.builder.SpendLimitDataProvider.getBillingCycleDates;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyInt;
 
@@ -71,7 +72,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getFailureCauseType()).isNull();
         assertThat(result.getFailureReason()).isEmpty();
-        assertThat(result.getAppliedLimitValue()).isEqualTo(50.0);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(2).getLimit().doubleValue());
         assertThat(result.getTotalTransactionsValue()).isEqualTo(50.0);
 
     }
@@ -208,6 +209,45 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxValue);
     }
 
+    @Test
+    public void shouldApplyLimitsCheckWhenNoTransactionHistory() {
+        //given
+        Map<String, LocalDateTime> billingCycleDates = getBillingCycleDates(10);
+        BigDecimal currentTransactionAmount = new BigDecimal(5.4);
+        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, newArrayList(), currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 10);
+
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(2).getLimit().doubleValue());
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(currentTransactionAmount.doubleValue());
+    }
+
+    @Test
+    public void shouldNotAllowNullParameters() {
+        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
+
+        assertThatThrownBy(() -> spendLimitChecker.checkDurationLimit(null, newArrayList(), newArrayList(), currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("spendLimits");
+        assertThatThrownBy(() -> spendLimitChecker.checkDurationLimit(newArrayList(), null, newArrayList(), currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("defaultSpendLimits");
+        assertThatThrownBy(() -> spendLimitChecker.checkDurationLimit(newArrayList(), newArrayList(), null, currentTransactionAmount, SpendLimitType.ACCOUNT_MONTH, 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("erTransList");
+        assertThatThrownBy(() -> spendLimitChecker.checkDurationLimit(newArrayList(), newArrayList(), newArrayList(), null, SpendLimitType.ACCOUNT_MONTH, 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("currentTransactionAmount");
+        assertThatThrownBy(() -> spendLimitChecker.checkDurationLimit(newArrayList(), newArrayList(), newArrayList(), currentTransactionAmount, null, 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("spendLimitType");
+    }
+
     @Ignore
     public void shouldGroupTransactions() {
         //DataSet
@@ -224,6 +264,6 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
                 spendLimitChecker.groupTransactions(spendLimits, defaultSpendLimits, transactions);
 
     }
-    
+
 
 }
