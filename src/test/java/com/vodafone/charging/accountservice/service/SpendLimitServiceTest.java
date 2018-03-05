@@ -1,39 +1,60 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.vodafone.charging.accountservice.client.ERService;
+import com.vodafone.charging.accountservice.domain.PaymentApproval;
+import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
+import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
+import com.vodafone.charging.accountservice.dto.SpendLimitResult;
+import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
+import com.vodafone.charging.accountservice.dto.er.ERTransaction;
+import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
 import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
+import com.vodafone.charging.data.builder.PaymentContextDataBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWithEmptyProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfileWithoutSpendLimits;
 import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitInfoList;
+import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitList;
+import static com.vodafone.charging.data.builder.SpendLimitResultDataBuilder.aSpendLimitResult;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SpendLimitServiceTest {
 
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private ERService erService;
+
+    @Mock
+    private SpendLimitChecker spendLimitChecker;
 
     @InjectMocks
     private SpendLimitService spendLimitService;
@@ -106,11 +127,287 @@ public class SpendLimitServiceTest {
     public void shouldCalculateFromDateCorrectly() {
 
         Account account = anAccount();
-
         final LocalDateTime fromDate = spendLimitService.calculateTransactionFromDate(account);
-
-
         System.out.println("Date: " + fromDate);
+    }
+
+    @Test
+    public void shouldReturnSuccessWhenAllSpendLimitsProvidedAndNoneAreBreached() {
+
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = aSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        final String reasonMessage = "Approved";
+        final SpendLimitResult txLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_TX);
+        final SpendLimitResult dayLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_DAY);
+        final SpendLimitResult monthLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_MONTH);
+
+        given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                .willReturn(dayLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                .willReturn(monthLimitResult);
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval.isSuccess()).isTrue();
+        assertThat(approval.getDescription()).contains(reasonMessage);
+
+        InOrder inOrder = inOrder(erService, spendLimitChecker);
+
+        inOrder.verify(erService).getTransactions(any(PaymentContext.class), any(ERTransactionCriteria.class));
+        inOrder.verify(spendLimitChecker).checkTransactionLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(TransactionInfo.class),
+                any(SpendLimitType.class));
+        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(ERTransaction.class),
+                any(BigDecimal.class),
+                eq(SpendLimitType.ACCOUNT_DAY),
+                anyInt());
+        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(ERTransaction.class),
+                any(BigDecimal.class),
+                eq(SpendLimitType.ACCOUNT_MONTH),
+                anyInt());
+        verifyNoMoreInteractions(erService, spendLimitChecker);
+    }
+
+    @Test
+    public void shouldReturnFailureWhenTransactionSpendLimitBreached() {
+
+        Account account = anAccount();
+        List<SpendLimit> spendLimits = aSpendLimitList();
+        List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        String reasonMessage = "This is a test reason" + this.getClass().hashCode();
+        final SpendLimitResult txLimitResult = aSpendLimitResult(false, reasonMessage, SpendLimitType.ACCOUNT_TX);
+
+
+        given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getDescription()).contains(reasonMessage);
+
+        verify(erService).getTransactions(any(PaymentContext.class), any(ERTransactionCriteria.class));
+        verify(spendLimitChecker).checkTransactionLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(TransactionInfo.class),
+                any(SpendLimitType.class));
+        verifyNoMoreInteractions(spendLimitChecker);
+    }
+
+    @Test
+    public void shouldReturnFailureWhenDaysSpendLimitBreached() {
+
+        Account account = anAccount();
+        List<SpendLimit> spendLimits = aSpendLimitList();
+        List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        String reasonMessage = "This is a test reason" + this.getClass().hashCode();
+        final SpendLimitResult txLimitResult = aSpendLimitResult(false, reasonMessage, SpendLimitType.ACCOUNT_TX);
+        final SpendLimitResult dayLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_DAY);
+
+        given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                .willReturn(dayLimitResult);
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getDescription()).contains(reasonMessage);
+
+        InOrder inOrder = inOrder(erService, spendLimitChecker);
+
+        inOrder.verify(erService).getTransactions(any(PaymentContext.class), any(ERTransactionCriteria.class));
+        inOrder.verify(spendLimitChecker).checkTransactionLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(TransactionInfo.class),
+                any(SpendLimitType.class));
+        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(ERTransaction.class),
+                any(BigDecimal.class),
+                any(SpendLimitType.class),
+                anyInt());
+        verifyNoMoreInteractions(spendLimitChecker);
+    }
+
+    @Test
+    public void shouldReturnFailureWhenMonthSpendLimitBreached() {
+
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = aSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        final String reasonMessage = "This is a test reason" + this.getClass().hashCode();
+        final SpendLimitResult txLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_TX);
+        final SpendLimitResult dayLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_DAY);
+        final SpendLimitResult monthLimitResult = aSpendLimitResult(false, reasonMessage, SpendLimitType.ACCOUNT_MONTH);
+
+        given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                .willReturn(dayLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                .willReturn(monthLimitResult);
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getDescription()).contains(reasonMessage);
+
+        InOrder inOrder = inOrder(erService, spendLimitChecker);
+
+        inOrder.verify(erService).getTransactions(any(PaymentContext.class), any(ERTransactionCriteria.class));
+        inOrder.verify(spendLimitChecker).checkTransactionLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(TransactionInfo.class),
+                any(SpendLimitType.class));
+        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(ERTransaction.class),
+                any(BigDecimal.class),
+                eq(SpendLimitType.ACCOUNT_DAY),
+                anyInt());
+        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(ERTransaction.class),
+                any(BigDecimal.class),
+                eq(SpendLimitType.ACCOUNT_MONTH),
+                anyInt());
+        verifyNoMoreInteractions(erService, spendLimitChecker);
 
     }
+
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenNullArgs() {
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = aSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(null, spendLimits, defaultSpendLimits, paymentContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("account is null");
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, null, defaultSpendLimits, paymentContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("spendLimits is null");
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, null, paymentContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("defaultSpendLimits is null");
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("paymentContext is null");
+    }
+
+    @Test
+    public void shouldPropogateExceptionThrownBySpendLimitService() {
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = aSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        String message = "This is a test exception " + new Random().nextInt();
+        final SpendLimitResult txLimitResult = aSpendLimitResult(true, message, SpendLimitType.ACCOUNT_TX);
+        final SpendLimitResult dayLimitResult = aSpendLimitResult(true, message, SpendLimitType.ACCOUNT_DAY);
+
+        given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willThrow(new RuntimeException(message));
+
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(message);
+
+        reset(spendLimitChecker);
+
+        message = "This is a test exception " + new Random().nextInt();
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                .willThrow(new RuntimeException(message));
+
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(message);
+
+        reset(spendLimitChecker);
+        message = "This is a test exception " + new Random().nextInt();
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(txLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                .willReturn(dayLimitResult);
+        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(ERTransaction.class),
+                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                .willThrow(new RuntimeException(message));
+
+        assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(message);
+
+    }
+
+    @Test
+    public void shouldNotReturnNPEWhenSpendLimitCheckerReturnsNullResult() {
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = aSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
+                anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
+                .willReturn(null);
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval).isNotNull();
+        assertThat(approval.isSuccess()).isTrue();
+
+    }
+
 }

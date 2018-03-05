@@ -34,6 +34,12 @@ public class SpendLimitDataBuilder {
                 .active(true)
                 .spendLimitType(type).build();
     }
+    public static SpendLimitInfo aSpendLimitInfo(double limit, SpendLimitType type) {
+        return SpendLimitInfo.builder()
+                .limit(limit)
+                .active(true)
+                .spendLimitType(type).build();
+    }
 
     public static SpendLimit aDefaultSpendLimit(double limit, SpendLimitType type) {
         return SpendLimit.builder()
