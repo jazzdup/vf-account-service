@@ -202,8 +202,7 @@ public class SpendLimitIT {
 //                .catalogInfo(CatalogInfo.builder().build())
                 .locale(Locale.UK)
                 .chargingId(account.getChargingId())
-                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("5.55")).build()).build();
-
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.00")).build()).build();
 
         //TODO ER Should respond with a bunch of standard Transactions which we can test with diffent limits set.
 
@@ -233,7 +232,7 @@ public class SpendLimitIT {
         assertThat(validation).isNotNull();
         assertThat(validation.isSuccess()).isTrue();
         assertThat(validation.getResponseCode()).isEqualTo(1);
-        assertThat(validation.getDescription()).isEqualTo("payment validated");
+        assertThat(validation.getDescription()).isEqualTo("Approved");
     }
 
     public void shouldValidatePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExists() {

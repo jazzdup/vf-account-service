@@ -225,8 +225,8 @@ public class SpendLimitServiceTest {
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         String reasonMessage = "This is a test reason" + this.getClass().hashCode();
-        final SpendLimitResult txLimitResult = aSpendLimitResult(false, reasonMessage, SpendLimitType.ACCOUNT_TX);
-        final SpendLimitResult dayLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_DAY);
+        final SpendLimitResult txLimitResult = aSpendLimitResult(true, reasonMessage, SpendLimitType.ACCOUNT_TX);
+        final SpendLimitResult dayLimitResult = aSpendLimitResult(false, reasonMessage, SpendLimitType.ACCOUNT_DAY);
 
         given(erService.getTransactions(eq(paymentContext), any(ERTransactionCriteria.class))).willReturn(newArrayList());
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),

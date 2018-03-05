@@ -1,5 +1,6 @@
 package com.vodafone.charging.data.builder;
 
+import com.google.common.collect.ImmutableList;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ public class ProfileDataBuilder {
                 .userGroups(Arrays.asList("ug1", "ug2"))
                 .lastUpdatedTransactions(MongoDataBuilder.aFixedDate())
                 .lastUpdatedUserGroups(MongoDataBuilder.aFixedDate())
-                .transactions(Arrays.asList(MongoDataBuilder.aTransaction()))
+                .transactions(ImmutableList.of(MongoDataBuilder.aTransaction()))
                 .spendLimits(SpendLimitDataBuilder.aSpendLimitList())
                 .build();
     }
@@ -22,7 +23,7 @@ public class ProfileDataBuilder {
                 .userGroups(Arrays.asList("ug1", "ug2"))
                 .lastUpdatedTransactions(MongoDataBuilder.aFixedDate())
                 .lastUpdatedUserGroups(MongoDataBuilder.aFixedDate())
-                .transactions(Arrays.asList(MongoDataBuilder.aTransaction()))
+                .transactions(ImmutableList.of(MongoDataBuilder.aTransaction()))
                 .build();
     }
 
