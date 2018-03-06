@@ -59,15 +59,8 @@ public class LogFileTest {
     @Test
     public void shouldCheckLogFileSizes() throws Exception {
         File logDir = new File("./logs/");
-        boolean logDirExistsBefore  = logDir.exists();
-        double ultimateSize = 0;
-        double ulfSize = 0;
-        double vfasSize = 0;
-        if (logDirExistsBefore){
-            //get file sizes
-            ultimateSize = new File("./logs/ultimate.log").length();
-            ulfSize = new File("./logs/ulf-log-without-payload.log").length();
-            vfasSize = new File("./logs/vf-account-service.log").length();
+        if (logDir.exists()){
+            logDir.delete();
         }
 
         //given
@@ -90,14 +83,18 @@ public class LogFileTest {
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        //get file sizes
-        double ultimateSize2 = new File("./logs/ultimate.log").length();
-        double ulfSize2 = new File("./logs/ulf-log-without-payload.log").length();
-        double vfasSize2 = new File("./logs/vf-account-service.log").length();
-
-        assertThat(ultimateSize2).isGreaterThan(ultimateSize);
-        assertThat(ulfSize2).isGreaterThan(ulfSize);
-        assertThat(vfasSize2).isGreaterThan(vfasSize);
+        File ultimate = new File("./logs/ultimate.log");
+        File ulf = new File("./logs/ulf-log-without-payload.log");
+        File applog = new File("./logs/vf-account-service.log");
+        assertThat(ultimate.exists()).as("check %s exists", ultimate.getName()).isTrue();
+        assertThat(ulf.exists()).as("check %s exists", ulf.getName()).isTrue();
+        assertThat(applog.exists()).as("check %s exists", applog.getName()).isTrue();
+        double ultimateSize2 = ultimate.length();
+        double ulfSize2 = ulf.length();
+        double vfasSize2 = applog.length();
+        assertThat(ultimateSize2).as("check %s is written to", ultimate.getName()).isGreaterThan(1);
+        assertThat(ulfSize2).as("check %s is written to", ulf.getName()).isGreaterThan(1);
+        assertThat(vfasSize2).as("check %s is written to", applog.getName()).isGreaterThan(1);
 
     }
 
