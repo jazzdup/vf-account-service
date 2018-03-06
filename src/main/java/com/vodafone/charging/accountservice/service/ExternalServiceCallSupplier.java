@@ -34,7 +34,7 @@ public class ExternalServiceCallSupplier {
                 throw new ExternalServiceException("Unknown Http Exception ER Adapter Service", unknownEx);
             } catch (Exception e) {
                 log.error("Unexpected exception from calling ER Adapter Service  Message: {}", e.getMessage());
-                throw e;
+                throw new ExternalServiceException("Unexpected Exception", e);
             }
         };
     }
