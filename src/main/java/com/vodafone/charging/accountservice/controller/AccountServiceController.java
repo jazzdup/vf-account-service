@@ -152,6 +152,7 @@ public class AccountServiceController {
                                                           @Valid @RequestBody PaymentContext paymentContext) {
         final PaymentApproval paymentApproval = serviceCallSupplier.call(() ->
                 spendLimitService.approvePayment(accountId, paymentContext)).get();
+
         return ResponseEntity.ok(paymentApproval);
     }
 

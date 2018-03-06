@@ -1,10 +1,12 @@
 package com.vodafone.charging.accountservice.client;
 
-import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
+import com.vodafone.charging.accountservice.exception.ApplicationConfigurationException;
+import com.vodafone.charging.accountservice.exception.ERServiceException;
 import com.vodafone.charging.properties.PropertiesAccessor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,6 +20,7 @@ import org.springframework.web.client.UnknownHttpStatusCodeException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Where all interaction with ER Core or it's adapter application takes place
@@ -32,19 +35,10 @@ public class ERService {
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
-    public List<ERTransaction> getTransactions(PaymentContext paymentContext, ERTransactionCriteria criteria) {
+    public List<ERTransaction> getTransactions(@NonNull final PaymentContext paymentContext,
+                                               @NonNull final ERTransactionCriteria criteria) {
 
-        //TODO Transaction needs to change to an ErTransactionSummary object
-        final String url = propertiesAccessor.getPropertyForOpco("erif.communication.protocol",
-                paymentContext.getLocale().getCountry(), "http://localhost:8094");
-
-        final URI uri;
-        try {
-            uri = new URI(url);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Incorrect application configuration for ER endpoint url.  Please check.");
-        }
-
+        final URI uri = getUri(paymentContext.getLocale());
         final ParameterizedTypeReference<List<ERTransaction>> reference =
                 new ParameterizedTypeReference<List<ERTransaction>>() {
                 };
@@ -53,30 +47,45 @@ public class ERService {
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .body(criteria);
 
-        ResponseEntity<List<ERTransaction>> responseEntity = null;
+        ResponseEntity<List<ERTransaction>> responseEntity;
         try {
-
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, reference);
+            //TODO Re-factor should be done through an ExternalServiceSupplier object
+            responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, reference);
 
         } catch (HttpClientErrorException clientEx) {
-            log.error("Client Exception calling url {} HttpStatus: {}", url, clientEx.getStatusText());
+            log.error("Client Exception calling url {} HttpStatus: {}", uri, clientEx.getStatusText());
+            throw new ERServiceException("Client Exception calling url " + uri.toString(), clientEx);
         } catch (HttpServerErrorException serverEx) {
             log.error("HttpStatus: {}", serverEx.getStatusText());
             log.error(serverEx.getResponseBodyAsString());
-            //TODO - something required with the response?
-            String response = serverEx.getResponseBodyAsString();
+            throw new ERServiceException("Server Exception calling url " + uri.toString(), serverEx);
         } catch (UnknownHttpStatusCodeException unknownEx) {
             log.error("Unknown Exception thrown with Status: {}", unknownEx.getStatusText());
+            throw new ERServiceException("Unknown Http Exception calling url " + uri.toString(), unknownEx);
         } catch (Exception e) {
-            log.error("Unexpected exception from calling RestService URL: {}.  Message: {}", url, e.getMessage());
+            log.error("Unexpected exception from calling RestService URL: {}.  Message: {}", uri, e.getMessage());
             throw e;
         }
 
-
         final HttpStatus status = responseEntity.getStatusCode();
-        final List<ERTransaction> erTransactions = responseEntity.getBody();
-        return erTransactions;
+        log.error("HttpStatus: {}", status.value());
 
+        return responseEntity.getBody();
+    }
+
+    public URI getUri(final Locale locale) {
+
+        final String url = propertiesAccessor.getPropertyForOpco("er.adapter.endpoint.url",
+                locale.getCountry(), "http://localhost:8094");
+
+        final URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            throw new ApplicationConfigurationException("Incorrect application configuration for property " +
+                    "er.adapter.endpoint.url. Please check.", e);
+        }
+        return uri;
     }
 
 }

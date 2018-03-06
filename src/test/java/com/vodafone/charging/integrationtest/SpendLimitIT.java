@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -210,11 +207,13 @@ public class SpendLimitIT {
         ERTransaction refund = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
 
         List<ERTransaction> transactions = Lists.newArrayList(purchase, refund);
+        final ParameterizedTypeReference<List<ERTransaction>> reference = new ParameterizedTypeReference<List<ERTransaction>>() {
+        };
 
 //        ResponseEntity<ERTransaction> responseEntity = ResponseEntity.ok(transactions);
         ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
 
-        given(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class)))
+        given(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(RequestEntity.class), eq(reference)))
                 .willReturn(responseEntity);
 
         final String json = jsonConverter.toJson(paymentContext);
@@ -226,13 +225,13 @@ public class SpendLimitIT {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-        final PaymentApproval validation =
+        final PaymentApproval approval =
                 (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
 
-        assertThat(validation).isNotNull();
-        assertThat(validation.isSuccess()).isTrue();
-        assertThat(validation.getResponseCode()).isEqualTo(1);
-        assertThat(validation.getDescription()).isEqualTo("Approved");
+        assertThat(approval).isNotNull();
+        assertThat(approval.isSuccess()).isTrue();
+        assertThat(approval.getResponseCode()).isEqualTo(1);
+        assertThat(approval.getDescription()).isEqualTo("Approved");
     }
 
     public void shouldValidatePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExists() {

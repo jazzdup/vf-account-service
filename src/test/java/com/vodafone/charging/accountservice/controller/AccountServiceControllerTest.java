@@ -1,14 +1,12 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
+import com.vodafone.charging.accountservice.domain.*;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
 import com.vodafone.charging.accountservice.exception.ServiceCallSupplier;
 import com.vodafone.charging.accountservice.service.AccountService;
+import com.vodafone.charging.data.builder.PaymentContextDataBuilder;
 import com.vodafone.charging.data.object.NullableChargingId;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +50,9 @@ public class AccountServiceControllerTest {
 
     @Mock
     private Supplier<Account> supplier;
+
+    @Mock
+    private Supplier<PaymentApproval> paymentApprovalSupplier;
 
     @InjectMocks
     private AccountServiceController accountServiceController;
@@ -228,7 +229,7 @@ public class AccountServiceControllerTest {
     }
 
     @Test
-    public void shouldPropogateExceptionWhenCallingServiceCallerGetMethod() {
+    public void shouldPropagateExceptionWhenCallingServiceCallerGetMethod() {
         final List<SpendLimitInfo> spendLimitInfoList = aSpendLimitInfoList();
         final String accountId = String.valueOf(new Random().nextInt());
         String message = String.valueOf(this.hashCode());
@@ -240,5 +241,63 @@ public class AccountServiceControllerTest {
                 .hasMessage(message).hasNoCause();
 
     }
+
+    @Test
+    public void shouldCallPaymentApprovalSupplierWithCorrectParametersSuccessfully() {
+
+        final Account account = anAccount();
+        String message = String.valueOf(new Random().nextInt());
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+        PaymentApproval paymentApproval = PaymentApproval.builder().success(true).description(message).build();
+
+        given(serviceCallSupplier.call(Matchers.<Supplier<PaymentApproval>>any())).willReturn(paymentApprovalSupplier);
+        given(paymentApprovalSupplier.get()).willReturn(paymentApproval);
+
+        final ResponseEntity<PaymentApproval> approvalResponseEntity =
+                accountServiceController.approvePayment(account.getId(), paymentContext);
+
+        assertThat(approvalResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(approvalResponseEntity.getBody()).isEqualToComparingFieldByField(paymentApproval);
+    }
+
+    @Test
+    public void shouldCallPaymentApprovalSupplierWithCorrectParametersAndReturnFailure() {
+        final Account account = anAccount();
+        String message = String.valueOf(new Random().nextInt());
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+        PaymentApproval paymentApproval = PaymentApproval.builder().success(false).description(message).build();
+
+        given(serviceCallSupplier.call(Matchers.<Supplier<PaymentApproval>>any())).willReturn(paymentApprovalSupplier);
+        given(paymentApprovalSupplier.get()).willReturn(paymentApproval);
+
+        final ResponseEntity<PaymentApproval> approvalResponseEntity =
+                accountServiceController.approvePayment(account.getId(), paymentContext);
+
+        assertThat(approvalResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(approvalResponseEntity.getBody()).isEqualToComparingFieldByField(paymentApproval);
+
+        verify(serviceCallSupplier).call(Matchers.<Supplier<PaymentApproval>>any());
+        verify(paymentApprovalSupplier).get();
+        verifyNoMoreInteractions(serviceCallSupplier, paymentApprovalSupplier);
+    }
+
+    @Test
+    public void shouldPropagateWhenExceptionThrownCallingForPaymentApproval() {
+        final Account account = anAccount();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        final String message = "Test exception " + new Random().nextDouble();
+        given(serviceCallSupplier.call(Matchers.<Supplier<PaymentApproval>>any())).willReturn(paymentApprovalSupplier);
+        given(paymentApprovalSupplier.get()).willThrow(new NullPointerException(message));
+
+        assertThatThrownBy(() -> accountServiceController.approvePayment(account.getId(), paymentContext))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage(message);
+
+        verify(serviceCallSupplier).call(Matchers.<Supplier<PaymentApproval>>any());
+        verify(paymentApprovalSupplier).get();
+        verifyNoMoreInteractions(serviceCallSupplier, paymentApprovalSupplier);
+    }
+
 
 }
