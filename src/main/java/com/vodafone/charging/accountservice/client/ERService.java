@@ -1,10 +1,11 @@
 package com.vodafone.charging.accountservice.client;
 
+import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
 import com.vodafone.charging.accountservice.exception.ApplicationConfigurationException;
-import com.vodafone.charging.accountservice.exception.ERServiceException;
+import com.vodafone.charging.accountservice.service.ExternalServiceCallSupplier;
 import com.vodafone.charging.properties.PropertiesAccessor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.UnknownHttpStatusCodeException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * Where all interaction with ER Core or it's adapter application takes place
@@ -35,6 +35,9 @@ public class ERService {
     @Autowired
     private PropertiesAccessor propertiesAccessor;
 
+    @Autowired
+    private ExternalServiceCallSupplier externalServiceCallSupplier;
+
     public List<ERTransaction> getTransactions(@NonNull final PaymentContext paymentContext,
                                                @NonNull final ERTransactionCriteria criteria) {
 
@@ -48,29 +51,15 @@ public class ERService {
                 .body(criteria);
 
         ResponseEntity<List<ERTransaction>> responseEntity;
-        try {
-            //TODO Re-factor should be done through an ExternalServiceSupplier object
-            responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, reference);
 
-        } catch (HttpClientErrorException clientEx) {
-            log.error("Client Exception calling url {} HttpStatus: {}", uri, clientEx.getStatusText());
-            throw new ERServiceException("Client Exception calling url " + uri.toString(), clientEx);
-        } catch (HttpServerErrorException serverEx) {
-            log.error("HttpStatus: {}", serverEx.getStatusText());
-            log.error(serverEx.getResponseBodyAsString());
-            throw new ERServiceException("Server Exception calling url " + uri.toString(), serverEx);
-        } catch (UnknownHttpStatusCodeException unknownEx) {
-            log.error("Unknown Exception thrown with Status: {}", unknownEx.getStatusText());
-            throw new ERServiceException("Unknown Http Exception calling url " + uri.toString(), unknownEx);
-        } catch (Exception e) {
-            log.error("Unexpected exception from calling RestService URL: {}.  Message: {}", uri, e.getMessage());
-            throw e;
-        }
+        responseEntity = externalServiceCallSupplier.call(() ->
+                restTemplate.exchange(uri, HttpMethod.POST, requestEntity, reference))
+                .get();
 
         final HttpStatus status = responseEntity.getStatusCode();
         log.error("HttpStatus: {}", status.value());
 
-        return responseEntity.getBody();
+        return ofNullable(responseEntity.getBody()).orElse(Lists.newArrayList());
     }
 
     public URI getUri(final Locale locale) {

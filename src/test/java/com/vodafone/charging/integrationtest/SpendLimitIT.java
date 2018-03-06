@@ -185,7 +185,7 @@ public class SpendLimitIT {
                 .chargingId(account.getChargingId())
                 .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.00")).build()).build();
 
-        //TODO ER Should respond with a bunch of standard Transactions which we can test with diffent limits set.
+        //TODO ER Should respond with a bunch of standard Transactions which we can test with different limits set.
 
         final ERTransaction purchase = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now(), ERTransactionType.PURCHASE);
         final ERTransaction refund = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
@@ -197,7 +197,6 @@ public class SpendLimitIT {
         given(restTemplate.exchange(any(URI.class),
                 eq(HttpMethod.POST),
                 Matchers.<RequestEntity<ERTransactionCriteria>>any(),
-//                Matchers.any(ParameterizedTypeReference.class)))
                 Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
                 .willReturn(responseEntity);
 
