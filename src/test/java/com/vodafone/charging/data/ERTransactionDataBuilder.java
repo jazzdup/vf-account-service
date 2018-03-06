@@ -6,7 +6,10 @@ import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ERTransactionDataBuilder {
 
@@ -24,6 +27,10 @@ public class ERTransactionDataBuilder {
                 .partnerId("test-partnerId")
                 .type(type.name())
                 .build();
+    }
+
+    public static List<ERTransaction> anErTransactionList() {
+        return newArrayList(anErTransaction(), anErTransaction(), anErTransaction());
     }
 
 }

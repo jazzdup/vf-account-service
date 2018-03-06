@@ -5,7 +5,7 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
 import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
-import com.vodafone.charging.accountservice.exception.ServiceCallSupplier;
+import com.vodafone.charging.accountservice.service.ServiceCallSupplier;
 import com.vodafone.charging.accountservice.service.AccountService;
 import com.vodafone.charging.accountservice.service.SpendLimitService;
 import io.swagger.annotations.Api;

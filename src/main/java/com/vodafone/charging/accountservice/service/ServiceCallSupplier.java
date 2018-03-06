@@ -1,5 +1,7 @@
-package com.vodafone.charging.accountservice.exception;
+package com.vodafone.charging.accountservice.service;
 
+import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;

@@ -9,6 +9,7 @@ import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
+import com.vodafone.charging.accountservice.dto.er.ERTransactionCriteria;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -44,10 +47,8 @@ import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWit
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfileWithoutSpendLimits;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -170,23 +171,6 @@ public class SpendLimitIT {
                 .forEach(i -> assertThat(resultLimits.get(i)).isEqualToComparingFieldByField(expectedLimits.get(i)));
     }
 
-
-            /* --- FEATURE ---
-        - get account using accountId
-            if not found then return validationFailed
-        - see if account has a spend limit associated with it
-                - if not then see if request has a default spend limit
-                        - if not the return a validationFailed
-                        - if yes then get the transactions for the account for the last month
-                          Calculate whether spend limit breached
-                          - if not then return validationSuccess
-                          - if breached return validationFailed
-        - if yes then get the transactions for the account for the last month.
-            Calculate whether the limit is breached for any of the limits set.
-            - if not then return validationSuccess
-                - if breached return validationFailed
-         */
-
     @Test
     public void shouldValidatePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExists() throws Exception {
 
@@ -195,7 +179,7 @@ public class SpendLimitIT {
         account.getProfiles().stream()
                 .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNotEmpty());
 
-        PaymentContext paymentContext = PaymentContext.builder()
+        final PaymentContext paymentContext = PaymentContext.builder()
 //                .catalogInfo(CatalogInfo.builder().build())
                 .locale(Locale.UK)
                 .chargingId(account.getChargingId())
@@ -203,17 +187,18 @@ public class SpendLimitIT {
 
         //TODO ER Should respond with a bunch of standard Transactions which we can test with diffent limits set.
 
-        ERTransaction purchase = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now(), ERTransactionType.PURCHASE);
-        ERTransaction refund = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
+        final ERTransaction purchase = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction refund = ERTransactionDataBuilder.anErTransaction(new BigDecimal(2.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
 
-        List<ERTransaction> transactions = Lists.newArrayList(purchase, refund);
-        final ParameterizedTypeReference<List<ERTransaction>> reference = new ParameterizedTypeReference<List<ERTransaction>>() {
-        };
+        final List<ERTransaction> transactions = Lists.newArrayList(purchase, refund);
 
-//        ResponseEntity<ERTransaction> responseEntity = ResponseEntity.ok(transactions);
-        ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
+        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
 
-        given(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(RequestEntity.class), eq(reference)))
+        given(restTemplate.exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
+//                Matchers.any(ParameterizedTypeReference.class)))
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
                 .willReturn(responseEntity);
 
         final String json = jsonConverter.toJson(paymentContext);
