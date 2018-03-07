@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.UnknownHttpStatusCodeException;
 
 import java.util.function.Supplier;
@@ -27,12 +28,14 @@ public class ExternalServiceCallSupplierTest {
     @Mock
     private ResponseEntity responseEntity;
 
+    @Mock
+    private RestTemplate restTemplate;
+
     @InjectMocks
     private ExternalServiceCallSupplier externalServiceCallSupplier;
 
     @Test
     public void shouldExecuteSupplierAndRespondSuccessfully() {
-
         given(supplier.get()).willReturn(responseEntity);
 
         final ResponseEntity responseEntity = externalServiceCallSupplier.call(supplier).get();

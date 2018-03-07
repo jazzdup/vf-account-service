@@ -60,10 +60,6 @@ public class ERServiceTest {
         given(externalServiceCallSupplier.call(Matchers.<Supplier<ResponseEntity<List<ERTransaction>>>>any()))
                 .willReturn(supplier);
         given(supplier.get()).willReturn(responseEntity);
-//        given(restTemplate.exchange(any(URI.class),
-//                eq(HttpMethod.POST),
-//                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
-//                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any())).willReturn(responseEntity);
 
         final List<ERTransaction> transactions = erService.getTransactions(paymentContext, criteria);
 

@@ -48,6 +48,7 @@ public class ERService {
 
         final RequestEntity<ERTransactionCriteria> requestEntity = RequestEntity.post(uri)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(criteria);
 
         ResponseEntity<List<ERTransaction>> responseEntity;
