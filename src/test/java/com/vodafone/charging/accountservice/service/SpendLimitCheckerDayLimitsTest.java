@@ -17,6 +17,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.data.ERTransactionDataBuilder.anErTransaction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 
 /**
@@ -37,7 +38,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         double expectedTxTotal = 10.00;
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -61,7 +62,8 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
 
         BigDecimal currentTransactionAmount = new BigDecimal(0.4);
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -87,7 +89,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         double expectedTxTotal = 14.7;
         BigDecimal currentTransactionAmount = new BigDecimal(5.0);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -111,7 +113,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(6.00);
         double expectedTotalTx = 15.7;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -140,7 +142,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         double expectedTxTotal = 8.7;
         BigDecimal currentTransactionAmount = new BigDecimal(4.0);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -164,6 +166,8 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(5000.0);
         double expectedTxTotal = 5009.7;
 
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
         //when
         final SpendLimitResult result =
                 spendLimitChecker.checkDurationLimit(newArrayList(), newArrayList(), transactions, currentTransactionAmount, SpendLimitType.ACCOUNT_DAY, 1);
@@ -185,6 +189,8 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
         BigDecimal currentTransactionAmount = new BigDecimal(0.11);
         double expectedTxTotal = 9.81;
+
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =

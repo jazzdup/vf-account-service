@@ -19,6 +19,7 @@ import static com.vodafone.charging.data.builder.SpendLimitDataProvider.getBilli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 
 /**
@@ -36,7 +37,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
         double totalTxValue = 50.00;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -63,7 +64,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =
@@ -87,7 +88,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(0.4);
         double totalTxValue = 50.1;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -119,7 +120,8 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 
         BigDecimal currentTransactionAmount = new BigDecimal(0.4);
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
+
 
         //when
         final SpendLimitResult result =
@@ -144,7 +146,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(5.4);
         double totalTxValue = 55.1;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -170,7 +172,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(5000);
         double totalTxValue = 5049.7;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -196,7 +198,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         BigDecimal currentTransactionAmount = new BigDecimal(5.4);
         double expectedTxValue = 55.1;
 
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =
@@ -214,7 +216,8 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         //given
         Map<String, LocalDateTime> billingCycleDates = getBillingCycleDates(10);
         BigDecimal currentTransactionAmount = new BigDecimal(5.4);
-        given(erDateCalculator.calculateBillingCycleDates(anyInt())).willReturn(billingCycleDates);
+
+        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =

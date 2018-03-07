@@ -98,16 +98,18 @@ public class SpendLimitChecker {
                                                @NonNull final SpendLimitType spendLimitType,
                                                int billingCycleDay) {
 
-        LocalDateTime start;
-        LocalDateTime end;
-        if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
-            start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
-            end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
-        } else {
-            Map<String, LocalDateTime> dates = erDateCalculator.calculateBillingCycleDates(billingCycleDay);
-            start = dates.get(erDateCalculator.getStartDateKey());
-            end = dates.get(erDateCalculator.getEndDateKey());
-        }
+        final Map<String, LocalDateTime> startEndDates =  erDateCalculator.calculateSpendLimitDates(spendLimitType, billingCycleDay);
+
+        final LocalDateTime start = startEndDates.get(erDateCalculator.getStartDateKey());
+        final LocalDateTime end =  startEndDates.get(erDateCalculator.getEndDateKey());
+//        if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
+//            start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
+//            end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
+//        } else {
+//            Map<String, LocalDateTime> dates = erDateCalculator.calculateBillingCycleDates(billingCycleDay);
+//            start = dates.get(erDateCalculator.getStartDateKey());
+//            end = dates.get(erDateCalculator.getEndDateKey());
+//        }
 
         //Collect relevant payments
         List<ERTransaction> payments =
