@@ -54,6 +54,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -93,7 +96,7 @@ public class SpendLimitIT {
     }
 
     @Test
-    public void shouldNonUpdateExistingSpendLimitsInAccountProfile() throws Exception {
+    public void shouldNotUpdateExistingSpendLimitsInAccountProfile() throws Exception {
         Account account = anAccount(aProfile());
         saveAccountAndCheck(account);
         successfulUpdateSpendLimitScenario(account);
@@ -180,11 +183,11 @@ public class SpendLimitIT {
     Variables - txSpendLimit
                 daySpendLimit
                 monthSpendLimit
-                defaultTxSpendLimit
-                defaultDaySpendLimit
-                defaultMonthSpendLimit
-                billingCycleDay included
-                transactionsReturned or not
+                defaultTxSpendLimit -
+                defaultDaySpendLimit -
+                defaultMonthSpendLimit -
+                billingCycleDay included - not done
+                transactionsReturned or not - done
      */
 
     @Test
@@ -196,7 +199,6 @@ public class SpendLimitIT {
                 .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNotEmpty());
 
         final PaymentContext paymentContext = PaymentContext.builder()
-//                .catalogInfo(CatalogInfo.builder().build())
                 .locale(Locale.UK)
                 .chargingId(account.getChargingId())
                 .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.00")).build()).build();
@@ -230,6 +232,9 @@ public class SpendLimitIT {
         assertThat(approval.isSuccess()).isTrue();
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
@@ -279,6 +284,8 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
 
     }
 
@@ -330,6 +337,8 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
@@ -374,6 +383,8 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
@@ -420,6 +431,9 @@ public class SpendLimitIT {
         assertThat(approval.isSuccess()).isTrue();
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     public void shouldNotApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndAccountSpendLimitBreached() throws Exception {
@@ -468,6 +482,8 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
@@ -518,6 +534,8 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
@@ -531,20 +549,6 @@ public class SpendLimitIT {
                 .locale(Locale.UK)
                 .chargingId(chargingId)
                 .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.0")).build()).build();
-
-        final ERTransaction purchase1 = anErTransaction(new BigDecimal(5.9), LocalDateTime.now(), ERTransactionType.PURCHASE);
-        final ERTransaction purchase2 = anErTransaction(new BigDecimal(5.1), LocalDateTime.now(), ERTransactionType.PURCHASE);
-        final ERTransaction refund = anErTransaction(new BigDecimal(0.9), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
-
-        final List<ERTransaction> transactions = newArrayList(purchase1, purchase2, refund);
-
-        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
-
-        given(restTemplate.exchange(any(URI.class),
-                eq(HttpMethod.POST),
-                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
-                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
-                .willReturn(responseEntity);
 
         final String json = jsonConverter.toJson(paymentContext);
 
@@ -564,6 +568,7 @@ public class SpendLimitIT {
         assertThat(error.getErrorId()).isEqualTo(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).startsWith(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorDesciption());
 
+        verifyZeroInteractions(restTemplate);
     }
 
     @Test
@@ -607,6 +612,10 @@ public class SpendLimitIT {
         assertThat(error.getStatus()).isEqualTo(EXTERNAL_SERVICE_ERROR.status().value());
         assertThat(error.getErrorId()).isEqualTo(EXTERNAL_SERVICE_ERROR.errorId().value());
         assertThat(error.getErrorDescription()).startsWith(EXTERNAL_SERVICE_ERROR.errorDesciption());
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
+
     }
 
 }
