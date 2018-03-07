@@ -1,4 +1,4 @@
-package com.vodafone.charging.data;
+package com.vodafone.charging.mock;
 
 public enum ApplicationPortsEnum {
     DEFAULT_ER_IF_PORT(8458);

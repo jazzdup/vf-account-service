@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 
-import static com.vodafone.charging.data.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
+import static com.vodafone.charging.mock.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static com.vodafone.charging.data.builder.IFResponseDataBuilder.aERIFResponse;
@@ -37,7 +37,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.HttpMethod.POST;
 
 
-//TODO This test needs to be reviewed.  Wiremock may not be the best approach.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
 public class LogFileTest {
