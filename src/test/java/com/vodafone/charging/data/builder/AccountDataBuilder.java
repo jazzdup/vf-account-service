@@ -17,6 +17,17 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
+                .profiles(newArrayList(aProfile()))
+                .build();
+    }
+
+    public static Account anAccountWithEmptyId() {
+        return Account.builder()
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(aChargingId())
+                .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
                 .profiles(newArrayList(aProfile()))
                 .build();
     }
@@ -27,6 +38,7 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
                 .profiles(newArrayList(profile))
                 .build();
     }
@@ -37,6 +49,7 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
                 .build();
     }
     public static Account anAccountWithEmptyProfile() {
@@ -45,6 +58,7 @@ public class AccountDataBuilder {
                 .lastValidate(MongoDataBuilder.aFixedDate())
                 .chargingId(aChargingId())
                 .customerType("PRE")
+                .billingCycleDay(new Random().nextInt(27) + 1)
                 .profiles(newArrayList())
                 .build();
     }
