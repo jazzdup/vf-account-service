@@ -64,7 +64,7 @@ public class AccountServiceControllerAdviceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String message = "This is a test ApplicationLogicException";
 
-        final ResponseEntity<AccountServiceError> response = advice.handleIllegalArgumentException(request,
+        final ResponseEntity<AccountServiceError> response = advice.handleMethodArgumentException(request,
                 new MethodArgumentValidationException(message));
 
         assertThat(response).isNotNull();

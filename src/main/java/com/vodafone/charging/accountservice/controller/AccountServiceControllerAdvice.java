@@ -1,9 +1,6 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.exception.AccountServiceError;
-import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
-import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
-import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
+import com.vodafone.charging.accountservice.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,7 +40,7 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(RepositoryResourceNotFoundException.class)
     @ResponseBody
-    public ResponseEntity<AccountServiceError> handleApplicationLogicException(HttpServletRequest request,
+    public ResponseEntity<AccountServiceError> handleRepositoryResourceNotFoundException(HttpServletRequest request,
                                                                                RepositoryResourceNotFoundException ex) {
         log.error("Handling RepositoryResourceNotFoundException with message: {}", ex.getMessage());
         return new ResponseEntity<>(AccountServiceError.builder()
@@ -56,13 +53,25 @@ public class AccountServiceControllerAdvice extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(MethodArgumentValidationException.class)
     @ResponseBody
-    public ResponseEntity<AccountServiceError> handleIllegalArgumentException(HttpServletRequest request,
+    public ResponseEntity<AccountServiceError> handleMethodArgumentException(HttpServletRequest request,
                                                                               MethodArgumentValidationException ex) {
         return new ResponseEntity<>(AccountServiceError.builder()
                 .status(ERROR.value())
                 .errorId(SYSTEM_ERROR.value())
                 .errorDescription(ex.getMessage())
                 .build(), HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    @ResponseBody
+    public ResponseEntity<AccountServiceError> handleExternalServiceException(HttpServletRequest request,
+                                                                              ExternalServiceException ex) {
+        return new ResponseEntity<>(AccountServiceError.builder()
+                .status(EXTERNAL_SERVICE_ERROR.status().value())
+                .errorId(EXTERNAL_SERVICE_ERROR.errorId().value())
+                .errorDescription(EXTERNAL_SERVICE_ERROR.errorDesciption() + " message: " +  ex.getMessage())
+                .build(), HttpStatus.BAD_GATEWAY);
 
     }
 

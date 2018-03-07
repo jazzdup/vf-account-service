@@ -18,7 +18,9 @@ public class PaymentContext {
     @NonNull
     private Locale locale;
 
-    //shouldUseBillingCycleDay
+    //TODO These fields are needed
+    //shouldUseBillingCycleDay - currently assume whenever one exists we use
+    //shouldUseRenewals - currently assume renewals
 
     @NonNull
     @Autowired

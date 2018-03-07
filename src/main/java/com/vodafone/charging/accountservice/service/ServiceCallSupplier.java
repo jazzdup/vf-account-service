@@ -1,6 +1,7 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
+import com.vodafone.charging.accountservice.exception.ExternalServiceException;
 import com.vodafone.charging.accountservice.exception.RepositoryResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +18,7 @@ public class ServiceCallSupplier {
         return () -> {
             try {
                 return supplier.get();
-            } catch (RepositoryResourceNotFoundException | ApplicationLogicException ex) {
+            } catch (RepositoryResourceNotFoundException | ApplicationLogicException | ExternalServiceException ex) {
                 throw ex;
             } catch (Exception e) {
                 throw new ApplicationLogicException(e.getMessage(), e);

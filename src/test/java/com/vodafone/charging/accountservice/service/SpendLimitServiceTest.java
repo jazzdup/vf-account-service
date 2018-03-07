@@ -32,7 +32,7 @@ import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWit
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfileWithoutSpendLimits;
 import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitInfoList;
-import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aSpendLimitList;
+import static com.vodafone.charging.data.builder.SpendLimitDataBuilder.aStandardSpendLimitList;
 import static com.vodafone.charging.data.builder.SpendLimitResultDataBuilder.aSpendLimitResult;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -135,8 +135,8 @@ public class SpendLimitServiceTest {
     public void shouldReturnSuccessWhenAllSpendLimitsProvidedAndNoneAreBreached() {
 
         final Account account = anAccount();
-        final List<SpendLimit> spendLimits = aSpendLimitList();
-        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         final String reasonMessage = "Approved";
@@ -189,8 +189,8 @@ public class SpendLimitServiceTest {
     public void shouldReturnFailureWhenTransactionSpendLimitBreached() {
 
         Account account = anAccount();
-        List<SpendLimit> spendLimits = aSpendLimitList();
-        List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         String reasonMessage = "This is a test reason" + this.getClass().hashCode();
@@ -220,8 +220,8 @@ public class SpendLimitServiceTest {
     public void shouldReturnFailureWhenDaysSpendLimitBreached() {
 
         Account account = anAccount();
-        List<SpendLimit> spendLimits = aSpendLimitList();
-        List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         String reasonMessage = "This is a test reason" + this.getClass().hashCode();
@@ -263,8 +263,8 @@ public class SpendLimitServiceTest {
     public void shouldReturnFailureWhenMonthSpendLimitBreached() {
 
         final Account account = anAccount();
-        final List<SpendLimit> spendLimits = aSpendLimitList();
-        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         final String reasonMessage = "This is a test reason" + this.getClass().hashCode();
@@ -318,8 +318,8 @@ public class SpendLimitServiceTest {
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenNullArgs() {
         final Account account = anAccount();
-        final List<SpendLimit> spendLimits = aSpendLimitList();
-        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         assertThatThrownBy(() -> spendLimitService.checkSpendLimits(null, spendLimits, defaultSpendLimits, paymentContext))
@@ -339,8 +339,8 @@ public class SpendLimitServiceTest {
     @Test
     public void shouldPropogateExceptionThrownBySpendLimitService() {
         final Account account = anAccount();
-        final List<SpendLimit> spendLimits = aSpendLimitList();
-        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         String message = "This is a test exception " + new Random().nextInt();
@@ -394,8 +394,8 @@ public class SpendLimitServiceTest {
     @Test
     public void shouldNotReturnNPEWhenSpendLimitCheckerReturnsNullResult() {
         final Account account = anAccount();
-        final List<SpendLimit> spendLimits = aSpendLimitList();
-        final List<SpendLimit> defaultSpendLimits = aSpendLimitList();
+        final List<SpendLimit> spendLimits = aStandardSpendLimitList();
+        final List<SpendLimit> defaultSpendLimits = aStandardSpendLimitList();
         final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
 
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),

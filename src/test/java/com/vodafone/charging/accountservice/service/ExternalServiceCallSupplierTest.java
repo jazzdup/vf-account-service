@@ -71,7 +71,7 @@ public class ExternalServiceCallSupplierTest {
 
     @Test
     public void shouldHandleUnknownExceptionWhenSupplierExecuted() {
-        given(supplier.get()).willThrow(new RuntimeException("message from cause"));
+        given(supplier.get()).willThrow(new RuntimeException());
 
         assertThatThrownBy(() -> externalServiceCallSupplier.call(supplier).get())
                 .isInstanceOf(ExternalServiceException.class)

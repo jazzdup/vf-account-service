@@ -12,6 +12,7 @@ public enum ApplicationErrors {
     REPOSITORY_RESOURCE_NOT_FOUND_ERROR(ERROR, CLIENT_ERROR , "Could not retrieve repository resource using identifier."),
     MESSAGE_NOT_READABLE_ERROR(ERROR, SYSTEM_ERROR, "Could not read incoming message."),
     BAD_REQUEST_ERROR(ERROR, SYSTEM_ERROR, "Incorrect request parameters were passed."),
+    EXTERNAL_SERVICE_ERROR(ERROR, SYSTEM_ERROR , "Error received communicating with an external system."),
     UNKNOWN_ERROR(ERROR, SYSTEM_ERROR, "An unknown error has occurred.");
 
     private ERCoreErrorStatus status;

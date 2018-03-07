@@ -5,6 +5,8 @@ import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,15 +17,33 @@ public class SpendLimitDataBuilder {
 
     public static List<SpendLimitInfo> aSpendLimitInfoList() {
         return newArrayList(SpendLimitInfo.builder()
-                        .limit(new Random().nextDouble())
+                        .limit(BigDecimal.valueOf(new Random().nextDouble()).setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue())
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_DAY).build(),
                 SpendLimitInfo.builder()
-                        .limit(new Random().nextDouble())
+                        .limit(BigDecimal.valueOf(new Random().nextDouble()).setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue())
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_TX).build(),
                 SpendLimitInfo.builder()
-                        .limit(new Random().nextDouble())
+                        .limit(BigDecimal.valueOf(new Random().nextDouble()).setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue())
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_MONTH).build());
+    }
+
+    public static List<SpendLimitInfo> aSpendLimitInfoList(double txLimit, double dayLimit, double monthLimit) {
+        return newArrayList(SpendLimitInfo.builder()
+                        .limit(txLimit)
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_TX).build(),
+                SpendLimitInfo.builder()
+                        .limit(dayLimit)
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_DAY).build(),
+                SpendLimitInfo.builder()
+                        .limit(monthLimit)
                         .active(true)
                         .spendLimitType(SpendLimitType.ACCOUNT_MONTH).build());
     }
@@ -41,15 +61,22 @@ public class SpendLimitDataBuilder {
                 .spendLimitType(type).build();
     }
 
-    public static SpendLimit aDefaultSpendLimit(double limit, SpendLimitType type) {
-        return SpendLimit.builder()
-                .limit(limit)
-                .active(true)
-                .spendLimitType(type).build();
-
+    public static List<SpendLimit> aSpendLimitList(double txLimit, double dayLimit, double monthLimit) {
+        return newArrayList(SpendLimit.builder()
+                        .limit(txLimit)
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_TX).build(),
+                SpendLimit.builder()
+                        .limit(dayLimit)
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_DAY).build(),
+                SpendLimit.builder()
+                        .limit(monthLimit)
+                        .active(true)
+                        .spendLimitType(SpendLimitType.ACCOUNT_MONTH).build());
     }
 
-    public static List<SpendLimit> aSpendLimitList() {
+    public static List<SpendLimit> aStandardSpendLimitList() {
         return newArrayList(SpendLimit.builder()
                         .limit(2.15)
                         .active(true)
@@ -64,7 +91,7 @@ public class SpendLimitDataBuilder {
                         .spendLimitType(SpendLimitType.ACCOUNT_MONTH).build());
     }
 
-    public static List<SpendLimit> aDefaultSpendLimitList() {
+    public static List<SpendLimit> aStandardDefaultSpendLimitList() {
         return newArrayList(SpendLimit.builder()
                         .limit(4.15)
                         .active(true)
@@ -83,7 +110,7 @@ public class SpendLimitDataBuilder {
 
 
     public static Map.Entry<List<SpendLimit>, List<SpendLimit>> aSpendLimitAndDefaultPairList() {
-        return Maps.immutableEntry(aSpendLimitList(), aDefaultSpendLimitList());
+        return Maps.immutableEntry(aStandardSpendLimitList(), aStandardDefaultSpendLimitList());
     }
 
 }
