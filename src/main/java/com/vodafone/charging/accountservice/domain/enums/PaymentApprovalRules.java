@@ -1,12 +1,10 @@
 package com.vodafone.charging.accountservice.domain.enums;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Rules that can be triggered from client applications
  * for payment approvals
  */
-@Component
+//@Component
 public enum PaymentApprovalRules {
 
 //    USE_ACCOUNT_BILLING_CYCLE_DAY,
