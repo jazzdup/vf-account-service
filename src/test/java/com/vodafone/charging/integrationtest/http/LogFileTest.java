@@ -9,6 +9,7 @@ import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import com.vodafone.charging.mock.WiremockPreparer;
 import com.vodafone.charging.properties.PropertiesAccessor;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ import static org.springframework.http.HttpMethod.POST;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
+@Ignore
 public class LogFileTest {
 
     private static final Logger log = LoggerFactory.getLogger(LogFileTest.class);

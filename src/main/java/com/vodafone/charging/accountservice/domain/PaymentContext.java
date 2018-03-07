@@ -18,10 +18,6 @@ public class PaymentContext {
     @NonNull
     private Locale locale;
 
-    //TODO These fields are needed
-    //shouldUseBillingCycleDay - currently assume whenever one exists we use
-    //shouldUseRenewals - currently assume renewals
-
     @NonNull
     @Autowired
     private ChargingId chargingId;
@@ -33,6 +29,9 @@ public class PaymentContext {
     @Autowired
     private CatalogInfo catalogInfo;
 
+//    @Nullable
+//    @Autowired
+//    private ApprovalCriteria approvalCriteria;
 
 
 }
