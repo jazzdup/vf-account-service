@@ -1,5 +1,8 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.vodafone.charging.accountservice.domain.ApprovalCriteria;
+import com.vodafone.charging.accountservice.domain.PaymentContext;
+import com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
@@ -11,9 +14,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.data.ERTransactionDataBuilder.anErTransaction;
+import static com.vodafone.charging.data.builder.PaymentContextDataBuilder.aPaymentContextWithApprovalCriteria;
 import static com.vodafone.charging.data.builder.SpendLimitDataProvider.anERTransactionListWithinDates;
 import static com.vodafone.charging.data.builder.SpendLimitDataProvider.getBillingCycleDates;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -268,5 +273,52 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 
     }
 
+
+    @Test
+    public void shouldGetCorrectPaymentAmount() {
+
+
+//        final List<Integer> integers = newArrayList(1, 5, 10, 20, 30);
+//
+//        Predicate<Integer> lessThan =  (i) -> i <= 10;
+//        Predicate<Integer> equalTo =  (i) -> i == 10;
+//        Predicate<Integer> combined = lessThan.and(equalTo);
+//
+//
+//
+//        List<Integer> result = integers.stream().filter(lessThan).filter(equalTo).collect(Collectors.toList());
+//        List<Integer> result2 = integers.stream().filter(combined).collect(Collectors.toList());
+//
+//        assertThat(result).isNotEmpty();
+//        assertThat(result.size()).isEqualTo(1);
+//        assertThat(result2.size()).isEqualTo(1);
+
+
+
+        final List<ERTransaction> transactions = newArrayList(
+                anErTransaction(new BigDecimal(0.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(0.1), LocalDateTime.now().minusHours(3), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(0.1), LocalDateTime.now().minusHours(4), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(0.1), LocalDateTime.now().minusMinutes(10), ERTransactionType.REFUND));//include and subtract
+
+
+        List<PaymentApprovalRule> rules = newArrayList(PaymentApprovalRule.USE_RENEWAL_TRANSACTIONS);
+        ApprovalCriteria approvalCriteria = ApprovalCriteria.builder().paymentApprovalRules(rules).build();
+        PaymentContext paymentContext = aPaymentContextWithApprovalCriteria(approvalCriteria);
+
+        Predicate<ERTransaction> erTransactionPredicate =
+                spendLimitChecker.erTransactionPredicateBuilder(paymentContext, monthDates.get("startDate"), monthDates.get("endDate"));
+
+        assertThat(erTransactionPredicate).isNotNull();
+
+//        Predicate<ERTransaction> paymentsPredicate = (payment) -> payment.getDateTime().isAfter(start)
+//                && payment.getDateTime().isBefore(end)
+//                && !payment.getType().equalsIgnoreCase(ERTransactionType.REFUND.name());
+
+        final BigDecimal totalPayments = spendLimitChecker.mapReducePayments(transactions, erTransactionPredicate);
+
+        assertThat(erTransactionPredicate).isNotNull();
+
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.google.common.collect.Lists;
+import com.vodafone.charging.accountservice.domain.ApprovalCriteria;
+import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
@@ -16,11 +18,10 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.function.Predicate;
 
+import static com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule.USE_RENEWAL_TRANSACTIONS;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -98,18 +99,10 @@ public class SpendLimitChecker {
                                                @NonNull final SpendLimitType spendLimitType,
                                                int billingCycleDay) {
 
-        final Map<String, LocalDateTime> startEndDates =  erDateCalculator.calculateSpendLimitDates(spendLimitType, billingCycleDay);
+        final Map<String, LocalDateTime> startEndDates = erDateCalculator.calculateSpendLimitDates(spendLimitType, billingCycleDay);
 
         final LocalDateTime start = startEndDates.get(erDateCalculator.getStartDateKey());
-        final LocalDateTime end =  startEndDates.get(erDateCalculator.getEndDateKey());
-//        if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
-//            start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
-//            end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
-//        } else {
-//            Map<String, LocalDateTime> dates = erDateCalculator.calculateBillingCycleDates(billingCycleDay);
-//            start = dates.get(erDateCalculator.getStartDateKey());
-//            end = dates.get(erDateCalculator.getEndDateKey());
-//        }
+        final LocalDateTime end = startEndDates.get(erDateCalculator.getEndDateKey());
 
         //Collect relevant payments
         List<ERTransaction> payments =
@@ -133,10 +126,11 @@ public class SpendLimitChecker {
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
 
         //calculate
-        BigDecimal totalValue = totalPaymentAmount.subtract(totalRefundAmount);
+//        BigDecimal totalValue = totalPaymentAmount.subtract(totalRefundAmount).add(currentTransactionAmount);
+        final BigDecimal transactionsIncludingCurrent = totalPaymentAmount.subtract(totalRefundAmount).add(currentTransactionAmount);
 
         //Add the current transaction value including all previous transactions
-        BigDecimal transactionsIncludingCurrent = totalValue.add(currentTransactionAmount);
+//        BigDecimal transactionsIncludingCurrent = totalValue.add(currentTransactionAmount);
 
         //find relevant limit to apply
         final List<SpendLimit> limits = spendLimits.stream()
@@ -173,6 +167,61 @@ public class SpendLimitChecker {
                 .appliedLimitValue(appliedLimitValue)
                 .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                 .build();
+    }
+
+    public Predicate<ERTransaction> erTransactionPredicateBuilder(PaymentContext context, LocalDateTime start, LocalDateTime end) {
+
+        Predicate<ERTransaction> dates = date -> date.getDateTime().isAfter(start)
+                && date.getDateTime().isBefore(end);
+
+        Predicate<ERTransaction> payments;
+
+        Optional<ApprovalCriteria> rulesOptional = Optional.ofNullable(context.getApprovalCriteria());
+
+        if (rulesOptional.isPresent()
+                && context.getApprovalCriteria().getPaymentApprovalRules().contains(USE_RENEWAL_TRANSACTIONS)) {
+
+            payments = payment ->
+                    payment.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name()) &&
+                            payment.getType().equalsIgnoreCase(ERTransactionType.USAGE.name()) &&
+                            payment.getType().equalsIgnoreCase(ERTransactionType.PURCHASE.name());
+        } else {
+            payments = payment ->
+                    payment.getType().equalsIgnoreCase(ERTransactionType.USAGE.name()) &&
+                            payment.getType().equalsIgnoreCase(ERTransactionType.PURCHASE.name());
+        }
+
+//        return dates.and(payments);
+        return payments;
+
+//        Predicate<ERTransaction> renewals =  (renewal) -> renewal.getDateTime().isAfter(start)
+//                && renewal.getDateTime().isBefore(end)
+//                && renewal.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name());
+//
+//        Predicate<ERTransaction> refunds =  (refund) -> refund.getDateTime().isAfter(start)
+//                && refund.getDateTime().isBefore(end)
+//                && !refund.getType().equalsIgnoreCase(ERTransactionType.REFUND.name());
+//
+//        Optional<List<PaymentApprovalRule>> rulesOptional = Optional.ofNullable(context.getApprovalCriteria().getPaymentApprovalRules());
+//
+//        if (rulesOptional.isPresent()
+//                && context.getApprovalCriteria().getPaymentApprovalRules().contains(USE_RENEWAL_TRANSACTIONS)) {
+//            return dates.and(payments).and(renewals).and(refunds);
+//
+//        } else {
+//            return dates.and(payments).and(refunds);
+//        }
+
+    }
+
+    public BigDecimal mapReducePayments(final List<ERTransaction> erTransList,
+                                        final Predicate<ERTransaction> predicate) {
+
+        List<ERTransaction> erTransactions = erTransList.stream().filter(predicate).collect(toList());
+
+        return erTransList.stream().filter(predicate)
+                .map(ERTransaction::getAmount)
+                .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
     }
 
     private double findAppliedLimit(List<SpendLimit> limits, List<SpendLimit> defaultLimits) {

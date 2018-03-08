@@ -1,6 +1,7 @@
 package com.vodafone.charging.data.builder;
 
 import com.google.common.collect.Lists;
+import com.vodafone.charging.accountservice.domain.ApprovalCriteria;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
@@ -33,6 +34,24 @@ public class PaymentContextDataBuilder {
                         .build())
                 .build();
 
+    }
+    public static PaymentContext aPaymentContextWithApprovalCriteria(ApprovalCriteria approvalCriteria) {
+
+        List<SpendLimitInfo> defaultSpendLimits =
+                Lists.newArrayList(aSpendLimitInfo(2, SpendLimitType.ACCOUNT_TX),
+                        aSpendLimitInfo(20, SpendLimitType.ACCOUNT_DAY),
+                        aSpendLimitInfo(50, SpendLimitType.ACCOUNT_MONTH));
+
+        return PaymentContext.builder().locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionInfo(TransactionInfo.builder()
+                        .amount(new BigDecimal(2.0))
+                        .build())
+                .catalogInfo(CatalogInfo.builder()
+                        .defaultSpendLimitInfo(defaultSpendLimits)
+                        .build())
+                .approvalCriteria(approvalCriteria)
+                .build();
 
     }
 }

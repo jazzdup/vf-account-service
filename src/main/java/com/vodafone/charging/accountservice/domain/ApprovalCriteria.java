@@ -1,7 +1,10 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 /**
  * Incoming requests from clients can optionally provide
@@ -10,6 +13,7 @@ import lombok.Getter;
 @Getter
 //@Component
 public class ApprovalCriteria {
-//    @Autowired
-//    private List<PaymentApprovalRules> paymentApprovalRules;
+
+    //    @Autowired
+    private List<PaymentApprovalRule> paymentApprovalRules;
 }

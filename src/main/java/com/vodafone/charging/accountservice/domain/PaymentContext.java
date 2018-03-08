@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 
 /**
@@ -29,9 +30,9 @@ public class PaymentContext {
     @Autowired
     private CatalogInfo catalogInfo;
 
-//    @Nullable
+    @Nullable
 //    @Autowired
-//    private ApprovalCriteria approvalCriteria;
+    private ApprovalCriteria approvalCriteria;
 
 
 }

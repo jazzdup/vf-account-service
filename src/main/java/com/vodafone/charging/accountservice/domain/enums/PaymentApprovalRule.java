@@ -5,11 +5,11 @@ package com.vodafone.charging.accountservice.domain.enums;
  * for payment approvals
  */
 //@Component
-public enum PaymentApprovalRules {
+public enum PaymentApprovalRule {
 
-//    USE_ACCOUNT_BILLING_CYCLE_DAY,
-//    USE_RENEWAL_TRANSACTIONS;
+    USE_ACCOUNT_BILLING_CYCLE_DAY,
+    USE_RENEWAL_TRANSACTIONS;
 
-//    PaymentApprovalRules() {
-//    }
+    PaymentApprovalRule() {
+    }
 }
