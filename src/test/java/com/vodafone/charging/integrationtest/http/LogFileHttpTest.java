@@ -12,8 +12,6 @@ import com.vodafone.charging.properties.PropertiesAccessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,10 +24,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 
-import static com.vodafone.charging.mock.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static com.vodafone.charging.data.builder.IFResponseDataBuilder.aERIFResponse;
+import static com.vodafone.charging.mock.ApplicationPortsEnum.DEFAULT_ER_IF_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
@@ -39,10 +37,7 @@ import static org.springframework.http.HttpMethod.POST;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
-public class LogFileTest {
-
-    private static final Logger log = LoggerFactory.getLogger(LogFileTest.class);
-
+public class LogFileHttpTest {
     private String url = "http://localhost:8080/accounts";
     private String erifUrl = "http://localhost:8458/broker/router.jsp";
 
@@ -94,8 +89,5 @@ public class LogFileTest {
         assertThat(ultimateSize2).as("check %s is written to", ultimate.getName()).isGreaterThan(1);
         assertThat(ulfSize2).as("check %s is written to", ulf.getName()).isGreaterThan(1);
         assertThat(vfasSize2).as("check %s is written to", applog.getName()).isGreaterThan(1);
-
     }
-
-
 }
