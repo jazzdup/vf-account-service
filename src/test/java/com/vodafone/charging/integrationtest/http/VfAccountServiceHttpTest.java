@@ -114,7 +114,8 @@ public class VfAccountServiceHttpTest {
         WiremockPreparer.prepareForValidateSoap(erifResponse);
 
         //when
-        ResponseEntity<EnrichedAccountInfo> responseEntity = testRestTemplate.exchange(url, POST, new HttpEntity<>(contextData, headers), EnrichedAccountInfo.class);
+        ResponseEntity<EnrichedAccountInfo> responseEntity =
+                testRestTemplate.exchange(url, POST, new HttpEntity<>(contextData, headers), EnrichedAccountInfo.class);
         EnrichedAccountInfo enrichedAccountInfo = responseEntity.getBody();
 
         //then

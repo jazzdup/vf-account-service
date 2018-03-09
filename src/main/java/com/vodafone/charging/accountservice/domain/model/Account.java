@@ -20,12 +20,12 @@ public class Account {
     private ChargingId chargingId;
     private Date lastValidate;
     private String customerType;//TODO: add constraint PRE/POST
-    private int billingCycleDay;
+    private Integer billingCycleDay;
     private List<Profile> profiles;
 
     public Account(){}
 
-    public Account(String id, ChargingId chargingId, Date lastValidate, String customerType, int billingCycleDay, List<Profile> profiles) {
+    private Account(String id, ChargingId chargingId, Date lastValidate, String customerType, int billingCycleDay, List<Profile> profiles) {
         this.id = id;
         this.chargingId = chargingId;
         this.lastValidate = lastValidate;

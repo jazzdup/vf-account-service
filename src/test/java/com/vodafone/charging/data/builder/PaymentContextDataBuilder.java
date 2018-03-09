@@ -35,6 +35,35 @@ public class PaymentContextDataBuilder {
                 .build();
 
     }
+    public static PaymentContext aPaymentContext(BigDecimal amount) {
+        List<SpendLimitInfo> defaultSpendLimits =
+                Lists.newArrayList(aSpendLimitInfo(2, SpendLimitType.ACCOUNT_TX),
+                        aSpendLimitInfo(20, SpendLimitType.ACCOUNT_DAY),
+                        aSpendLimitInfo(50, SpendLimitType.ACCOUNT_MONTH));
+
+        return PaymentContext.builder().locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionInfo(TransactionInfo.builder()
+                        .amount(amount)
+                        .build())
+                .catalogInfo(CatalogInfo.builder()
+                        .defaultSpendLimitInfo(defaultSpendLimits)
+                        .build())
+                .build();
+    }
+
+    public static PaymentContext aPaymentContext(List<SpendLimitInfo> defaultSpendLimits, BigDecimal amount) {
+        return PaymentContext.builder().locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionInfo(TransactionInfo.builder()
+                        .amount(amount)
+                        .build())
+                .catalogInfo(CatalogInfo.builder()
+                        .defaultSpendLimitInfo(defaultSpendLimits)
+                        .build())
+                .build();
+    }
+
     public static PaymentContext aPaymentContextWithApprovalCriteria(ApprovalCriteria approvalCriteria) {
 
         List<SpendLimitInfo> defaultSpendLimits =

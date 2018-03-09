@@ -1,11 +1,11 @@
 package com.vodafone.charging.accountservice.service;
 
-import com.google.common.collect.Lists;
 import com.vodafone.charging.accountservice.domain.ApprovalCriteria;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.SpendLimitResult;
+import com.vodafone.charging.accountservice.dto.client.CatalogInfo;
 import com.vodafone.charging.accountservice.dto.client.TransactionInfo;
 import com.vodafone.charging.accountservice.dto.er.ERTransaction;
 import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
@@ -21,7 +21,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule.USE_RENEWAL_TRANSACTIONS;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -53,7 +55,7 @@ public class SpendLimitChecker {
                 .reduce(BigDecimal::add)
                 .orElse(BigDecimal.ZERO);
 
-        List<SpendLimit> defaultLimits = Lists.newArrayList();
+        List<SpendLimit> defaultLimits = newArrayList();
 
         final List<SpendLimit> limits = spendLimits.stream()
                 .filter(l -> l.getSpendLimitType().equals(spendLimitType))
@@ -92,13 +94,20 @@ public class SpendLimitChecker {
      * Check the currentTransction plus all transactions in a given duration do not breach the limit set for that duration.
      * If no duration limit has been set, check if a default limit has been set for that duration.
      */
-    public SpendLimitResult checkDurationLimit(@NonNull List<SpendLimit> spendLimits,
-                                               @NonNull List<SpendLimit> defaultSpendLimits,
+    public SpendLimitResult checkDurationLimit(@NonNull PaymentContext paymentContext,
+                                               @NonNull List<SpendLimit> spendLimits,
                                                @NonNull List<ERTransaction> erTransList,
-                                               @NonNull BigDecimal currentTransactionAmount,
                                                @NonNull final SpendLimitType spendLimitType,
                                                int billingCycleDay) {
 
+
+        Optional<CatalogInfo> infoOptional = ofNullable(paymentContext.getCatalogInfo());
+
+        final List<SpendLimit> defaultSpendLimits = SpendLimit.fromSpendLimitsInfo(infoOptional
+                .orElse(CatalogInfo.builder().defaultSpendLimitInfo(newArrayList())
+                        .build())
+                .getDefaultSpendLimitInfo());
+        final BigDecimal currentTransactionAmount = paymentContext.getTransactionInfo().getAmount();
         final Map<String, LocalDateTime> startEndDates = erDateCalculator.calculateSpendLimitDates(spendLimitType, billingCycleDay);
 
         final LocalDateTime start = startEndDates.get(erDateCalculator.getStartDateKey());
@@ -121,6 +130,8 @@ public class SpendLimitChecker {
         final BigDecimal totalPaymentAmount = payments.stream().map(ERTransaction::getAmount)
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
 
+//        final BigDecimal totalPaymentAmount = mapReducePayments(erTransList, buildPaymentsPredicate(paymentContext, start, end));
+
         //total refunds
         final BigDecimal totalRefundAmount = refundTransactions.stream().map(ERTransaction::getAmount)
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
@@ -137,6 +148,8 @@ public class SpendLimitChecker {
                 .filter(limit -> limit.getSpendLimitType().equals(spendLimitType))
                 .collect(toList());
 
+        List<SpendLimit> filteredDefaultLimits = newArrayList();
+
         //check limit if exists otherwise check default
         if (!limits.isEmpty()
                 && limits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
@@ -147,20 +160,20 @@ public class SpendLimitChecker {
                     .build();
         } else if (limits.isEmpty()) {//apply a default
             //get default
-            defaultSpendLimits = defaultSpendLimits.stream()
+            filteredDefaultLimits = defaultSpendLimits.stream()
                     .filter(l -> l.getSpendLimitType().equals(spendLimitType))
                     .collect(toList());
 
-            if (!defaultSpendLimits.isEmpty() && defaultSpendLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
+            if (!filteredDefaultLimits.isEmpty() && filteredDefaultLimits.get(0).getLimit() < transactionsIncludingCurrent.doubleValue()) {
                 return SpendLimitResult.builder().success(false)
                         .failureCauseType(spendLimitType)
-                        .appliedLimitValue(defaultSpendLimits.get(0).getLimit())
+                        .appliedLimitValue(filteredDefaultLimits.get(0).getLimit())
                         .totalTransactionsValue(transactionsIncludingCurrent.doubleValue())
                         .failureReason(spendLimitType.name() + " default spend limit breached").build();
             }
         }
 
-        double appliedLimitValue = findAppliedLimit(limits, defaultSpendLimits);
+        double appliedLimitValue = findAppliedLimit(limits, filteredDefaultLimits);
 
         return SpendLimitResult.builder().success(true)
                 .failureReason("")
@@ -169,55 +182,33 @@ public class SpendLimitChecker {
                 .build();
     }
 
-    public Predicate<ERTransaction> erTransactionPredicateBuilder(PaymentContext context, LocalDateTime start, LocalDateTime end) {
+    public Predicate<ERTransaction> buildPaymentsPredicate(PaymentContext context, LocalDateTime start, LocalDateTime end) {
 
-        Predicate<ERTransaction> dates = date -> date.getDateTime().isAfter(start)
-                && date.getDateTime().isBefore(end);
+        final Predicate<ERTransaction> dates = date -> date.getDateTime().isAfter(start) && date.getDateTime().isBefore(end);
 
-        Predicate<ERTransaction> payments;
+        Predicate<ERTransaction> allPayments;
+        Predicate<ERTransaction> minusRenewals;
 
-        Optional<ApprovalCriteria> rulesOptional = Optional.ofNullable(context.getApprovalCriteria());
+        Optional<ApprovalCriteria> rulesOptional = ofNullable(context.getApprovalCriteria());
 
-        if (rulesOptional.isPresent()
-                && context.getApprovalCriteria().getPaymentApprovalRules().contains(USE_RENEWAL_TRANSACTIONS)) {
+        allPayments = payment ->
+                payment.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name()) ||
+                        payment.getType().equalsIgnoreCase(ERTransactionType.USAGE.name()) ||
+                        payment.getType().equalsIgnoreCase(ERTransactionType.PURCHASE.name());
 
-            payments = payment ->
-                    payment.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name()) &&
-                            payment.getType().equalsIgnoreCase(ERTransactionType.USAGE.name()) &&
-                            payment.getType().equalsIgnoreCase(ERTransactionType.PURCHASE.name());
-        } else {
-            payments = payment ->
-                    payment.getType().equalsIgnoreCase(ERTransactionType.USAGE.name()) &&
-                            payment.getType().equalsIgnoreCase(ERTransactionType.PURCHASE.name());
+        if (!rulesOptional.isPresent()
+                || !context.getApprovalCriteria().getPaymentApprovalRules().contains(USE_RENEWAL_TRANSACTIONS)) {
+            minusRenewals = payment ->
+                    !payment.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name());
+
+            return dates.and(allPayments).and(minusRenewals);
         }
 
-//        return dates.and(payments);
-        return payments;
-
-//        Predicate<ERTransaction> renewals =  (renewal) -> renewal.getDateTime().isAfter(start)
-//                && renewal.getDateTime().isBefore(end)
-//                && renewal.getType().equalsIgnoreCase(ERTransactionType.RENEWAL.name());
-//
-//        Predicate<ERTransaction> refunds =  (refund) -> refund.getDateTime().isAfter(start)
-//                && refund.getDateTime().isBefore(end)
-//                && !refund.getType().equalsIgnoreCase(ERTransactionType.REFUND.name());
-//
-//        Optional<List<PaymentApprovalRule>> rulesOptional = Optional.ofNullable(context.getApprovalCriteria().getPaymentApprovalRules());
-//
-//        if (rulesOptional.isPresent()
-//                && context.getApprovalCriteria().getPaymentApprovalRules().contains(USE_RENEWAL_TRANSACTIONS)) {
-//            return dates.and(payments).and(renewals).and(refunds);
-//
-//        } else {
-//            return dates.and(payments).and(refunds);
-//        }
-
+        return dates.and(allPayments);
     }
 
     public BigDecimal mapReducePayments(final List<ERTransaction> erTransList,
                                         final Predicate<ERTransaction> predicate) {
-
-        List<ERTransaction> erTransactions = erTransList.stream().filter(predicate).collect(toList());
 
         return erTransList.stream().filter(predicate)
                 .map(ERTransaction::getAmount)

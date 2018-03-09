@@ -5,6 +5,7 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.PaymentApproval;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
+import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
 import com.vodafone.charging.accountservice.dto.client.CatalogInfo;
@@ -88,6 +89,36 @@ public class SpendLimitIT {
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
+    private void saveAccountAndCheck(Account account) {
+        final Account savedAccount = repository.save(account);
+        assertThat(savedAccount).isNotNull();
+        assertThat(savedAccount).isEqualToComparingFieldByField(account);
+    }
+
+    private void successfulUpdateSpendLimitScenario(final Account account) throws Exception {
+
+        final List<SpendLimitInfo> spendLimitInfo = aSpendLimitInfoList();
+        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitsInfo(spendLimitInfo);
+        final String content = jsonConverter.toJson(spendLimitInfo);
+
+        log.info("xml= {}", content);
+
+        MvcResult result = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/spendlimits")
+                .content(content)
+                .contentType(contentType)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED.value())).andReturn();
+
+        Account accountResult = (Account) jsonConverter.fromJson(Account.class, result.getResponse().getContentAsString());
+        assertThat(accountResult.getProfiles().get(0).getSpendLimits()).isNotEmpty();
+        final List<SpendLimit> resultLimits = accountResult.getProfiles().get(0).getSpendLimits();
+        IntStream.range(0, resultLimits.size())
+                .forEach(i -> assertThat(resultLimits.get(i)).isEqualToComparingFieldByField(expectedLimits.get(i)));
+    }
+
+
     @Test
     public void shouldAddSpendLimitsInProfile() throws Exception {
         Account account = anAccount(aProfileWithoutSpendLimits());
@@ -96,7 +127,7 @@ public class SpendLimitIT {
     }
 
     @Test
-    public void shouldNotUpdateExistingSpendLimitsInAccountProfile() throws Exception {
+    public void shouldUpdateExistingSpendLimitsInAccountProfile() throws Exception {
         Account account = anAccount(aProfile());
         saveAccountAndCheck(account);
         successfulUpdateSpendLimitScenario(account);
@@ -131,7 +162,6 @@ public class SpendLimitIT {
         saveAccountAndCheck(account);
 
         final List<SpendLimitInfo> spendLimitInfo = aSpendLimitInfoList();
-        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitsInfo(spendLimitInfo);
         final String content = jsonConverter.toJson(spendLimitInfo);
 
         log.info("xml= {}", content);
@@ -150,47 +180,8 @@ public class SpendLimitIT {
         assertThat(errorResponse.getErrorDescription()).startsWith(APPLICATION_LOGIC_ERROR.errorDesciption());
     }
 
-    private void saveAccountAndCheck(Account account) {
-        final Account savedAccount = repository.save(account);
-        assertThat(savedAccount).isNotNull();
-        assertThat(savedAccount).isEqualToComparingFieldByField(account);
-    }
-
-    private void successfulUpdateSpendLimitScenario(final Account account) throws Exception {
-
-        final List<SpendLimitInfo> spendLimitInfo = aSpendLimitInfoList();
-        final List<SpendLimit> expectedLimits = SpendLimit.fromSpendLimitsInfo(spendLimitInfo);
-        final String content = jsonConverter.toJson(spendLimitInfo);
-
-        log.info("xml= {}", content);
-
-        MvcResult result = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/spendlimits")
-                .content(content)
-                .contentType(contentType)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED.value())).andReturn();
-
-        Account accountResult = (Account) jsonConverter.fromJson(Account.class, result.getResponse().getContentAsString());
-        assertThat(accountResult.getProfiles().get(0).getSpendLimits()).isNotEmpty();
-        final List<SpendLimit> resultLimits = accountResult.getProfiles().get(0).getSpendLimits();
-        IntStream.range(0, resultLimits.size())
-                .forEach(i -> assertThat(resultLimits.get(i)).isEqualToComparingFieldByField(expectedLimits.get(i)));
-    }
-
-    /*
-    Variables - txSpendLimit
-                daySpendLimit
-                monthSpendLimit
-                defaultTxSpendLimit -
-                defaultDaySpendLimit -
-                defaultMonthSpendLimit -
-                billingCycleDay included - not done
-                transactionsReturned or not - done
-     */
-
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExistsButNotBreached() throws Exception {
 
         final Account account = anAccount();
@@ -238,6 +229,7 @@ public class SpendLimitIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExistsButNoBreach() throws Exception {
 
         List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
@@ -290,6 +282,7 @@ public class SpendLimitIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndNoBreach() throws Exception {
 
         final List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
@@ -342,7 +335,8 @@ public class SpendLimitIT {
     }
 
     @Test
-    public void shouldApprovePaymentWhenEmptyTransactionListReceivedFromService() throws Exception {
+    @SuppressWarnings("unchecked")
+    public void shouldApprovePaymentWhenEmptyTransactionListReceivedFromERService() throws Exception {
 
         final List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
         final List<SpendLimit> spendLimitList = aSpendLimitList(9.0, 18.0, 200.0);
@@ -388,7 +382,7 @@ public class SpendLimitIT {
     }
 
     @Test
-    public void shouldApprovePaymentWhenNoDefaultOrNoAccountSpendLimitExistAndThereIsATransactionHistory() throws Exception {
+    public void shouldApprovePaymentAndNotCallERServiceWhenNoDefaultOrNoAccountSpendLimitExist() throws Exception {
 
         final Account account = anAccount(aProfileWithoutSpendLimits());
         saveAccountAndCheck(account);
@@ -400,20 +394,6 @@ public class SpendLimitIT {
                 .locale(Locale.UK)
                 .chargingId(account.getChargingId())
                 .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("200000")).build()).build();
-
-        final ERTransaction purchase1 = anErTransaction(new BigDecimal(2500.9), LocalDateTime.now(), ERTransactionType.PURCHASE);
-        final ERTransaction purchase2 = anErTransaction(new BigDecimal(3000.1), LocalDateTime.now(), ERTransactionType.PURCHASE);
-        final ERTransaction refund = anErTransaction(new BigDecimal(0.9), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
-
-        final List<ERTransaction> transactions = newArrayList(purchase1, purchase2, refund);
-
-        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
-
-        given(restTemplate.exchange(any(URI.class),
-                eq(HttpMethod.POST),
-                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
-                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
-                .willReturn(responseEntity);
 
         final String json = jsonConverter.toJson(paymentContext);
 
@@ -432,10 +412,10 @@ public class SpendLimitIT {
         assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
-        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
-        verifyNoMoreInteractions(restTemplate);
+        verifyZeroInteractions(restTemplate);
     }
 
+    @Test
     public void shouldNotApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndAccountSpendLimitBreached() throws Exception {
         final List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
         final List<SpendLimit> spendLimitList = aSpendLimitList(9.0, 18.0, 200.0);
@@ -477,10 +457,11 @@ public class SpendLimitIT {
         final PaymentApproval approval =
                 (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
 
+        //TODO - Check this fails
         assertThat(approval).isNotNull();
-        assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
-        assertThat(approval.getDescription()).isEqualTo("Approved");
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getResponseCode()).isEqualTo(2);
+        assertThat(approval.getDescription()).startsWith(SpendLimitType.ACCOUNT_TX.name());
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
         verifyNoMoreInteractions(restTemplate);

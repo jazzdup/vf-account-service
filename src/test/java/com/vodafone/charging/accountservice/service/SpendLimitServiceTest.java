@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -148,13 +147,13 @@ public class SpendLimitServiceTest {
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
                 anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
                 .willReturn(txLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
                 .willReturn(dayLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
                 .willReturn(monthLimitResult);
 
         final PaymentApproval approval =
@@ -170,16 +169,12 @@ public class SpendLimitServiceTest {
                 anyListOf(SpendLimit.class),
                 anyListOf(TransactionInfo.class),
                 any(SpendLimitType.class));
-        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
-                anyListOf(SpendLimit.class),
+        inOrder.verify(spendLimitChecker).checkDurationLimit(any(PaymentContext.class), anyListOf(SpendLimit.class),
                 anyListOf(ERTransaction.class),
-                any(BigDecimal.class),
                 eq(SpendLimitType.ACCOUNT_DAY),
                 anyInt());
-        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
-                anyListOf(SpendLimit.class),
+        inOrder.verify(spendLimitChecker).checkDurationLimit(any(PaymentContext.class), anyListOf(SpendLimit.class),
                 anyListOf(ERTransaction.class),
-                any(BigDecimal.class),
                 eq(SpendLimitType.ACCOUNT_MONTH),
                 anyInt());
         verifyNoMoreInteractions(erService, spendLimitChecker);
@@ -232,9 +227,9 @@ public class SpendLimitServiceTest {
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
                 anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
                 .willReturn(txLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
                 .willReturn(dayLimitResult);
 
         final PaymentApproval approval =
@@ -250,10 +245,8 @@ public class SpendLimitServiceTest {
                 anyListOf(SpendLimit.class),
                 anyListOf(TransactionInfo.class),
                 any(SpendLimitType.class));
-        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
-                anyListOf(SpendLimit.class),
+        inOrder.verify(spendLimitChecker).checkDurationLimit(any(PaymentContext.class), anyListOf(SpendLimit.class),
                 anyListOf(ERTransaction.class),
-                any(BigDecimal.class),
                 any(SpendLimitType.class),
                 anyInt());
         verifyNoMoreInteractions(spendLimitChecker);
@@ -276,13 +269,13 @@ public class SpendLimitServiceTest {
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
                 anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
                 .willReturn(txLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
                 .willReturn(dayLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
                 .willReturn(monthLimitResult);
 
         final PaymentApproval approval =
@@ -298,16 +291,14 @@ public class SpendLimitServiceTest {
                 anyListOf(SpendLimit.class),
                 anyListOf(TransactionInfo.class),
                 any(SpendLimitType.class));
-        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+        inOrder.verify(spendLimitChecker).checkDurationLimit(any(PaymentContext.class),
                 anyListOf(SpendLimit.class),
                 anyListOf(ERTransaction.class),
-                any(BigDecimal.class),
                 eq(SpendLimitType.ACCOUNT_DAY),
                 anyInt());
-        inOrder.verify(spendLimitChecker).checkDurationLimit(anyListOf(SpendLimit.class),
+        inOrder.verify(spendLimitChecker).checkDurationLimit(any(PaymentContext.class),
                 anyListOf(SpendLimit.class),
                 anyListOf(ERTransaction.class),
-                any(BigDecimal.class),
                 eq(SpendLimitType.ACCOUNT_MONTH),
                 anyInt());
         verifyNoMoreInteractions(erService, spendLimitChecker);
@@ -362,9 +353,9 @@ public class SpendLimitServiceTest {
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
                 anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
                 .willReturn(txLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
                 .willThrow(new RuntimeException(message));
 
         assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext))
@@ -376,13 +367,13 @@ public class SpendLimitServiceTest {
         given(spendLimitChecker.checkTransactionLimit(eq(spendLimits), eq(defaultSpendLimits),
                 anyListOf(TransactionInfo.class), eq(SpendLimitType.ACCOUNT_TX)))
                 .willReturn(txLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
+                eq(SpendLimitType.ACCOUNT_DAY), anyInt()))
                 .willReturn(dayLimitResult);
-        given(spendLimitChecker.checkDurationLimit(eq(spendLimits), eq(defaultSpendLimits),
+        given(spendLimitChecker.checkDurationLimit(eq(paymentContext), eq(spendLimits),
                 anyListOf(ERTransaction.class),
-                eq(paymentContext.getTransactionInfo().getAmount()), eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
+                eq(SpendLimitType.ACCOUNT_MONTH), anyInt()))
                 .willThrow(new RuntimeException(message));
 
         assertThatThrownBy(() -> spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext))
@@ -407,6 +398,26 @@ public class SpendLimitServiceTest {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
+
+    }
+
+    @Test
+    public void shouldNotGetTransactionsWhenNoSpendLimitsOrDefaultSpendLimits() {
+
+        final Account account = anAccount();
+        final List<SpendLimit> spendLimits = newArrayList();
+        final List<SpendLimit> defaultSpendLimits = newArrayList();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext();
+
+        final PaymentApproval approval =
+                spendLimitService.checkSpendLimits(account, spendLimits, defaultSpendLimits, paymentContext);
+
+        assertThat(approval).isNotNull();
+        assertThat(approval.isSuccess()).isTrue();
+        assertThat(approval.getDescription()).isEqualTo("Approved");
+        assertThat(approval.getResponseCode()).isEqualTo(1);
+
+        verifyZeroInteractions(erService);
 
     }
 

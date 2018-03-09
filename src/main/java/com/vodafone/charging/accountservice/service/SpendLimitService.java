@@ -80,9 +80,12 @@ public class SpendLimitService {
                                             @NonNull final List<SpendLimit> spendLimits,
                                             @NonNull final List<SpendLimit> defaultSpendLimits,
                                             @NonNull final PaymentContext paymentContext) {
+        //No need to continue if no spend limits configured
+        if (spendLimits.isEmpty() && defaultSpendLimits.isEmpty()) {
+            return createResponse(newArrayList(SpendLimitResult.builder().success(true).build()));
+        }
 
-        //TODO - This value must be stored in and come from the Account. If not there then it should be 1.
-        int billingCycleDay = ofNullable(1).orElse(1);
+        int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
         final List<ERTransaction> erTransactions = getHistoricTransactions(account, paymentContext);
 
         final List<SpendLimitResult> results = newArrayList();
@@ -93,11 +96,11 @@ public class SpendLimitService {
                 result = spendLimitChecker.checkTransactionLimit(spendLimits, defaultSpendLimits,
                         newArrayList(paymentContext.getTransactionInfo()), SpendLimitType.ACCOUNT_TX);
             } else if (type.equals(SpendLimitType.ACCOUNT_DAY)) {
-                result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
-                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_DAY, billingCycleDay);
+                result = spendLimitChecker.checkDurationLimit(paymentContext, spendLimits,
+                        erTransactions, SpendLimitType.ACCOUNT_DAY, billingCycleDay);
             } else if (type.equals(SpendLimitType.ACCOUNT_MONTH)) {
-                result = spendLimitChecker.checkDurationLimit(spendLimits, defaultSpendLimits, erTransactions,
-                        paymentContext.getTransactionInfo().getAmount(), SpendLimitType.ACCOUNT_MONTH, billingCycleDay);
+                result = spendLimitChecker.checkDurationLimit(paymentContext, spendLimits,
+                        erTransactions, SpendLimitType.ACCOUNT_MONTH, billingCycleDay);
             }
 
             if (Objects.nonNull(result) && !result.isSuccess()) {
