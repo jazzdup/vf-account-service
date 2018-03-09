@@ -1,10 +1,8 @@
 package com.vodafone.charging.integrationtest;
 
 import com.vodafone.charging.accountservice.AccountServiceApplication;
-import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.PaymentApproval;
-import com.vodafone.charging.accountservice.domain.PaymentContext;
-import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
+import com.vodafone.charging.accountservice.domain.*;
+import com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.SpendLimit;
@@ -20,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,9 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -83,6 +81,9 @@ public class SpendLimitIT {
 
     @MockBean
     private RestTemplate restTemplate;
+
+    @Captor
+    private ArgumentCaptor<RequestEntity<ERTransactionCriteria>> requestEntityCaptor;
 
     @Before
     public void setUp() {
@@ -416,6 +417,7 @@ public class SpendLimitIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldNotApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndAccountSpendLimitBreached() throws Exception {
         final List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
         final List<SpendLimit> spendLimitList = aSpendLimitList(9.0, 18.0, 200.0);
@@ -457,7 +459,6 @@ public class SpendLimitIT {
         final PaymentApproval approval =
                 (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
 
-        //TODO - Check this fails
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isFalse();
         assertThat(approval.getResponseCode()).isEqualTo(2);
@@ -597,6 +598,66 @@ public class SpendLimitIT {
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
         verifyNoMoreInteractions(restTemplate);
 
+    }
+
+    @Test
+    public void shouldPassCorrectParametersToERServiceIncludingRenewals() throws Exception {
+
+        final Account expectedAccount = anAccount();
+        final ApprovalCriteria approvalCriteria = ApprovalCriteria.builder()
+                .paymentApprovalRules(newArrayList(PaymentApprovalRule.USE_RENEWAL_TRANSACTIONS))
+                .build();
+        final Account savedAccount = repository.save(expectedAccount);
+        assertThat(expectedAccount).isEqualToComparingFieldByField(savedAccount);
+
+        final PaymentContext paymentContext = PaymentContext.builder()
+                .locale(Locale.UK)
+                .chargingId(expectedAccount.getChargingId())
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("1.0")).build())
+                .approvalCriteria(approvalCriteria)
+                .build();
+
+        final ERTransaction purchase1 = anErTransaction(new BigDecimal(1.0), LocalDateTime.now(), ERTransactionType.PURCHASE);
+
+        final List<ERTransaction> transactions = newArrayList(purchase1);
+
+        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
+
+        given(restTemplate.exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
+                .willReturn(responseEntity);
+
+        final String json = jsonConverter.toJson(paymentContext);
+
+        final MvcResult response = mockMvc.perform(post("/accounts/" + expectedAccount.getId() + "/profile/transactions/payments")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        final PaymentApproval approval =
+                (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
+
+        assertThat(approval.isSuccess()).isTrue();
+
+        verify(restTemplate).exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                requestEntityCaptor.capture(),
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any());
+
+        final RequestEntity<ERTransactionCriteria> requestEntity = requestEntityCaptor.getValue();
+        final ERTransactionCriteria criteria = requestEntity.getBody();
+
+        assertThat(criteria).isNotNull();
+        assertThat(criteria.getChargingId()).isEqualToComparingFieldByField(paymentContext.getChargingId());
+        assertThat(criteria.getLocale()).isEqualToIgnoringGivenFields(paymentContext.getLocale(), "hashCodeValue", "languageTag");
+        assertThat(criteria.getTransactionTypes()).contains(ERTransactionType.PURCHASE.name(),
+                ERTransactionType.RENEWAL.name(),
+                ERTransactionType.USAGE.name(),
+                ERTransactionType.REFUND.name());
     }
 
 }

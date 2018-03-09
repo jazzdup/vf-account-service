@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.vodafone.charging.accountservice.domain.enums.PaymentApprovalRule.USE_RENEWAL_TRANSACTIONS;
 import static com.vodafone.charging.accountservice.dto.er.ERTransactionType.*;
 import static java.util.Optional.ofNullable;
 
@@ -111,10 +112,21 @@ public class SpendLimitService {
         return createResponse(results);
     }
 
-    public List<ERTransaction> getHistoricTransactions(Account account, PaymentContext paymentContext) {
+    public List<ERTransaction> getHistoricTransactions(@NonNull Account account, @NonNull PaymentContext paymentContext) {
 
-        final List<String> transactionTypes = newArrayList(PURCHASE.name(), USAGE.name(), REFUND.name(), RENEWAL.name());
+        final List<String> transactionTypes = newArrayList(PURCHASE.name(), USAGE.name(), REFUND.name());
+
+        if (Objects.nonNull(paymentContext.getApprovalCriteria())) {
+            paymentContext.getApprovalCriteria().getPaymentApprovalRules()
+                    .stream().filter(rule -> rule.equals(USE_RENEWAL_TRANSACTIONS))
+                    .findFirst()
+                    .ifPresent(approvalRule -> transactionTypes.add(RENEWAL.name()));
+
+        }
+
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true)
+                .locale(paymentContext.getLocale())
+                .chargingId(paymentContext.getChargingId())
                 .transactionTypes(transactionTypes)
                 .fromDate(calculateTransactionFromDate(account))
                 .toDate(LocalDateTime.now())
@@ -125,10 +137,8 @@ public class SpendLimitService {
 
     //We only want max of a month but we must consider the billingCycleDay for Post pay customers.
     public LocalDateTime calculateTransactionFromDate(Account account) {
-        int billingCycleDay = 1;
-        //TODO store and deal with billingCycleDate.  From date should be from the last billingCycle date
-//      int billingCycleDay = nullableOf(account.billingCycleDay).orElse(1);
-
+        int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
+//
         final LocalDate firstOfMonth = LocalDate.now(ZoneId.of("CET")).withDayOfMonth(billingCycleDay);
         return LocalDateTime.of(firstOfMonth, LocalTime.MIDNIGHT);
     }

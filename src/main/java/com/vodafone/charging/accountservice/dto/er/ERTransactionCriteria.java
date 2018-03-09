@@ -24,4 +24,5 @@ public class ERTransactionCriteria {
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private int requiredResultSize;
+
 }
