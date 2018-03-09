@@ -39,6 +39,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public class AccountServiceApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(AccountServiceApplication.class, args);
     }
 

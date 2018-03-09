@@ -46,7 +46,7 @@ public class VfAccountServiceHttpTest {
 
     private static final Logger log = LoggerFactory.getLogger(VfAccountServiceHttpTest.class);
 
-    private String url = "http://localhost:8080/accounts";
+    private String url = "http://localhost:11800/accounts";
     private String erifUrl = "http://localhost:8458/broker/router.jsp";
 
     @Autowired
