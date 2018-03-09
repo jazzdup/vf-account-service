@@ -39,15 +39,17 @@ public class SpendLimitService {
     private AccountRepository repository;
     private ERService erService;
     private SpendLimitChecker spendLimitChecker;
+    private ERDateCalculator erDateCalculator;
 
     @Autowired
-    public SpendLimitService(AccountRepository repository, ERService erService, SpendLimitChecker spendLimitChecker) {
+    public SpendLimitService(AccountRepository repository, ERService erService, SpendLimitChecker spendLimitChecker, ERDateCalculator erDateCalculator) {
         this.repository = repository;
         this.erService = erService;
         this.spendLimitChecker = spendLimitChecker;
+        this.erDateCalculator = erDateCalculator;
     }
 
-    public PaymentApproval approvePayment(final String accountId, final PaymentContext paymentContext) {
+    public PaymentApproval approvePayment(@NonNull final String accountId, @NonNull final PaymentContext paymentContext) {
 
         //TODO Get the SpendLimits info for the accountId.  If no account, fail, if no SpendLimit
         //Get record
@@ -87,7 +89,7 @@ public class SpendLimitService {
         }
 
         int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
-        final List<ERTransaction> erTransactions = getHistoricTransactions(account, paymentContext);
+        final List<ERTransaction> erTransactions = getTransactions(account, paymentContext);
 
         final List<SpendLimitResult> results = newArrayList();
 
@@ -112,23 +114,23 @@ public class SpendLimitService {
         return createResponse(results);
     }
 
-    public List<ERTransaction> getHistoricTransactions(@NonNull Account account, @NonNull PaymentContext paymentContext) {
+    public List<ERTransaction> getTransactions(@NonNull Account account, @NonNull PaymentContext paymentContext) {
 
         final List<String> transactionTypes = newArrayList(PURCHASE.name(), USAGE.name(), REFUND.name());
 
-        if (Objects.nonNull(paymentContext.getApprovalCriteria())) {
+        if (Objects.nonNull(paymentContext.getApprovalCriteria()) &&
+                Objects.nonNull(paymentContext.getApprovalCriteria().getPaymentApprovalRules())) {
             paymentContext.getApprovalCriteria().getPaymentApprovalRules()
                     .stream().filter(rule -> rule.equals(USE_RENEWAL_TRANSACTIONS))
                     .findFirst()
                     .ifPresent(approvalRule -> transactionTypes.add(RENEWAL.name()));
-
         }
 
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true)
                 .locale(paymentContext.getLocale())
                 .chargingId(paymentContext.getChargingId())
                 .transactionTypes(transactionTypes)
-                .fromDate(calculateTransactionFromDate(account))
+                .fromDate(erDateCalculator.calculateAccountBillingCycleDate(account))
                 .toDate(LocalDateTime.now())
                 .build();
 
@@ -136,7 +138,7 @@ public class SpendLimitService {
     }
 
     //We only want max of a month but we must consider the billingCycleDay for Post pay customers.
-    public LocalDateTime calculateTransactionFromDate(Account account) {
+    public LocalDateTime calculateTransactionFromDate(@NonNull Account account) {
         int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
 //
         final LocalDate firstOfMonth = LocalDate.now(ZoneId.of("CET")).withDayOfMonth(billingCycleDay);
@@ -144,8 +146,6 @@ public class SpendLimitService {
     }
 
     private PaymentApproval createResponse(List<SpendLimitResult> results) {
-
-        //TODO Map result to approval response
         final Optional<SpendLimitResult> failure = results.stream().filter(result -> !result.isSuccess()).findFirst();
 
         PaymentApproval approval;

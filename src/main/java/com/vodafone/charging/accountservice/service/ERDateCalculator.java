@@ -2,6 +2,7 @@ package com.vodafone.charging.accountservice.service;
 
 import com.google.common.collect.Maps;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class ERDateCalculator {
 
     /**
      * If billingCycleDay == 1 then return the dateTime of the first day of the month at midnight
-     * If biillingCycleDay > 1 then return either that day of this month or the previous month.  This month if
+     * If billingCycleDay > 1 then return either that day of this month or the previous month.  This month if
      * we have passed it already, last month if not.
      */
     public Map<String, LocalDateTime> calculateBillingCycleDates(int billingCycleDay) {
@@ -64,9 +65,6 @@ public class ERDateCalculator {
      * Depending on the type of SpendLimit passed in this works out the start and end date required.
      * Takes into account an optional billing cycle day for monthly spend limits only
      *
-     * @param spendLimitType
-     * @param billingCycleDay
-     * @return
      */
     public Map<String, LocalDateTime> calculateSpendLimitDates(@NonNull final SpendLimitType spendLimitType,
                                                                @Nullable final Integer billingCycleDay) {
@@ -81,6 +79,16 @@ public class ERDateCalculator {
             dates = calculateBillingCycleDates(startDayOfMonth);
         }
         return dates;
+    }
+
+    /**
+     * Gives you the last billing cycle (start) day for an account as a LocalDateTime object.
+     */
+    public LocalDateTime calculateAccountBillingCycleDate(@NonNull Account account) {
+        int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
+        Map<String, LocalDateTime> dates = calculateBillingCycleDates(billingCycleDay);
+
+        return dates.get(getStartDateKey());
     }
 
 }

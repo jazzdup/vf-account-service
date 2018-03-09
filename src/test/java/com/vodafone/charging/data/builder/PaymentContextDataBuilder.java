@@ -52,15 +52,28 @@ public class PaymentContextDataBuilder {
                 .build();
     }
 
-    public static PaymentContext aPaymentContext(List<SpendLimitInfo> defaultSpendLimits, BigDecimal amount) {
+    public static PaymentContext aPaymentContext(List<SpendLimitInfo> defaultSpendLimits, BigDecimal paymentAmount) {
         return PaymentContext.builder().locale(Locale.UK)
                 .chargingId(aChargingId())
                 .transactionInfo(TransactionInfo.builder()
-                        .amount(amount)
+                        .amount(paymentAmount)
                         .build())
                 .catalogInfo(CatalogInfo.builder()
                         .defaultSpendLimitInfo(defaultSpendLimits)
                         .build())
+                .build();
+    }
+
+    public static PaymentContext aPaymentContext(List<SpendLimitInfo> defaultSpendLimits, BigDecimal paymentAmount, ApprovalCriteria approvalCriteria) {
+        return PaymentContext.builder().locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionInfo(TransactionInfo.builder()
+                        .amount(paymentAmount)
+                        .build())
+                .catalogInfo(CatalogInfo.builder()
+                        .defaultSpendLimitInfo(defaultSpendLimits)
+                        .build())
+                .approvalCriteria(approvalCriteria)
                 .build();
     }
 

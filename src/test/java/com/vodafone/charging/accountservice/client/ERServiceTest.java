@@ -12,13 +12,15 @@ import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.vodafone.charging.accountservice.dto.er.ERTransactionType.PURCHASE;
+import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.PaymentContextDataBuilder.aPaymentContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,9 +31,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ERServiceTest {
-
-    @Mock
-    private RestTemplate restTemplate;
 
     @Mock
     private ExternalServiceCallSupplier externalServiceCallSupplier;
@@ -49,7 +48,10 @@ public class ERServiceTest {
     public void shouldCallGetTransactionsSuccessfully() {
 
         final PaymentContext paymentContext = aPaymentContext();
-        final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true).locale(Locale.UK)
+        final ERTransactionCriteria criteria = ERTransactionCriteria.builder()
+                .monetaryOnly(true).locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionTypes(newArrayList(PURCHASE.name()))
                 .build();
         final List<ERTransaction> expectedTransactions = ERTransactionDataBuilder.anErTransactionList();
         final ResponseEntity<List<ERTransaction>> responseEntity = ResponseEntity.ok(expectedTransactions);
@@ -77,9 +79,10 @@ public class ERServiceTest {
 
     @Test
     public void shouldHandleNullResponseBody() {
-
         final PaymentContext paymentContext = aPaymentContext();
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true).locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionTypes(newArrayList(PURCHASE.name()))
                 .build();
         final String url = "http://localhost:9999";
 
@@ -114,6 +117,8 @@ public class ERServiceTest {
 
         final PaymentContext paymentContext = aPaymentContext();
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true).locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionTypes(newArrayList(PURCHASE.name()))
                 .build();
         final String url = "http://localhost:9999";
         final String exceptionMessage = "this is a test message " + new Random().nextDouble();
@@ -131,6 +136,8 @@ public class ERServiceTest {
     public void shouldPropagateExceptionFromSupplierExecution() {
         final PaymentContext paymentContext = aPaymentContext();
         final ERTransactionCriteria criteria = ERTransactionCriteria.builder().monetaryOnly(true).locale(Locale.UK)
+                .chargingId(aChargingId())
+                .transactionTypes(newArrayList(PURCHASE.name()))
                 .build();
 
         final String url = "http://localhost:9999";
