@@ -24,13 +24,8 @@ public class ERDateCalculator {
     @Autowired
     private TimeZone timeZone;
 
-    public String getStartDateKey() {
-        return "startDate";
-    }
-
-    public String getEndDateKey() {
-        return "endDate";
-    }
+    public static final String START_DATE_KEY = "startDate";
+    public static final String END_DATE_KEY = "endDate";
 
     /**
      * If billingCycleDay == 1 then return the dateTime of the first day of the month at midnight
@@ -39,24 +34,25 @@ public class ERDateCalculator {
      */
     public Map<String, LocalDateTime> calculateBillingCycleDates(int billingCycleDay) {
 
-        final LocalDate today = LocalDate.now(timeZone.toZoneId());
+        final LocalDateTime todayDateTime = LocalDateTime.now(timeZone.toZoneId());
+        final LocalDate initDate = LocalDate.now(timeZone.toZoneId());
         Map<String, LocalDateTime> dates = new HashMap<>();
 
         //If 1 then we start at start of the current month
-        if (billingCycleDay == 1) {
-            dates.put(getStartDateKey(), LocalDateTime.of(today.withDayOfMonth(1), LocalTime.MIDNIGHT));
-            dates.put(getEndDateKey(), LocalDateTime.of(today.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX));
+        if (billingCycleDay == 1 || billingCycleDay < 1) {
+            dates.put(START_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(1), LocalTime.MIDNIGHT));
+            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX));
             return dates;
         }
 
         //If they have a cycle date, check if we have past it in the current month
-        LocalDate billingDateThisMonth = today.withDayOfMonth(billingCycleDay);
-        if (billingDateThisMonth.isBefore(today)) {
-            dates.put(getStartDateKey(), LocalDateTime.of(today.withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT));//e.g. 6th this month
-            dates.put(getEndDateKey(), LocalDateTime.of(today.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX)); //e.g. 6th next month
+        final LocalDateTime billingDateTimeThisMonth = LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay-1), LocalTime.MAX);
+        if (todayDateTime.isAfter(billingDateTimeThisMonth)) {
+            dates.put(START_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT));//e.g. 6th this month
+            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.plusMonths(1).withDayOfMonth(billingCycleDay-1), LocalTime.MAX)); //e.g. 5th next month
         } else {
-            dates.put(getStartDateKey(), LocalDateTime.of(today.minusMonths(1).withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT)); //e.g 6th last month
-            dates.put(getEndDateKey(), LocalDateTime.of(today.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX)); //e.g. 6th this month
+            dates.put(START_DATE_KEY, LocalDateTime.of(initDate.minusMonths(1).withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT)); //e.g 6th last month
+            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay-1), LocalTime.MAX)); //e.g. 5th this month
         }
         return dates;
     }
@@ -72,8 +68,8 @@ public class ERDateCalculator {
         Map<String, LocalDateTime> dates = Maps.newHashMapWithExpectedSize(2);
 
         if (spendLimitType.equals(SpendLimitType.ACCOUNT_DAY)) {
-            dates.put(getStartDateKey(), LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT));
-            dates.put(getEndDateKey(), LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX));
+            dates.put(START_DATE_KEY, LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT));
+            dates.put(END_DATE_KEY, LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX));
         } else if (spendLimitType.equals(SpendLimitType.ACCOUNT_MONTH)) {
             int startDayOfMonth = ofNullable(billingCycleDay).orElse(1);
             dates = calculateBillingCycleDates(startDayOfMonth);
@@ -88,7 +84,7 @@ public class ERDateCalculator {
         int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
         Map<String, LocalDateTime> dates = calculateBillingCycleDates(billingCycleDay);
 
-        return dates.get(getStartDateKey());
+        return dates.get(START_DATE_KEY);
     }
 
 }

@@ -41,8 +41,6 @@ public class SpendLimitCheckerBase {
     public void init() {
         MockitoAnnotations.initMocks(this);
         given(timeZone.toZoneId()).willReturn(ZoneId.of("CET"));
-        given(erDateCalculator.getStartDateKey()).willCallRealMethod();
-        given(erDateCalculator.getEndDateKey()).willCallRealMethod();
     }
 
     @Before

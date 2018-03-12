@@ -110,8 +110,8 @@ public class SpendLimitChecker {
         final BigDecimal currentTransactionAmount = paymentContext.getTransactionInfo().getAmount();
         final Map<String, LocalDateTime> startEndDates = erDateCalculator.calculateSpendLimitDates(spendLimitType, billingCycleDay);
 
-        final LocalDateTime start = startEndDates.get(erDateCalculator.getStartDateKey());
-        final LocalDateTime end = startEndDates.get(erDateCalculator.getEndDateKey());
+        final LocalDateTime start = startEndDates.get(ERDateCalculator.START_DATE_KEY);
+        final LocalDateTime end = startEndDates.get(ERDateCalculator.END_DATE_KEY);
 
         //Collect relevant payments
         List<ERTransaction> payments =
