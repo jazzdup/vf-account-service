@@ -41,7 +41,7 @@ public class ERDateCalculator {
         Map<String, LocalDateTime> dates = new HashMap<>();
 
         //If 1 then we start at start of the current month
-        if (billingCycleDay == 1 || billingCycleDay < 1 || billingCycleDay > 28) {
+        if (billingCycleDay <= 1 || billingCycleDay > 28) {
             dates.put(START_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(1), LocalTime.MIDNIGHT));
             dates.put(END_DATE_KEY, LocalDateTime.of(initDate.with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX));
             return dates;
