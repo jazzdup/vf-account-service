@@ -38,6 +38,8 @@ public class ERService {
     @Autowired
     private ExternalServiceCallSupplier externalServiceCallSupplier;
 
+    private static final String path = "/transactions/filter";
+
     public List<ERTransaction> getTransactions(@NonNull final PaymentContext paymentContext,
                                                @NonNull final ERTransactionCriteria criteria) {
 
@@ -66,7 +68,7 @@ public class ERService {
     public URI getUri(final Locale locale) {
 
         final String url = propertiesAccessor.getPropertyForOpco("er.adapter.endpoint.url",
-                locale.getCountry(), "http://localhost:8094");
+                locale.getCountry(), "http://localhost:8094") + path;
 
         final URI uri;
         try {

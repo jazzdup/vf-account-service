@@ -5,7 +5,6 @@ import com.vodafone.charging.accountservice.dto.xml.Response;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,12 +46,6 @@ public class EnrichedAccountInfo {
         errorDescription = erifResponse.getErrDescription();
     }
 
-    public Integer checkBillingCycleDay(Integer billingCycleDay) {
-
-        Integer value  = ValueRange.of(1, 28).checkValidIntValue(billingCycleDay.longValue(), null);
-
-        return value;
-    }
     /**
      * for not-quite-soap version
      * @param response
