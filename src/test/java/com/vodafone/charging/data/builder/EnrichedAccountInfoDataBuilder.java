@@ -21,11 +21,13 @@ public class EnrichedAccountInfoDataBuilder {
     public static EnrichedAccountInfo aEnrichedAccountInfo() {
 
         Random random = new Random();
+        int billingDayMin = 1;
+        int billingDayMax = 28;
 
         return new EnrichedAccountInfo.Builder("OK")
                 .usergroups(newArrayList(valueOf(random.nextInt()), valueOf(random.nextInt())))
                 .ban(random.nextInt() + "_ban")
-                .billingCycleDay(random.nextInt())
+                .billingCycleDay(billingDayMin + random.nextInt((billingDayMax - billingDayMin) + 1))
                 .serviceProviderId("serviceProviderId")
                 .childServiceProviderId("childServiceProviderId")
                 .serviceProviderType("serviceProviderType")

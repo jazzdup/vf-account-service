@@ -42,7 +42,7 @@ public class Account {
         Profile profile = Profile.builder()
                 .userGroups(info.getUsergroups())
                 .build();
-        this.profiles = Arrays.asList(profile);
+        this.profiles = Collections.singletonList(profile);
     }
 
     public Map<String, Object> asMap() throws IllegalAccessException {

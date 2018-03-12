@@ -5,8 +5,11 @@ import com.vodafone.charging.accountservice.dto.xml.Response;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.vodafone.charging.accountservice.service.ERDateCalculator.isValidBillingCycleDay;
 
 /**
  * Represents the response to the client after external calls have completed
@@ -17,7 +20,7 @@ public class EnrichedAccountInfo {
     private String validationStatus;
     private String ban;
     private List<String> usergroups;
-    private int billingCycleDay;
+    private Integer billingCycleDay;
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
@@ -32,7 +35,9 @@ public class EnrichedAccountInfo {
         validationStatus = erifResponse.getStatus();
         ban = erifResponse.getBan();
         usergroups = erifResponse.getUserGroups();
-        billingCycleDay = erifResponse.getBillingCycleDay();
+        if(isValidBillingCycleDay(erifResponse.getBillingCycleDay())) {
+            billingCycleDay = erifResponse.getBillingCycleDay();
+        }
         serviceProviderId = erifResponse.getSpId();
         childServiceProviderId = erifResponse.getChildSpId();
         serviceProviderType = erifResponse.getSpType();
@@ -42,6 +47,12 @@ public class EnrichedAccountInfo {
         errorDescription = erifResponse.getErrDescription();
     }
 
+    public Integer checkBillingCycleDay(Integer billingCycleDay) {
+
+        Integer value  = ValueRange.of(1, 28).checkValidIntValue(billingCycleDay.longValue(), null);
+
+        return value;
+    }
     /**
      * for not-quite-soap version
      * @param response
@@ -124,7 +135,7 @@ public class EnrichedAccountInfo {
         private String validationStatus;
         private String ban;
         private List<String> usergroups;
-        private int billingCycleDay;
+        private Integer billingCycleDay;
         private String serviceProviderId;
         private String childServiceProviderId;
         private String serviceProviderType;

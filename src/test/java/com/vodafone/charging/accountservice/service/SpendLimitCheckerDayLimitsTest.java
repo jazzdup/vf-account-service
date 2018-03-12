@@ -41,7 +41,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
         double expectedTxTotal = 10.00;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -67,7 +67,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
         BigDecimal currentTransactionAmount = new BigDecimal(0.4);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -94,7 +94,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(SpendLimitInfo.from(defaultSpendLimits), new BigDecimal(5.0));
 //        BigDecimal currentTransactionAmount = new BigDecimal(5.0);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -119,7 +119,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(6.00);
         double expectedTotalTx = 15.7;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -149,7 +149,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(newArrayList(defaultLimit), new BigDecimal(4.0));
 //        BigDecimal currentTransactionAmount = new BigDecimal(4.0);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -175,7 +175,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(newArrayList(), new BigDecimal(5000.0));
         double expectedTxTotal = 5009.7;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =
@@ -201,7 +201,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(0.11);
         double expectedTxTotal = 9.81;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
         //when
         final SpendLimitResult result =

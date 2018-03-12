@@ -1,5 +1,6 @@
 package com.vodafone.charging.data.builder;
 
+import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 
@@ -40,6 +41,17 @@ public class AccountDataBuilder {
                 .customerType("PRE")
                 .billingCycleDay(new Random().nextInt(27) + 1)
                 .profiles(newArrayList(profile))
+                .build();
+    }
+
+    public static Account anAccount(int billingCycleDay, ChargingId chargingId) {
+        return Account.builder()
+                .id(String.valueOf(new Random().nextInt()))
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(chargingId)
+                .customerType("PRE")
+                .billingCycleDay(billingCycleDay)
+                .profiles(newArrayList(aProfile()))
                 .build();
     }
 
