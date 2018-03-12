@@ -9,6 +9,7 @@ import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.data.builder.ContextDataDataBuilder;
 import com.vodafone.charging.mock.WiremockPreparer;
 import com.vodafone.charging.properties.PropertiesAccessor;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,7 @@ public class LogFileHttpTest {
     public WireMockRule wireMockRule = new WireMockRule(DEFAULT_ER_IF_PORT.value());
 
     @Test
+    @Ignore
     public void shouldCheckLogFileSizes() throws Exception {
         File logDir = new File("./logs/");
         if (logDir.exists()){
