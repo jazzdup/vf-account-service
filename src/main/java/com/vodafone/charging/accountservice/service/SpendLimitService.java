@@ -51,7 +51,6 @@ public class SpendLimitService {
 
     public PaymentApproval approvePayment(@NonNull final String accountId, @NonNull final PaymentContext paymentContext) {
 
-        //TODO Get the SpendLimits info for the accountId.  If no account, fail, if no SpendLimit
         //Get record
         final Account account = ofNullable(repository.findOne(accountId))
                 .orElseThrow(() -> new RepositoryResourceNotFoundException("No account found using id " + accountId));

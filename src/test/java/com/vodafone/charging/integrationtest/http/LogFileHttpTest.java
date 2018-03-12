@@ -39,7 +39,7 @@ import static org.springframework.http.HttpMethod.POST;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AccountServiceApplication.class, webEnvironment = DEFINED_PORT)
 public class LogFileHttpTest {
-    private String url = "http://localhost:8080/accounts";
+    private String url = "http://localhost:11800/accounts";
     private String erifUrl = "http://localhost:8458/broker/router.jsp";
 
     @MockBean
