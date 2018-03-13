@@ -26,7 +26,7 @@ public class Account {
 
     public Account(){}
 
-    private Account(String id, ChargingId chargingId, Date lastValidate, String customerType, int billingCycleDay, List<Profile> profiles) {
+    private Account(String id, ChargingId chargingId, Date lastValidate, String customerType, Integer billingCycleDay, List<Profile> profiles) {
         this.id = id;
         this.chargingId = chargingId;
         this.lastValidate = lastValidate;
@@ -61,7 +61,7 @@ public class Account {
         Profile profile = Profile.builder()
                 .userGroups(response.getUserGroups())
                 .build();
-        this.profiles = Arrays.asList(profile);
+        this.profiles = Collections.singletonList(profile);
     }
 
     public Map<String, Object> asMap() throws IllegalAccessException {
@@ -84,7 +84,7 @@ public class Account {
         private ChargingId chargingId;
         private Date lastValidate;
         private String customerType;
-        private int billingCycleDay;
+        private Integer billingCycleDay;
         private List<Profile> profiles;
 
         AccountBuilder() {
@@ -110,7 +110,7 @@ public class Account {
             return this;
         }
 
-        public AccountBuilder billingCycleDay(int billingCycleDay) {
+        public AccountBuilder billingCycleDay(Integer billingCycleDay) {
             this.billingCycleDay = billingCycleDay;
             return this;
         }

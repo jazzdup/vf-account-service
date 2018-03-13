@@ -19,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,10 +48,9 @@ public class SpendLimitService {
 
     public PaymentApproval approvePayment(@NonNull final String accountId, @NonNull final PaymentContext paymentContext) {
 
-        //TODO Get the SpendLimits info for the accountId.  If no account, fail, if no SpendLimit
         //Get record
         final Account account = ofNullable(repository.findOne(accountId))
-                .orElseThrow(() -> new RepositoryResourceNotFoundException("No account found using id " + accountId));
+                .orElseThrow(() -> new RepositoryResourceNotFoundException("No Account found using id " + accountId));
 
         final Profile profile = account.getProfiles().stream().findFirst()
                 .orElseThrow(() -> new RepositoryResourceNotFoundException("No Profile found using account id " + accountId));
@@ -137,14 +133,6 @@ public class SpendLimitService {
         return erService.getTransactions(paymentContext, criteria);
     }
 
-    //We only want max of a month but we must consider the billingCycleDay for Post pay customers.
-    public LocalDateTime calculateTransactionFromDate(@NonNull Account account) {
-        int billingCycleDay = ofNullable(account.getBillingCycleDay()).orElse(1);
-//
-        final LocalDate firstOfMonth = LocalDate.now(ZoneId.of("CET")).withDayOfMonth(billingCycleDay);
-        return LocalDateTime.of(firstOfMonth, LocalTime.MIDNIGHT);
-    }
-
     private PaymentApproval createResponse(List<SpendLimitResult> results) {
         final Optional<SpendLimitResult> failure = results.stream().filter(result -> !result.isSuccess()).findFirst();
 
@@ -152,11 +140,9 @@ public class SpendLimitService {
 
         if (failure.isPresent()) {
             approval = PaymentApproval.builder().success(failure.get().isSuccess())
-                    .responseCode(2)
                     .description(failure.get().getFailureReason()).build();
         } else {
             approval = PaymentApproval.builder().success(true)
-                    .responseCode(1)
                     .description("Approved").build();
         }
         return approval;

@@ -41,7 +41,10 @@ public class ERService {
     public List<ERTransaction> getTransactions(@NonNull final PaymentContext paymentContext,
                                                @NonNull final ERTransactionCriteria criteria) {
 
-        final URI uri = getUri(paymentContext.getLocale());
+        final String transactionsSearchPath =
+                propertiesAccessor.getProperty("er.adapter.path.transactions.search", "/transactions/filter");
+
+        final URI uri = getUri(paymentContext.getLocale(), transactionsSearchPath);
         final ParameterizedTypeReference<List<ERTransaction>> reference =
                 new ParameterizedTypeReference<List<ERTransaction>>() {
                 };
@@ -63,10 +66,10 @@ public class ERService {
         return ofNullable(responseEntity.getBody()).orElse(Lists.newArrayList());
     }
 
-    public URI getUri(final Locale locale) {
+    public URI getUri(@NonNull final Locale locale, @NonNull final String transactionsSearchPath) {
 
         final String url = propertiesAccessor.getPropertyForOpco("er.adapter.endpoint.url",
-                locale.getCountry(), "http://localhost:8094");
+                locale.getCountry(), "http://localhost:8094") + transactionsSearchPath;
 
         final URI uri;
         try {

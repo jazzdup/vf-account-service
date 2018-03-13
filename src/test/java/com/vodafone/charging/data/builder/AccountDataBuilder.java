@@ -60,6 +60,17 @@ public class AccountDataBuilder {
                 .build();
     }
 
+    public static Account anAccount(Integer billingCycleDay, ChargingId chargingId) {
+        return Account.builder()
+                .id(String.valueOf(new Random().nextInt()))
+                .lastValidate(MongoDataBuilder.aFixedDate())
+                .chargingId(chargingId)
+                .customerType("PRE")
+                .billingCycleDay(billingCycleDay)
+                .profiles(newArrayList(aProfile()))
+                .build();
+    }
+
     public static Account anAccountWithNullProfile() {
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))

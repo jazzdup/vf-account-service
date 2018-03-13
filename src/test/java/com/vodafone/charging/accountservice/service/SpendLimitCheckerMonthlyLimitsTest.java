@@ -46,7 +46,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(0.3);
         double totalTxValue = 50.00;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -74,7 +74,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         PaymentContext paymentContext = aPaymentContext(SpendLimitInfo.from(defaultSpendLimits), new BigDecimal(0.3));
         BigDecimal currentTransactionAmount = new BigDecimal(0.3);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =
@@ -99,7 +99,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(0.4);
         double totalTxValue = 50.1;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -131,7 +131,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         PaymentContext paymentContext = aPaymentContext(SpendLimitInfo.from(defaultSpendLimits), new BigDecimal(0.4));
 //        BigDecimal currentTransactionAmount = new BigDecimal(0.4);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
 
         //when
@@ -158,7 +158,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(5.4);
         double totalTxValue = 55.1;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -184,7 +184,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(5000);
         double totalTxValue = 5049.7;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(monthDates);
 
         //when
         final SpendLimitResult result =
@@ -210,7 +210,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
 //        BigDecimal currentTransactionAmount = new BigDecimal(5.4);
         double expectedTxValue = 55.1;
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =
@@ -230,7 +230,7 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
         final PaymentContext paymentContext = aPaymentContext(SpendLimitInfo.from(defaultSpendLimits), new BigDecimal(5.4));
 //        BigDecimal currentTransactionAmount = new BigDecimal(5.4);
 
-        given(erDateCalculator.calculateSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(billingCycleDates);
 
         //when
         final SpendLimitResult result =

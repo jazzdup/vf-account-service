@@ -131,14 +131,6 @@ public class SpendLimitServiceTest {
     }
 
     @Test
-    public void shouldCalculateFromDateCorrectly() {
-
-        Account account = anAccount();
-        final LocalDateTime fromDate = spendLimitService.calculateTransactionFromDate(account);
-        System.out.println("Date: " + fromDate);
-    }
-
-    @Test
     public void shouldReturnSuccessWhenAllSpendLimitsProvidedAndNoneAreBreached() {
 
         final Account account = anAccount();
@@ -423,7 +415,6 @@ public class SpendLimitServiceTest {
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
         assertThat(approval.getDescription()).isEqualTo("Approved");
-        assertThat(approval.getResponseCode()).isEqualTo(1);
 
         verifyZeroInteractions(erService);
 
@@ -544,6 +535,54 @@ public class SpendLimitServiceTest {
         assertThat(criteria.getRequiredResultSize()).isNull();
         assertThat(criteria.getFromDate()).isEqualTo(expectedFromDate);
         assertThat(criteria.getTransactionTypes()).containsExactly(PURCHASE.name(), USAGE.name(), REFUND.name());
+    }
+
+    @Test
+    public void shouldApprovePaymentSuccessfully() {
+
+        final Account account = anAccount();
+        final PaymentContext paymentContext = aPaymentContext();
+        final SpendLimitResult spendLimitResult = aSpendLimitResult(true, "none", any(SpendLimitType.class));
+
+        given(accountRepository.findOne(account.getId())).willReturn(account);
+        given(spendLimitChecker.checkTransactionLimit(anyListOf(SpendLimit.class),
+                anyListOf(SpendLimit.class),
+                anyListOf(TransactionInfo.class),
+                any(SpendLimitType.class))).willReturn(spendLimitResult);
+
+        final PaymentApproval approval = spendLimitService.approvePayment(account.getId(), paymentContext);
+
+        assertThat(approval.isSuccess()).isTrue();
+        assertThat(approval.getDescription()).isEqualTo("Approved");
+
+    }
+
+    @Test
+    public void shouldThrowRepositoryExceptionWhenNoAccountFound() {
+
+        final Account account = anAccount();
+
+        given(accountRepository.findOne(account.getId())).willReturn(null);
+        final PaymentContext paymentContext = aPaymentContext();
+
+        assertThatThrownBy(() -> spendLimitService.approvePayment(account.getId(), paymentContext))
+                .isInstanceOf(RepositoryResourceNotFoundException.class)
+                .hasMessageStartingWith("No Account found")
+                .hasMessageContaining(account.getId());
+    }
+
+    @Test
+    public void shouldThrowRepositoryExceptionWhenNoProfileFound() {
+
+        final Account account = anAccountWithEmptyProfile();
+
+        given(accountRepository.findOne(account.getId())).willReturn(account);
+        final PaymentContext paymentContext = aPaymentContext();
+
+        assertThatThrownBy(() -> spendLimitService.approvePayment(account.getId(), paymentContext))
+                .isInstanceOf(RepositoryResourceNotFoundException.class)
+                .hasMessageStartingWith("No Profile found")
+                .hasMessageContaining(account.getId());
     }
 
 }

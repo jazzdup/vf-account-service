@@ -57,6 +57,7 @@ public class ERServiceTest {
         final ResponseEntity<List<ERTransaction>> responseEntity = ResponseEntity.ok(expectedTransactions);
         final String url = "http://localhost:9999";
 
+        given(propertiesAccessor.getProperty(eq("er.adapter.path.transactions.search"), anyString())).willReturn("/transactions/filter");
         given(propertiesAccessor.getPropertyForOpco(anyString(), eq(Locale.UK.getCountry()), anyString()))
                 .willReturn(url);
         given(externalServiceCallSupplier.call(Matchers.<Supplier<ResponseEntity<List<ERTransaction>>>>any()))
@@ -68,7 +69,8 @@ public class ERServiceTest {
         assertThat(transactions).isNotEmpty();
         assertThat(transactions).containsAll(expectedTransactions);
 
-        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier,supplier);
+        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier, supplier);
+        inOrder.verify(propertiesAccessor).getProperty(anyString(), anyString());
         inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString(), anyString());
         inOrder.verify(externalServiceCallSupplier).call(any());
         inOrder.verify(supplier).get();
@@ -88,6 +90,7 @@ public class ERServiceTest {
 
         ResponseEntity responseEntity = mock(ResponseEntity.class);
 
+        given(propertiesAccessor.getProperty(eq("er.adapter.path.transactions.search"), anyString())).willReturn("/transactions/filter");
         given(propertiesAccessor.getPropertyForOpco(anyString(), eq(Locale.UK.getCountry()), anyString()))
                 .willReturn(url);
         given(externalServiceCallSupplier.call(Matchers.<Supplier<ResponseEntity<List<ERTransaction>>>>any()))
@@ -101,7 +104,8 @@ public class ERServiceTest {
         assertThat(transactions).isNotNull();
         assertThat(transactions).isEmpty();
 
-        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier,supplier, responseEntity);
+        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier, supplier, responseEntity);
+        inOrder.verify(propertiesAccessor).getProperty(anyString(), anyString());
         inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString(), anyString());
         inOrder.verify(externalServiceCallSupplier).call(any());
         inOrder.verify(supplier).get();
@@ -123,13 +127,14 @@ public class ERServiceTest {
         final String url = "http://localhost:9999";
         final String exceptionMessage = "this is a test message " + new Random().nextDouble();
 
+        given(propertiesAccessor.getProperty(eq("er.adapter.path.transactions.search"), anyString())).willReturn("/transactions/filter");
         given(propertiesAccessor.getPropertyForOpco(anyString(), eq(Locale.UK.getCountry()), anyString()))
                 .willReturn(url);
         given(externalServiceCallSupplier.call(Matchers.<Supplier<ResponseEntity<List<ERTransaction>>>>any()))
                 .willThrow(new NullPointerException(exceptionMessage));
 
         assertThatThrownBy(() -> erService.getTransactions(paymentContext, criteria)).isInstanceOf(NullPointerException.class)
-        .hasMessage(exceptionMessage);
+                .hasMessage(exceptionMessage);
     }
 
     @Test
@@ -143,6 +148,8 @@ public class ERServiceTest {
         final String url = "http://localhost:9999";
         String exceptionMessage = "this is a test message " + new Random().nextDouble();
 
+        given(propertiesAccessor.getProperty(eq("er.adapter.path.transactions.search"), anyString()))
+                .willReturn("/transactions/filter");
         given(propertiesAccessor.getPropertyForOpco(anyString(), eq(Locale.UK.getCountry()), anyString()))
                 .willReturn(url);
         given(externalServiceCallSupplier.call(Matchers.<Supplier<ResponseEntity<List<ERTransaction>>>>any()))
@@ -152,7 +159,8 @@ public class ERServiceTest {
         assertThatThrownBy(() -> erService.getTransactions(paymentContext, criteria)).isInstanceOf(RuntimeException.class)
                 .hasMessage(exceptionMessage);
 
-        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier,supplier);
+        InOrder inOrder = Mockito.inOrder(propertiesAccessor, externalServiceCallSupplier, supplier);
+        inOrder.verify(propertiesAccessor).getProperty(anyString(), anyString());
         inOrder.verify(propertiesAccessor).getPropertyForOpco(anyString(), anyString(), anyString());
         inOrder.verify(externalServiceCallSupplier).call(any());
         inOrder.verify(supplier).get();

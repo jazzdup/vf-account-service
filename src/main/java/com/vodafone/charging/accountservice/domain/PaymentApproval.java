@@ -7,8 +7,6 @@ import lombok.ToString;
 @Builder
 @Getter @ToString
 public class PaymentApproval {
-
     private boolean success;
-    private int responseCode;
     private String description;
 }

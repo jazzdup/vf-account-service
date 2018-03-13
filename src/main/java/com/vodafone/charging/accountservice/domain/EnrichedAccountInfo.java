@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.vodafone.charging.accountservice.service.ERDateCalculator.isValidBillingCycleDay;
+
 /**
  * Represents the response to the client after external calls have completed
  */
@@ -17,7 +19,7 @@ public class EnrichedAccountInfo {
     private String validationStatus;
     private String ban;
     private List<String> usergroups;
-    private int billingCycleDay;
+    private Integer billingCycleDay;
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
@@ -33,7 +35,9 @@ public class EnrichedAccountInfo {
         validationStatus = erifResponse.getStatus();
         ban = erifResponse.getBan();
         usergroups = erifResponse.getUserGroups();
-        billingCycleDay = erifResponse.getBillingCycleDay();
+        if(isValidBillingCycleDay(erifResponse.getBillingCycleDay())) {
+            billingCycleDay = erifResponse.getBillingCycleDay();
+        }
         serviceProviderId = erifResponse.getSpId();
         childServiceProviderId = erifResponse.getChildSpId();
         serviceProviderType = erifResponse.getSpType();
@@ -128,7 +132,7 @@ public class EnrichedAccountInfo {
         private String validationStatus;
         private String ban;
         private List<String> usergroups;
-        private int billingCycleDay;
+        private Integer billingCycleDay;
         private String serviceProviderId;
         private String childServiceProviderId;
         private String serviceProviderType;

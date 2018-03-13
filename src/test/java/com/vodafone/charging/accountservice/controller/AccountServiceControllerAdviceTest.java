@@ -1,8 +1,6 @@
 package com.vodafone.charging.accountservice.controller;
 
-import com.vodafone.charging.accountservice.exception.AccountServiceError;
-import com.vodafone.charging.accountservice.exception.ApplicationLogicException;
-import com.vodafone.charging.accountservice.exception.MethodArgumentValidationException;
+import com.vodafone.charging.accountservice.exception.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +71,43 @@ public class AccountServiceControllerAdviceTest {
         assertThat(response.getBody().getErrorId()).isEqualTo(SYSTEM_ERROR.value());
         assertThat(response.getBody().getErrorDescription()).isEqualTo(message);
     }
+
+    @Test
+    public void shouldHandleRepositoryResourceNotFoundException() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        final String message = "This is a test ApplicationLogicException";
+
+        final RepositoryResourceNotFoundException ex = new RepositoryResourceNotFoundException(message);
+
+        final ResponseEntity<AccountServiceError> response =
+                advice.handleRepositoryResourceNotFoundException(request, ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody().getStatus()).isEqualTo(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.status().value());
+        assertThat(response.getBody().getErrorId()).isEqualTo(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorId().value());
+        assertThat(response.getBody().getErrorDescription()).startsWith(REPOSITORY_RESOURCE_NOT_FOUND_ERROR.errorDesciption());
+        assertThat(response.getBody().getErrorDescription()).contains(message);
+
+    }
+
+    @Test
+    public void shouldHandleExternalServiceException() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        final String message = "This is a test ApplicationLogicException";
+
+        final ExternalServiceException ex = new ExternalServiceException(message);
+
+        final ResponseEntity<AccountServiceError> response =
+                advice.handleExternalServiceException(request, ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+        assertThat(response.getBody().getStatus()).isEqualTo(EXTERNAL_SERVICE_ERROR.status().value());
+        assertThat(response.getBody().getErrorId()).isEqualTo(EXTERNAL_SERVICE_ERROR.errorId().value());
+        assertThat(response.getBody().getErrorDescription()).startsWith(EXTERNAL_SERVICE_ERROR.errorDesciption());
+        assertThat(response.getBody().getErrorDescription()).contains(message);
+
+    }
+
 
     @Test
     public void shouldHandleGenericException() {
