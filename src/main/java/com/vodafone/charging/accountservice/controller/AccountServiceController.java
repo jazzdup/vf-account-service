@@ -97,7 +97,7 @@ public class AccountServiceController {
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
             @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
-    @ApiOperation(value = "Get UserGroups for an Account",
+    @ApiOperation(value = "Get an Account",
             notes = "Get Account using AccountId",
             response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = HttpMethod.GET, nickname = "getUserGroups")

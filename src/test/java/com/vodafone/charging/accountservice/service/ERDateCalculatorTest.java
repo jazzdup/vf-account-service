@@ -17,8 +17,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static com.vodafone.charging.accountservice.service.ERDateCalculator.END_DATE_KEY;
-import static com.vodafone.charging.accountservice.service.ERDateCalculator.START_DATE_KEY;
+import static com.vodafone.charging.accountservice.service.ERDateCalculator.*;
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,8 +66,8 @@ public class ERDateCalculatorTest {
         int billingCycleDay = yesterday.getDayOfMonth();
 
         final Map<String, LocalDateTime> expectedDates = getAccountMonthExpectedStartEndDates(billingCycleDay);
-        final LocalDateTime expectedStart = expectedDates.get(ERDateCalculator.START_DATE_KEY);
-        final LocalDateTime expectedEnd = expectedDates.get(ERDateCalculator.END_DATE_KEY);
+        final LocalDateTime expectedStart = expectedDates.get(START_DATE_KEY);
+        final LocalDateTime expectedEnd = expectedDates.get(END_DATE_KEY);
 
         given(timeZone.toZoneId()).willReturn(ZoneId.of("CET"));
 
@@ -159,8 +158,8 @@ public class ERDateCalculatorTest {
         int billingCycleDay = 10;
 
         final Map<String, LocalDateTime> expectedDates = getAccountMonthExpectedStartEndDates(billingCycleDay);
-        final LocalDateTime expectedStart = expectedDates.get(ERDateCalculator.START_DATE_KEY);
-        final LocalDateTime expectedEnd = expectedDates.get(ERDateCalculator.END_DATE_KEY);
+        final LocalDateTime expectedStart = expectedDates.get(START_DATE_KEY);
+        final LocalDateTime expectedEnd = expectedDates.get(END_DATE_KEY);
 
         given(timeZone.toZoneId()).willReturn(ZoneId.of("CET"));
         final Map<String, LocalDateTime> dates =
@@ -177,7 +176,7 @@ public class ERDateCalculatorTest {
     }
 
     @Test
-    public void shouldGetStartDateCorrectly() {
+    public void shouldGetStartDateCorrectlyWhenBillingCycleDateProvided() {
 
         final Account account = anAccount(10, aChargingId());
         Map<String, LocalDateTime> expectedDates = getAccountMonthExpectedStartEndDates(account.getBillingCycleDay());
@@ -190,14 +189,27 @@ public class ERDateCalculatorTest {
     }
 
     @Test
-    public void shouldValidateBillingCycleDay() {
-        assertThat(ERDateCalculator.isValidBillingCycleDay(19)).isTrue();
-        assertThat(ERDateCalculator.isValidBillingCycleDay(29)).isFalse();
-        assertThat(ERDateCalculator.isValidBillingCycleDay(0)).isFalse();
-        assertThat(ERDateCalculator.isValidBillingCycleDay(-10)).isFalse();
+    public void shouldGetStartDateCorrectlyWhenBillingCycleDateIsNull() {
+
+        final Account account = anAccount(null, aChargingId());
+        Map<String, LocalDateTime> expectedDates = getAccountMonthExpectedStartEndDates(1);
+
+        given(timeZone.toZoneId()).willReturn(ZoneId.of("CET"));
+
+        LocalDateTime startTime = erDateCalculator.calculateAccountBillingCycleDate(account);
+        assertThat(startTime).isEqualByComparingTo(expectedDates.get(START_DATE_KEY));
+
     }
 
-    private Map<String, LocalDateTime> getAccountMonthExpectedStartEndDates(int billingCycleDay) {
+    @Test
+    public void shouldValidateBillingCycleDay() {
+        assertThat(isValidBillingCycleDay(19)).isTrue();
+        assertThat(isValidBillingCycleDay(29)).isFalse();
+        assertThat(isValidBillingCycleDay(0)).isFalse();
+        assertThat(isValidBillingCycleDay(-10)).isFalse();
+    }
+
+    private Map<String, LocalDateTime> getAccountMonthExpectedStartEndDates(final Integer billingCycleDay) {
         final LocalDateTime billingDate = LocalDateTime.of(LocalDate.now().withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT);
 
         Map<String, LocalDateTime> response = Maps.newHashMapWithExpectedSize(2);
@@ -205,14 +217,14 @@ public class ERDateCalculatorTest {
         //set expectations
         if (billingDate.isBefore(LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIDNIGHT))) {
             //last month date so we want last month billingDate to this month billingDate
-            response.put(ERDateCalculator.START_DATE_KEY, LocalDateTime.of(LocalDate.now().minusMonths(1).withDayOfMonth(billingCycleDay),
+            response.put(START_DATE_KEY, LocalDateTime.of(LocalDate.now().minusMonths(1).withDayOfMonth(billingCycleDay),
                     LocalTime.MIDNIGHT));
-            response.put(ERDateCalculator.END_DATE_KEY, LocalDateTime.of(LocalDate.now().withDayOfMonth(billingCycleDay - 1), LocalTime.MAX));
+            response.put(END_DATE_KEY, LocalDateTime.of(LocalDate.now().withDayOfMonth(billingCycleDay).minusDays(1), LocalTime.MAX));
         } else {
             //this month to next month
-            response.put(ERDateCalculator.START_DATE_KEY, LocalDateTime.of(LocalDate.now().withDayOfMonth(billingCycleDay),
+            response.put(START_DATE_KEY, LocalDateTime.of(LocalDate.now().withDayOfMonth(billingCycleDay),
                     LocalTime.MIDNIGHT));
-            response.put(ERDateCalculator.END_DATE_KEY,LocalDateTime.of(LocalDate.now().plusMonths(1).withDayOfMonth(billingCycleDay - 1), LocalTime.MAX));
+            response.put(END_DATE_KEY, LocalDateTime.of(LocalDate.now().plusMonths(1).withDayOfMonth(billingCycleDay).minusDays(1), LocalTime.MAX));
         }
 
         return response;

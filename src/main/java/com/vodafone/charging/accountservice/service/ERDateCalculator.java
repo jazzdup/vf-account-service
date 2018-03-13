@@ -48,13 +48,13 @@ public class ERDateCalculator {
         }
 
         //If they have a cycle date, check if we have past it in the current month
-        final LocalDateTime billingDateTimeThisMonth = LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay - 1), LocalTime.MAX);
+        final LocalDateTime billingDateTimeThisMonth = LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay).minusDays(1), LocalTime.MAX);
         if (todayDateTime.isAfter(billingDateTimeThisMonth)) {
             dates.put(START_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT));//e.g. 6th this month
-            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.plusMonths(1).withDayOfMonth(billingCycleDay - 1), LocalTime.MAX)); //e.g. 5th next month
+            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.plusMonths(1).withDayOfMonth(billingCycleDay).minusDays(1), LocalTime.MAX)); //e.g. 5th next month
         } else {
             dates.put(START_DATE_KEY, LocalDateTime.of(initDate.minusMonths(1).withDayOfMonth(billingCycleDay), LocalTime.MIDNIGHT)); //e.g 6th last month
-            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay - 1), LocalTime.MAX)); //e.g. 5th this month
+            dates.put(END_DATE_KEY, LocalDateTime.of(initDate.withDayOfMonth(billingCycleDay).minusDays(1), LocalTime.MAX)); //e.g. 5th this month
         }
         return dates;
     }

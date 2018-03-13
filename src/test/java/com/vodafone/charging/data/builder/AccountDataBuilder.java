@@ -44,7 +44,7 @@ public class AccountDataBuilder {
                 .build();
     }
 
-    public static Account anAccount(int billingCycleDay, ChargingId chargingId) {
+    public static Account anAccount(Integer billingCycleDay, ChargingId chargingId) {
         return Account.builder()
                 .id(String.valueOf(new Random().nextInt()))
                 .lastValidate(MongoDataBuilder.aFixedDate())
