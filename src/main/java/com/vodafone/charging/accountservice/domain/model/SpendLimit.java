@@ -19,15 +19,14 @@ public class SpendLimit {
 
     private SpendLimitType spendLimitType;
     private Double limit;
-    private boolean active;
 
-    public static List<SpendLimit> fromSpendLimitsInfo(List<SpendLimitInfo> spendLimitsInfo) {
+    public static List<SpendLimit> fromSpendLimitsInfo(final List<SpendLimitInfo> spendLimitsInfo) {
         return newArrayList(
                 spendLimitsInfo.stream().filter(Objects::nonNull)
                         .map(limitInfo -> SpendLimit.builder()
                                 .limit(limitInfo.getLimit())
                                 .spendLimitType(limitInfo.getSpendLimitType())
-                                .active(limitInfo.isActive()).build())
+                                .build())
                         .collect(Collectors.toList()));
     }
 }

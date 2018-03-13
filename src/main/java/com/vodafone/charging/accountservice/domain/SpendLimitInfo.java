@@ -37,7 +37,7 @@ public class SpendLimitInfo {
                         .map(l -> SpendLimitInfo.builder()
                                 .limit(l.getLimit())
                                 .spendLimitType(l.getSpendLimitType())
-                                .active(l.isActive()).build())
+                                .build())
                         .collect(Collectors.toList()));
 
     }

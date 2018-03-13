@@ -415,7 +415,6 @@ public class SpendLimitServiceTest {
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
         assertThat(approval.getDescription()).isEqualTo("Approved");
-        assertThat(approval.getResponseCode()).isEqualTo(1);
 
         verifyZeroInteractions(erService);
 

@@ -140,11 +140,9 @@ public class SpendLimitService {
 
         if (failure.isPresent()) {
             approval = PaymentApproval.builder().success(failure.get().isSuccess())
-                    .responseCode(2)
                     .description(failure.get().getFailureReason()).build();
         } else {
             approval = PaymentApproval.builder().success(true)
-                    .responseCode(1)
                     .description("Approved").build();
         }
         return approval;

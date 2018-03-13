@@ -222,7 +222,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
@@ -274,7 +273,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
@@ -328,7 +326,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
@@ -375,7 +372,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
@@ -410,7 +406,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verifyZeroInteractions(restTemplate);
@@ -461,7 +456,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isFalse();
-        assertThat(approval.getResponseCode()).isEqualTo(2);
         assertThat(approval.getDescription()).startsWith(SpendLimitType.ACCOUNT_TX.name());
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
@@ -513,7 +507,6 @@ public class SpendLimitIT {
 
         assertThat(approval).isNotNull();
         assertThat(approval.isSuccess()).isTrue();
-        assertThat(approval.getResponseCode()).isEqualTo(1);
         assertThat(approval.getDescription()).isEqualTo("Approved");
 
         verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
