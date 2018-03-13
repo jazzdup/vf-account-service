@@ -195,9 +195,9 @@
         </dependency>
         <!--an alternative to wiremock is https://github.com/square/okhttp/tree/master/mockwebserver-->
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
-            <version>${wiremock.version}</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <version>1.2.3.RELEASE</version>
             <scope>test</scope>
         </dependency>
         <dependency>
