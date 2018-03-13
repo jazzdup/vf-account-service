@@ -1,5 +1,6 @@
 package com.vodafone.charging.accountservice.service;
 
+import com.google.common.collect.ImmutableList;
 import com.vodafone.charging.accountservice.domain.PaymentContext;
 import com.vodafone.charging.accountservice.domain.SpendLimitInfo;
 import com.vodafone.charging.accountservice.domain.enums.SpendLimitType;
@@ -10,7 +11,6 @@ import com.vodafone.charging.accountservice.dto.er.ERTransactionType;
 import com.vodafone.charging.data.builder.PaymentContextDataBuilder;
 import com.vodafone.charging.data.builder.SpendLimitDataBuilder;
 import com.vodafone.charging.data.builder.SpendLimitDataProvider;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -28,12 +28,11 @@ import static org.mockito.Matchers.anyInt;
  */
 public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
-
     /*
-    under dayLimit
+    Equal to limit
      */
     @Test
-    public void shouldNotBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimit() {
+    public void shouldNotBreachWhenDayLimitDefinedDefaultDefinedAndPaymentsOverLimitRefundsLowerTotalToEqualLimit() {
         //given
         //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
         final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
@@ -56,16 +55,42 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     }
 
     /*
+    under dayLimit
+     */
+    @Test
+    public void shouldNotBreachWhenDayLimitDefinedDefaultDefinedAndPaymentsOverLimitRefundsLowerTotalToBelowLimit() {
+        //given
+        //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(new BigDecimal(0.2));
+
+        double expectedTxTotal = 9.9;
+
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(paymentContext, spendLimits, transactions, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(1).getLimit());
+    }
+
+    /*
     over dayLimit
     */
     @Test
-    public void shouldBreachWhenDayLimitDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimitCurrentTxMakesOverLimit() {
+    public void shouldBreachWhenDayLimitDefinedDefaultDefinedPaymentsOverLimitRefundsLowerTotalToBelowLimitAndTxMakesOverLimit() {
         //given
         //purchases total 16, current tx = 0.4 refunds 6.3 limit = 10
         final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
         PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(new BigDecimal(0.4));
 
-        BigDecimal currentTransactionAmount = new BigDecimal(0.4);
+//        BigDecimal currentTransactionAmount = new BigDecimal(0.4);
 
         given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
@@ -84,7 +109,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     }
 
     @Test
-    public void shouldNotBreachDefaultWhenNoDayLimitDefinedAndPaymentsOverDefault() {
+    public void shouldNotBreachDefaultWhenNoDayLimitDefinedAndPaymentsUnderDefault() {
 
         //given
         //purchases total 16, current tx = 5.0 refunds 6.3 limit = 15
@@ -98,7 +123,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
         //when
         final SpendLimitResult result =
-                spendLimitChecker.checkDurationLimit(paymentContext, Lists.emptyList(), transactions, SpendLimitType.ACCOUNT_DAY, 1);
+                spendLimitChecker.checkDurationLimit(paymentContext, ImmutableList.of(), transactions, SpendLimitType.ACCOUNT_DAY, 1);
 
         //then
         assertThat(result.isSuccess()).isTrue();
@@ -109,7 +134,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     }
 
     @Test
-    public void shouldBreachDefaultWhenDayLimitNotDefinedAndPaymentsOver() {
+    public void shouldBreachDefaultWhenDayLimitNotDefinedAndPaymentsOverDefault() {
 
         //given
         //purchases total 16, current tx = 6.0 refunds 6.3 limit = 15
@@ -134,6 +159,30 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         assertThat(result.getAppliedLimitValue()).isEqualTo(defaultSpendLimits.get(1).getLimit().doubleValue());
     }
 
+    @Test
+    public void shouldNotBreachDefaultWhenDayLimitNotDefinedAndPaymentsEqualToDefault() {
+        //given
+        //purchases total 16, current tx = 5.3 refunds 6.3 limit = 15
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+
+        double expectedTxTotal = 15.0;
+        PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(SpendLimitInfo.from(defaultSpendLimits), new BigDecimal(5.3));
+//        BigDecimal currentTransactionAmount = new BigDecimal(5.0);
+
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(paymentContext, ImmutableList.of(), transactions, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(defaultSpendLimits.get(1).getLimit().doubleValue());
+
+    }
 
     @Test
     public void shouldNotBreachDefaultWhenDayLimitDefinedAndPaymentsOverDefault() {
@@ -191,7 +240,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
     }
 
     @Test
-    public void shouldNotBreachWhenDayLimitDefinedAndNoDefaultLimit() {
+    public void shouldNotBreachWhenDayLimitDefinedAndNoDefaultLimitAndPaymentsUnder() {
 
         //given
         //purchases total 16, current tx = 0.11 refunds 6.3 limit = 10
@@ -216,5 +265,73 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
 
     }
 
+    @Test
+    public void shouldNotBreachWhenDayLimitDefinedDefaultNotDefinedAndPaymentsEqualToLimit() {
+        //given
+        //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(ImmutableList.of(), new BigDecimal(0.3));
+
+        double expectedTxTotal = 10.00;
+
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(paymentContext, spendLimits, transactions, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(1).getLimit());
+
+    }
+
+    @Test
+    public void shouldNotBreachWhenDayLimitDefinedDefaultNotDefinedAndPaymentsUnderLimit() {
+        //given
+        //purchases total 16, current tx = 0.3 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(ImmutableList.of(), new BigDecimal(0.2));
+
+        double expectedTxTotal = 9.9;
+
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(paymentContext, spendLimits, transactions, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getFailureCauseType()).isNull();
+        assertThat(result.getFailureReason()).isEmpty();
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(expectedTxTotal);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(spendLimits.get(1).getLimit());
+    }
+
+    @Test
+    public void shouldBreachWhenDayLimitDefinedDefaultNotDefinedAndPaymentsOverLimit() {
+        //given
+        //purchases total 16, current tx = 0.4 refunds 6.3 limit = 10
+        final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
+        PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(ImmutableList.of(), new BigDecimal(0.4));
+
+        given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
+
+        //when
+        final SpendLimitResult result =
+                spendLimitChecker.checkDurationLimit(paymentContext, spendLimits, transactions, SpendLimitType.ACCOUNT_DAY, 1);
+
+        //then
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureCauseType()).isEqualTo(SpendLimitType.ACCOUNT_DAY);
+        assertThat(result.getFailureReason()).startsWith(SpendLimitType.ACCOUNT_DAY.name());
+        assertThat(result.getFailureReason()).doesNotContain("default");
+        assertThat(result.getTotalTransactionsValue()).isEqualTo(10.1);
+        assertThat(result.getAppliedLimitValue()).isEqualTo(10.0);
+    }
 
 }
