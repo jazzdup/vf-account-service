@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Component
 public class EnrichedAccountInfo {
-
+    private String accountId;
     private String validationStatus;
     private String ban;
     private List<String> usergroups;
@@ -28,7 +28,8 @@ public class EnrichedAccountInfo {
     public EnrichedAccountInfo() {
     }
 
-    public EnrichedAccountInfo(@NonNull ERIFResponse erifResponse){
+    public EnrichedAccountInfo(@NonNull ERIFResponse erifResponse, String accountId){
+        this.accountId = accountId;
         validationStatus = erifResponse.getStatus();
         ban = erifResponse.getBan();
         usergroups = erifResponse.getUserGroups();
@@ -46,7 +47,8 @@ public class EnrichedAccountInfo {
      * for not-quite-soap version
      * @param response
      */
-    public EnrichedAccountInfo(@NonNull Response response){
+    public EnrichedAccountInfo(@NonNull Response response, String accountId){
+        this.accountId = accountId;
         validationStatus = response.getStatus();
         ban = response.getBan();
         Response.UserGroups userGroups = response.getUserGroups();
@@ -67,6 +69,7 @@ public class EnrichedAccountInfo {
     }
 
     private EnrichedAccountInfo(final Builder builder) {
+        this.accountId = builder.accountId;
         this.validationStatus = builder.validationStatus;
         this.ban = builder.ban;
         this.usergroups = builder.usergroups;
@@ -79,6 +82,7 @@ public class EnrichedAccountInfo {
         this.errorDescription = builder.errorDescription;
     }
 
+    public String getAccountId(){return accountId;}
     public String getValidationStatus() {
         return validationStatus;
     }
@@ -120,7 +124,7 @@ public class EnrichedAccountInfo {
     }
 
     public static class Builder {
-
+        private String accountId;
         private String validationStatus;
         private String ban;
         private List<String> usergroups;
@@ -135,7 +139,10 @@ public class EnrichedAccountInfo {
         public Builder(String validationStatus) {
             this.validationStatus = validationStatus;
         }
-
+        public Builder accountId(final String accountId){
+            this.accountId = accountId;
+            return this;
+        }
         public Builder ban(final String ban) {
             this.ban = ban;
             return this;

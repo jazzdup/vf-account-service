@@ -1,7 +1,8 @@
 package com.vodafone.charging.accountservice.domain.model;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.xml.Response;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
@@ -34,13 +35,31 @@ public class Account {
         this.profiles = profiles;
     }
 
-    public Account(ChargingId chargingId, EnrichedAccountInfo info, Date lastValidate){
+    public Account(ChargingId chargingId, Response response, Date lastValidate){
         this.chargingId = chargingId;
         this.lastValidate = lastValidate;
-        this.customerType = info.getCustomerType();
-        this.billingCycleDay = info.getBillingCycleDay();
+        this.customerType = response.getIsPrepay();
+        this.billingCycleDay = response.getBillingCycleDay();
+        List<String> usergroups = new ArrayList<>();
+        Response.UserGroups userGroups = response.getUserGroups();
+        if (userGroups != null && userGroups.getItem() != null) {
+            usergroups = new ArrayList<String>();
+            for (String item : userGroups.getItem()) {
+                usergroups.add(item);
+            }
+        }
         Profile profile = Profile.builder()
-                .userGroups(info.getUsergroups())
+                .userGroups(usergroups)
+                .build();
+        this.profiles = Arrays.asList(profile);
+    }
+    public Account(ChargingId chargingId, ERIFResponse response, Date lastValidate){
+        this.chargingId = chargingId;
+        this.lastValidate = lastValidate;
+        this.customerType = response.getIsPrepay();
+        this.billingCycleDay = response.getBillingCycleDay();
+        Profile profile = Profile.builder()
+                .userGroups(response.getUserGroups())
                 .build();
         this.profiles = Arrays.asList(profile);
     }

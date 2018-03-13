@@ -4,6 +4,7 @@ import com.vodafone.charging.accountservice.AccountServiceApplication;
 import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
+import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.net.URI;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWithEmptyId;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
 import static com.vodafone.charging.data.builder.HttpHeadersDataBuilder.aHttpHeaders;
 import static com.vodafone.charging.data.builder.IFResponseDataBuilder.aERIFResponse;
@@ -68,9 +70,10 @@ public class VfAccountServiceHttpTest {
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.payload.enable"), anyBoolean())).willReturn(true);
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
         final ERIFResponse erifResponse = aERIFResponse();
         //set expectedInfo to be what we're setting in the mock
-        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse, null);
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
@@ -98,10 +101,11 @@ public class VfAccountServiceHttpTest {
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
 
         final Response erifResponse = anXmlResponse();
         //set expectedInfo to be what we're setting in the mock
-        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse, null);
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
@@ -124,6 +128,8 @@ public class VfAccountServiceHttpTest {
 
         //given
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
+
         final ERIFResponse expectedResponse = aERIFResponse();
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
@@ -160,9 +166,11 @@ public class VfAccountServiceHttpTest {
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.payload.enable"), anyBoolean())).willReturn(true);
         given(propertiesAccessor.getPropertyAsBoolean(eq("ulf.logger.with.pretty.printing.enable"), anyBoolean()    )).willReturn(true);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.url"), anyString())).willReturn(erifUrl);
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
+
         final ERIFResponse erifResponse = aERIFResponse();
         //set expectedInfo to be what we're setting in the mock
-        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse, null);
         ChargingId chargingId = aChargingId();
         final ContextData contextData = ContextDataDataBuilder.aContextData(chargingId);
         HttpHeaders headers = aHttpHeaders(contextData.getClientId(),
