@@ -34,7 +34,7 @@ public class ERIFClient {
         this.propertiesAccessor = propertiesAccessor;
     }
 
-    public EnrichedAccountInfo validate(ContextData contextData) {
+    public ERIFResponse validate(ContextData contextData) {
 
         final MessageControl messageControl = new MessageControl(contextData.getLocale());
         final Routable routable = new Routable(RoutableType.validate, contextData);
@@ -53,7 +53,7 @@ public class ERIFClient {
         final ERIFResponse responseBody = responseEntity.getBody();
         log.debug(responseEntity.toString());
 
-        return new EnrichedAccountInfo(responseBody);
+        return responseBody;
 
     }
 }

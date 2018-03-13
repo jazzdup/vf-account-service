@@ -12,6 +12,7 @@ import com.vodafone.charging.accountservice.errors.ERCoreErrorId;
 import com.vodafone.charging.accountservice.errors.ERCoreErrorStatus;
 import com.vodafone.charging.accountservice.exception.AccountServiceError;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
+import com.vodafone.charging.data.builder.AccountDataBuilder;
 import com.vodafone.charging.data.message.JsonConverter;
 import com.vodafone.charging.properties.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +120,7 @@ public class VfAccountServiceIT {
         //then
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "accountId");
 
     }
     @Test
@@ -148,7 +149,7 @@ public class VfAccountServiceIT {
         //then
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
-        assertThat(expectedInfo).isEqualToComparingFieldByField(info);
+        assertThat(expectedInfo).isEqualToIgnoringGivenFields(info, "accountId");
 
     }
     @Test
@@ -356,7 +357,7 @@ public class VfAccountServiceIT {
         final EnrichedAccountInfo info =
                 (EnrichedAccountInfo) converter.fromJson(EnrichedAccountInfo.class, result.getResponse().getContentAsString());
 
-        final Account expectedAccount = new Account(contextData.getChargingId(), info, new Date());
+        final Account expectedAccount = AccountDataBuilder.anAccount(contextData.getChargingId(), info, new Date());
         final ChargingId expectedChargingId = expectedAccount.getChargingId();
         repository.save(expectedAccount);
 

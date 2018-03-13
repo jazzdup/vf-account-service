@@ -7,8 +7,8 @@ import com.vodafone.charging.accountservice.dto.xml.Msgcontrol;
 import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.dto.xml.Validate;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
-import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.accountservice.service.ERIFXmlClient;
+import com.vodafone.charging.properties.PropertiesAccessor;
 import com.vodafone.charging.validator.HttpHeaderValidator;
 import com.vodafone.ppe.common.configuration.error.MissingConfigurationException;
 import org.junit.Before;
@@ -70,7 +70,8 @@ public class ERIFXmlClientTest {
                 .willReturn(responseEntity);
 
         //when
-        final EnrichedAccountInfo enrichedAccountInfo = erifXmlClient.validate(contextData);
+        final Response response =  erifXmlClient.validate(contextData);
+        final EnrichedAccountInfo enrichedAccountInfo = new EnrichedAccountInfo(response, null);
 
         //then
         //validate actual request and response in full:

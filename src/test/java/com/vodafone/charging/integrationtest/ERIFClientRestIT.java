@@ -65,7 +65,8 @@ public class ERIFClientRestIT {
 
         final ContextData contextData = aContextData();
         //when
-        final EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(contextData);
+        ERIFResponse erifResponse1 = this.erifClient.validate(contextData);
+        final EnrichedAccountInfo enrichedAccountInfo = new EnrichedAccountInfo(erifResponse1, null);
 
         //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
@@ -81,7 +82,7 @@ public class ERIFClientRestIT {
         final ERIFResponse erifResponse = IFResponseDataBuilder.aERIFResponse();
 
         //set expectedInfo to be what we're setting in the mock
-        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse);
+        EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse, null);
         String url = propertiesAccessor.getPropertyForOpco("erif.url", "GB");
         server.expect(requestTo(url)).andExpect(method(POST))
                 .andRespond(withSuccess(converter.toJson(erifResponse), MediaType.APPLICATION_JSON));
@@ -89,7 +90,8 @@ public class ERIFClientRestIT {
         final ContextData contextData = aContextData();
 
         //when
-        EnrichedAccountInfo enrichedAccountInfo = this.erifClient.validate(contextData);
+        ERIFResponse erifResponse1 = this.erifClient.validate(contextData);
+        EnrichedAccountInfo enrichedAccountInfo = new EnrichedAccountInfo(erifResponse1, null);
 
         //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);

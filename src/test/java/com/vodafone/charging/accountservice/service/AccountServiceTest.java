@@ -4,6 +4,8 @@ import com.vodafone.charging.accountservice.domain.ChargingId;
 import com.vodafone.charging.accountservice.domain.ContextData;
 import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.xml.Response;
 import com.vodafone.charging.accountservice.repository.AccountRepository;
 import com.vodafone.charging.properties.PropertiesAccessor;
 import org.junit.Before;
@@ -18,8 +20,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 
 import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccount;
+import static com.vodafone.charging.data.builder.AccountDataBuilder.anAccountWithEmptyId;
 import static com.vodafone.charging.data.builder.ContextDataDataBuilder.aContextData;
-import static com.vodafone.charging.data.builder.EnrichedAccountInfoDataBuilder.aEnrichedAccountInfo;
+import static com.vodafone.charging.data.builder.IFResponseDataBuilder.aERIFResponse;
+import static com.vodafone.charging.data.builder.IFResponseDataBuilder.anXmlResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -54,10 +58,12 @@ public class AccountServiceTest {
     @Test
     public void shouldCallERIFClientWithoutChangingContextData() throws Exception {
         //given
-        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
+        final ERIFResponse erifResponse = aERIFResponse();
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(erifResponse, null);
         final ContextData contextData = aContextData();
-        given(erifClient.validate(contextData)).willReturn(expectedInfo);
+        given(erifClient.validate(contextData)).willReturn(erifResponse);
         given(propertiesAccessor.getProperty(eq("gb.erif.communication.protocol"))).willReturn("json");
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
 
         //when
         final EnrichedAccountInfo info = accountService.enrichAccountData(contextData);
@@ -67,14 +73,15 @@ public class AccountServiceTest {
         verify(erifClient).validate(any(ContextData.class));
         verify(repository, Mockito.times(1)).save(any(Account.class));
     }
-
     @Test
     public void shouldCallERIFXmlClientWithoutChangingContextData() throws Exception {
         //given
-        final EnrichedAccountInfo expectedInfo = aEnrichedAccountInfo();
+        final Response response = anXmlResponse();
+        final EnrichedAccountInfo expectedInfo = new EnrichedAccountInfo(response, null);
         final ContextData contextData = aContextData();
-        given(erifXmlClient.validate(contextData)).willReturn(expectedInfo);
+        given(erifXmlClient.validate(contextData)).willReturn(response);
         given(propertiesAccessor.getPropertyForOpco(eq("erif.communication.protocol"), anyString(), anyString())).willReturn("soap");
+        given(repository.save(any(Account.class))).willReturn(anAccountWithEmptyId());
 
         //when
         final EnrichedAccountInfo info = accountService.enrichAccountData(contextData);

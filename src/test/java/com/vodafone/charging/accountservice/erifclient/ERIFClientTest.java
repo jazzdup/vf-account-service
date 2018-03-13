@@ -72,7 +72,8 @@ public class ERIFClientTest {
                 .willReturn(responseEntity);
 
         //when
-        EnrichedAccountInfo enrichedAccountInfo = erifClient.validate(contextData);
+        final ERIFResponse erifResponse2 =  erifClient.validate(contextData);
+        EnrichedAccountInfo enrichedAccountInfo = new EnrichedAccountInfo(erifResponse2, null);
 
         //then
         assertThat(expectedInfo).isEqualToComparingFieldByField(enrichedAccountInfo);
