@@ -230,6 +230,52 @@ public class SpendLimitIT {
     }
 
     @Test
+    public void shouldApprovePaymentWhenNoDefaultSuppliedAndAccountSpendLimitExistsAndBreached() throws Exception {
+        final Account account = anAccount();
+        saveAccountAndCheck(account);
+        account.getProfiles().stream()
+                .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNotEmpty());
+
+        final PaymentContext paymentContext = PaymentContext.builder()
+                .locale(Locale.UK)
+                .chargingId(account.getChargingId())
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.16")).build()).build();
+
+        final ERTransaction purchase = anErTransaction(new BigDecimal(2.0), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction refund = anErTransaction(new BigDecimal(2.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
+
+        final List<ERTransaction> transactions = newArrayList(purchase, refund);
+
+        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
+
+        given(restTemplate.exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
+                .willReturn(responseEntity);
+
+        final String json = jsonConverter.toJson(paymentContext);
+
+        final MvcResult response = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        final PaymentApproval approval =
+                (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
+
+        assertThat(approval).isNotNull();
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getResponseCode()).isEqualTo(2);
+        assertThat(approval.getDescription()).startsWith(SpendLimitType.ACCOUNT_TX.name());
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExistsButNoBreach() throws Exception {
 
@@ -283,6 +329,57 @@ public class SpendLimitIT {
     }
 
     @Test
+    public void shouldApprovePaymentWhenDefaultSuppliedAndNoAccountSpendLimitExistsAndBreached() throws Exception {
+        List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(10.0, 50.0, 100.0);
+
+        final Account account = anAccount(aProfileWithoutSpendLimits());
+        saveAccountAndCheck(account);
+        account.getProfiles().stream()
+                .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNullOrEmpty());
+
+        final PaymentContext paymentContext = PaymentContext.builder()
+                .catalogInfo(CatalogInfo.builder().defaultSpendLimitInfo(defaultSpendLimitInfoList).build())
+                .locale(Locale.UK)
+                .chargingId(account.getChargingId())
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.00")).build()).build();
+
+        final ERTransaction purchase1 = anErTransaction(new BigDecimal(2.5), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction purchase2 = anErTransaction(new BigDecimal(50.5), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction refund = anErTransaction(new BigDecimal(3.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
+
+        final List<ERTransaction> transactions = newArrayList(purchase1, purchase2, refund);
+
+        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
+
+        given(restTemplate.exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
+                .willReturn(responseEntity);
+
+        final String json = jsonConverter.toJson(paymentContext);
+
+        final MvcResult response = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        final PaymentApproval approval =
+                (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
+
+        assertThat(approval).isNotNull();
+        assertThat(approval.isSuccess()).isFalse();
+        assertThat(approval.getResponseCode()).isEqualTo(2);
+        assertThat(approval.getDescription()).startsWith(SpendLimitType.ACCOUNT_DAY.name());
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
+    }
+
+
+        @Test
     @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndNoBreach() throws Exception {
 
@@ -658,6 +755,58 @@ public class SpendLimitIT {
                 ERTransactionType.RENEWAL.name(),
                 ERTransactionType.USAGE.name(),
                 ERTransactionType.REFUND.name());
+    }
+
+    @Test
+    public void shouldNotBreachWhenDefaultsDefinedLowerThanSpendLimitsAndPaymentsOverDefaultButUnderSpendLimit() throws Exception {
+
+        final List<SpendLimitInfo> defaultSpendLimitInfoList = aSpendLimitInfoList(1.0, 5.0, 25.0);
+        final List<SpendLimit> spendLimits = aSpendLimitList(2.0, 10.0, 50);
+
+        final Account account = anAccount(aProfile(spendLimits));
+        saveAccountAndCheck(account);
+        account.getProfiles().stream()
+                .findFirst().ifPresent(value -> assertThat(value.getSpendLimits()).isNotEmpty());
+
+        final PaymentContext paymentContext = PaymentContext.builder()
+                .catalogInfo(CatalogInfo.builder().defaultSpendLimitInfo(defaultSpendLimitInfoList).build())
+                .locale(Locale.UK)
+                .chargingId(account.getChargingId())
+                .transactionInfo(TransactionInfo.builder().amount(new BigDecimal("2.00")).build()).build();
+
+        final ERTransaction purchase1 = anErTransaction(new BigDecimal(2.5), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction purchase2 = anErTransaction(new BigDecimal(4.5), LocalDateTime.now(), ERTransactionType.PURCHASE);
+        final ERTransaction refund = anErTransaction(new BigDecimal(3.0), LocalDateTime.now().minusSeconds(20), ERTransactionType.REFUND);
+
+        final List<ERTransaction> transactions = newArrayList(purchase1, purchase2, refund);
+
+        final ResponseEntity<List<ERTransaction>> responseEntity = new ResponseEntity<>(transactions, HttpStatus.OK);
+
+        given(restTemplate.exchange(any(URI.class),
+                eq(HttpMethod.POST),
+                Matchers.<RequestEntity<ERTransactionCriteria>>any(),
+                Matchers.<ParameterizedTypeReference<List<ERTransaction>>>any()))
+                .willReturn(responseEntity);
+
+        final String json = jsonConverter.toJson(paymentContext);
+
+        final MvcResult response = mockMvc.perform(post("/accounts/" + account.getId() + "/profile/transactions/payments")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        final PaymentApproval approval =
+                (PaymentApproval) jsonConverter.fromJson(PaymentApproval.class, response.getResponse().getContentAsString());
+
+        assertThat(approval.isSuccess()).isTrue();
+        assertThat(approval.getResponseCode()).isEqualTo(1);
+        assertThat(approval.getDescription()).isEqualTo("Approved");
+
+        verify(restTemplate).exchange(any(URI.class), any(HttpMethod.class), any(RequestEntity.class), any(ParameterizedTypeReference.class));
+        verifyNoMoreInteractions(restTemplate);
+
     }
 
 }
