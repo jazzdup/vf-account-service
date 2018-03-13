@@ -27,7 +27,7 @@
         <swagger.version>2.8.0</swagger.version>
         <springfox.version>2.8.0</springfox.version>
         <findbugs.version>3.0.1</findbugs.version>
-        <wiremock.version>2.14.0</wiremock.version>
+        <wiremock.version>1.2.3.RELEASE</wiremock.version>
         <powermock.version>1.6.6</powermock.version>
     </properties>
 
@@ -195,8 +195,8 @@
         </dependency>
         <!--an alternative to wiremock is https://github.com/square/okhttp/tree/master/mockwebserver-->
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
             <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
