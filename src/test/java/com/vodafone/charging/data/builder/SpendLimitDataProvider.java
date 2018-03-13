@@ -43,34 +43,34 @@ public class SpendLimitDataProvider {
 
     public static List<ERTransaction> anERTransactionListWithinDates(LocalDateTime start, LocalDateTime end) {
 
-        //payments=65.5, refunds 15.8, total 49.7 - month spend limit = 50
+        //payments=65.5, refunds 15.8, total 49.7 - month spend limit = 50 (default 55)
         final List<ERTransaction> transactions = newArrayList(
                 //value = 55.5
-                anErTransaction(new BigDecimal(11.1), start.plusMinutes(10), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(22.1), start.plusHours(10), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), start.plusDays(10), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), start.plusDays(21), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(10.1), start.plusHours(20), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(11.1), start.plusSeconds(10), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(22.1), start.plusSeconds(10), ERTransactionType.PURCHASE),//include
+                anErTransaction(new BigDecimal(5.1), start.plusSeconds(10), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(7.1), start.plusSeconds(10), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(10.1), start.plusSeconds(10), ERTransactionType.USAGE),//include
 
                 //value = 10
-                anErTransaction(new BigDecimal(0.1), start.plusHours(20), ERTransactionType.RENEWAL),//include
-                anErTransaction(new BigDecimal(0.3), start.plusDays(2), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(0.1), start.plusSeconds(20), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(0.3), start.plusSeconds(10), ERTransactionType.PURCHASE),//include
                 anErTransaction(new BigDecimal(4.2), end.minusSeconds(4), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(3.3), end.minusMinutes(52), ERTransactionType.RENEWAL),//include
-                anErTransaction(new BigDecimal(2.1), start.plusHours(50), ERTransactionType.USAGE),//include
+                anErTransaction(new BigDecimal(3.3), end.minusSeconds(52), ERTransactionType.RENEWAL),//include
+                anErTransaction(new BigDecimal(2.1), end.minusSeconds(52), ERTransactionType.USAGE),//include
 
                 //all excluded
-                anErTransaction(new BigDecimal(0.1), end.plusHours(20), ERTransactionType.RENEWAL),//exclude
-                anErTransaction(new BigDecimal(0.3), end.plusDays(2), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(0.1), end.plusSeconds(20), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(0.3), end.plusSeconds(2), ERTransactionType.RENEWAL),//exclude
                 anErTransaction(new BigDecimal(4.2), start.minusSeconds(4), ERTransactionType.PURCHASE),//exclude
-                anErTransaction(new BigDecimal(3.3), start.minusMinutes(52), ERTransactionType.RENEWAL),//exclude
-                anErTransaction(new BigDecimal(2.1), end.plusHours(50), ERTransactionType.USAGE),//exclude
+                anErTransaction(new BigDecimal(3.3), start.minusSeconds(52), ERTransactionType.RENEWAL),//exclude
+                anErTransaction(new BigDecimal(2.1), end.plusSeconds(50), ERTransactionType.USAGE),//exclude
 
                 //value = -15.8
                 anErTransaction(new BigDecimal(10.1), end.plusSeconds(1), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(10.1), end.plusHours(1), ERTransactionType.REFUND),//exclude
+                anErTransaction(new BigDecimal(10.1), end.plusSeconds(1), ERTransactionType.REFUND),//exclude
                 anErTransaction(new BigDecimal(5.3), end.minusSeconds(5), ERTransactionType.REFUND),//include
-                anErTransaction(new BigDecimal(10.5), end.minusDays(20), ERTransactionType.REFUND),//include
+                anErTransaction(new BigDecimal(10.5), end.minusSeconds(20), ERTransactionType.REFUND),//include
                 anErTransaction(new BigDecimal(20.1), start.minusSeconds(1), ERTransactionType.REFUND));//exclude
 
         return transactions;

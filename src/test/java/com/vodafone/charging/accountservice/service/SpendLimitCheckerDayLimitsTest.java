@@ -317,7 +317,7 @@ public class SpendLimitCheckerDayLimitsTest extends SpendLimitCheckerBase {
         //given
         //purchases total 16, current tx = 0.4 refunds 6.3 limit = 10
         final List<ERTransaction> transactions = SpendLimitDataProvider.anERTransactionListForCurrentDay();
-        PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(ImmutableList.of(), new BigDecimal(0.4));
+        final PaymentContext paymentContext = PaymentContextDataBuilder.aPaymentContext(ImmutableList.of(), new BigDecimal(0.4));
 
         given(erDateCalculator.calculateDurationSpendLimitDates(any(SpendLimitType.class), anyInt())).willReturn(todayDates);
 
