@@ -375,7 +375,7 @@ public class SpendLimitIT {
     }
 
 
-        @Test
+    @Test
     @SuppressWarnings("unchecked")
     public void shouldApprovePaymentWhenDefaultSuppliedAndAccountSpendLimitExistsAndNoBreach() throws Exception {
 

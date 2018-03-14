@@ -55,10 +55,10 @@ public class AccountServiceController {
     }
 
     @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
-            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)})
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)
+    })
     @ApiOperation(value = "Obtain enriched charging account information",
-            notes = "If you provide some contextual information this operation will process the request and respond with enriched charging account data.  " +
-                    "\n In particular properties such as usergroups, customer type, billing account number will be returned ",
+            notes = "This operation will process the request and respond with enriched charging account data and either create or update an Account.  ",
             response = EnrichedAccountInfo.class, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             httpMethod = javax.ws.rs.HttpMethod.POST, nickname = "enrichAccountData")
 
@@ -131,6 +131,14 @@ public class AccountServiceController {
         return ResponseEntity.ok(userGroups);
     }
 
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class)
+    })
+    @ApiOperation(value = "Update Account profile with account spend limits info",
+            notes = "Set Spend Limit info for an Account",
+            response = Account.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "updateAccountSpendLimit")
+
     @RequestMapping(path = "/{accountId}/profile/spendlimits", method = POST,
             consumes = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE},
             produces = {APPLICATION_JSON_UTF8_VALUE, APPLICATION_JSON_VALUE})
@@ -144,6 +152,16 @@ public class AccountServiceController {
         return ResponseEntity.created(URI.create(accountId + "/profile/spendlimits/"))
                 .body(account);
     }
+
+
+    @ApiResponses({@ApiResponse(code = 500, message = "Internal Server Error", response = AccountServiceError.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = AccountServiceError.class),
+            @ApiResponse(code = 502, message = "Bad Gateway", response = AccountServiceError.class)
+    })
+    @ApiOperation(value = "Obtain approval for a particular payment",
+            notes = "Approve a payment transaction",
+            response = PaymentApproval.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            httpMethod = HttpMethod.GET, nickname = "approvePayment")
 
     @RequestMapping(path = "/{accountId}/profile/transactions/payments", method = POST,
             consumes = APPLICATION_JSON_UTF8_VALUE,
