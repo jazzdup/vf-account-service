@@ -1,11 +1,10 @@
 package com.vodafone.charging.accountservice.service;
 
 import com.vodafone.charging.accountservice.domain.ContextData;
-import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
-import com.vodafone.charging.ulf.ValidateHttpHeaders;
 import com.vodafone.charging.accountservice.dto.xml.*;
 import com.vodafone.charging.accountservice.exception.NullRestResponseReceivedException;
 import com.vodafone.charging.properties.PropertiesAccessor;
+import com.vodafone.charging.ulf.ValidateHttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -36,7 +35,7 @@ public class ERIFXmlClient {
         this.propertiesAccessor = propertiesAccessor;
     }
 
-    public EnrichedAccountInfo validate(ContextData contextData) {
+    public Response validate(ContextData contextData) {
 
         Envelope requestEnvelope = buildEnvelope(contextData);
         //generates ERIF not-quite-soap specific headers
@@ -56,7 +55,7 @@ public class ERIFXmlClient {
         final Body body = envelope.getBody();
         final Response response = body.getResponse();
 
-        return new EnrichedAccountInfo(response);
+        return response;
 
     }
 

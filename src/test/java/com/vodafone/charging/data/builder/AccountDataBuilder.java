@@ -1,9 +1,12 @@
 package com.vodafone.charging.data.builder;
 
 import com.vodafone.charging.accountservice.domain.ChargingId;
+import com.vodafone.charging.accountservice.domain.EnrichedAccountInfo;
 import com.vodafone.charging.accountservice.domain.model.Account;
 import com.vodafone.charging.accountservice.domain.model.Profile;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Random;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -11,6 +14,19 @@ import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aCharging
 import static com.vodafone.charging.data.builder.ProfileDataBuilder.aProfile;
 
 public class AccountDataBuilder {
+
+    public static Account anAccount(ChargingId chargingId, EnrichedAccountInfo info, Date lastValidate){
+        Profile profile = Profile.builder()
+                .userGroups(info.getUsergroups())
+                .build();
+        return Account.builder()
+            .chargingId(chargingId)
+            .lastValidate(lastValidate)
+            .customerType(info.getCustomerType())
+            .billingCycleDay(info.getBillingCycleDay())
+            .profiles(Arrays.asList(profile))
+                .build();
+    }
 
     public static Account anAccount() {
         return Account.builder()

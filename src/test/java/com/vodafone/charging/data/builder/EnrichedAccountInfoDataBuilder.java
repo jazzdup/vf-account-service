@@ -38,12 +38,11 @@ public class EnrichedAccountInfoDataBuilder {
     }
 
     public static EnrichedAccountInfo aEnrichedAccountInfo(ERIFResponse response) {
-        Random random = new Random();
-        return new EnrichedAccountInfo(response);
+        return new EnrichedAccountInfo(response, null);
     }
 
     public static EnrichedAccountInfo aEnrichedAccountInfo(Response response) {
-        return new EnrichedAccountInfo(response);
+        return new EnrichedAccountInfo(response, null);
     }
 //
 //    public static EnrichedAccountInfo aEnrichedAccountInfo(ContextData contextData) {

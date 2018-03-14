@@ -16,6 +16,7 @@ public class EnrichedAccountInfoTest {
 
         List<String> usergroups = newArrayList("test-ug1", "test-ug2");
         EnrichedAccountInfo accountInfo = new EnrichedAccountInfo.Builder("success")
+                .accountId("accountId")
                 .ban("test-ban")
                 .billingCycleDay(22)
                 .childServiceProviderId("test-childServiceProviderId")
@@ -27,6 +28,7 @@ public class EnrichedAccountInfoTest {
                 .errorId("test-errorId")
                 .build();
 
+        assertThat(accountInfo.getAccountId()).isEqualTo("accountId");
         assertThat(accountInfo.getValidationStatus()).isEqualTo("success");
         assertThat(accountInfo.getBan()).isEqualTo("test-ban");
         assertThat(accountInfo.getBillingCycleDay()).isEqualTo(22);
