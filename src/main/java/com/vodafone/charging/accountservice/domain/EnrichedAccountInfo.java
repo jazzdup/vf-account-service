@@ -57,7 +57,7 @@ public class EnrichedAccountInfo {
         ban = response.getBan();
         Response.UserGroups userGroups = response.getUserGroups();
         if (userGroups != null && userGroups.getItem() != null) {
-            usergroups = new ArrayList<String>();
+            usergroups = new ArrayList<>();
             for (String item : userGroups.getItem()) {
                 usergroups.add(item);
             }

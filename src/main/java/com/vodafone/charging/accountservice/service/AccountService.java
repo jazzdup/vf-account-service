@@ -37,8 +37,6 @@ public class AccountService {
     @Autowired
     private AccountRepository repository;
 
-    public AccountService() {
-    }
 
     public EnrichedAccountInfo enrichAccountData(ContextData contextData) {
         log.debug("contextData={}", contextData);

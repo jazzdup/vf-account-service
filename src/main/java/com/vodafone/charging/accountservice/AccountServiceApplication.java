@@ -39,7 +39,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public class AccountServiceApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(AccountServiceApplication.class, args);
     }
 
@@ -65,22 +64,6 @@ public class AccountServiceApplication {
                 .contact(new Contact("Ravi Aghera", "www.vodafone.com", "ravi.aghera@vodafone.com"))
                 .description("REST Api to enrich Vodafone Account Information via interaction with OPCO and Partner Services")
                 .build();
-
-    }
-
-    @Bean
-    CommandLineRunner init(AccountRepository accountRepository) {
-        return (args) ->
-                newArrayList("al-pacino-" + new Random().nextInt(),
-                        "robert-deniro-" + new Random().nextInt(),
-                        "joe-pesci" + new Random().nextInt()).forEach(id ->
-                        accountRepository.save(Account.builder()
-                                .id(id)
-                                .chargingId(new ChargingId.Builder().type(ChargingId.Type.MSISDN)
-                                        .value(String.valueOf(new Random().nextInt())).build())
-                                .customerType("PRE")
-                                .lastValidate(new Date())
-                                .build()));
     }
 
     @Bean
@@ -101,6 +84,23 @@ public class AccountServiceApplication {
                 .validatorUrl(null)
                 .build();
     }
+
+    @Bean
+    CommandLineRunner init(AccountRepository accountRepository) {
+        return args ->
+                newArrayList("al-pacino-" + new Random().nextInt(),
+                        "robert-deniro-" + new Random().nextInt(),
+                        "joe-pesci" + new Random().nextInt())
+                        .forEach(id ->
+                                accountRepository.save(Account.builder()
+                                        .id(id)
+                                        .chargingId(new ChargingId.Builder().type(ChargingId.Type.MSISDN)
+                                                .value(String.valueOf(new Random().nextInt())).build())
+                                        .customerType("PRE")
+                                        .lastValidate(new Date())
+                                        .build()));
+    }
+
 
 }
 

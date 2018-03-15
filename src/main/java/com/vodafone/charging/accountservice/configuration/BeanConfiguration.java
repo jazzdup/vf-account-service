@@ -19,14 +19,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.Filter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
@@ -42,13 +40,6 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-//        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-//        builder.serializationInclusion(JsonInclude.Include.NON_EMPTY);
-        builder.indentOutput(true);
-        builder.dateFormat(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss"));
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new ParameterNamesModule())
 //                .registerModule(new Jackson2HalModule())
@@ -121,15 +112,6 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public Filter loggingFilter(UlfLogger ulfLogger){
         return new LoggingFilter(ulfLogger);
     }
-
-//    @Bean
-//    public Docket api() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .select()
-//                .apis(RequestHandlerSelectors.any())
-//                .paths(PathSelectors.any())
-//                .build();
-//    }
 
 
 }

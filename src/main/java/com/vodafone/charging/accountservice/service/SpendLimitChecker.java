@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -226,26 +224,4 @@ public class SpendLimitChecker {
         }
         return appliedLimitValue;
     }
-
-    public Map<String, List<ERTransaction>> groupTransactions(List<SpendLimit> spendLimits, List<SpendLimit> defaultSpendLimits, List<ERTransaction> tx) {
-
-        final LocalDateTime start = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MIDNIGHT);
-        final LocalDateTime end = LocalDateTime.of(LocalDate.now(timeZone.toZoneId()), LocalTime.MAX);
-
-//        Map<String, List<ERTransaction>> grouping =
-//                tx.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
-//                        && transaction.getDateTime().isBefore(end))
-//                        .collect(Collectors.groupingBy(ERTransaction::getType));
-
-//        Map<String, Optional<BigDecimal>> grouping =
-//                tx.stream().filter(transaction -> transaction.getDateTime().isAfter(start)
-//                        && transaction.getDateTime().isBefore(end))
-//                        .collect(groupingBy(ERTransaction::getType, maxBy(ERTransaction::getAmount)));
-//
-//        return grouping;
-        throw new UnsupportedOperationException();
-
-    }
-
-
 }
