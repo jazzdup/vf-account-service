@@ -558,24 +558,6 @@ public class SpendLimitCheckerMonthlyLimitsTest extends SpendLimitCheckerBase {
                 .hasMessageContaining("spendLimitType");
     }
 
-    @Ignore
-    public void shouldGroupTransactions() {
-        //DataSet
-        final List<ERTransaction> transactions = newArrayList(
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(2), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(3), ERTransactionType.PURCHASE),//include
-                anErTransaction(new BigDecimal(5.1), LocalDateTime.now().minusHours(4), ERTransactionType.USAGE),//include
-                anErTransaction(new BigDecimal(7.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(2), ERTransactionType.USAGE),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusDays(2), ERTransactionType.REFUND),//exclude
-                anErTransaction(new BigDecimal(10.1), LocalDateTime.now().minusMinutes(10), ERTransactionType.REFUND));//include and subtract
-
-        final Map<String, List<ERTransaction>> groupingMap =
-                spendLimitChecker.groupTransactions(spendLimits, defaultSpendLimits, transactions);
-
-    }
-
-
     @Test
     public void shouldGetCorrectPaymentAmountWithoutRenewals() {
 
