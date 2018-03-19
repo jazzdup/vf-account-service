@@ -61,7 +61,7 @@ public class ERService {
                 .get();
 
         final HttpStatus status = responseEntity.getStatusCode();
-        log.error("HttpStatus: {}", status.value());
+        log.info("HttpStatus: {}", status.value());
 
         return ofNullable(responseEntity.getBody()).orElse(Lists.newArrayList());
     }
