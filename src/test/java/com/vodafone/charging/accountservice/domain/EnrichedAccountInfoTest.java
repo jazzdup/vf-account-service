@@ -16,10 +16,11 @@ public class EnrichedAccountInfoTest {
 
         List<String> usergroups = newArrayList("test-ug1", "test-ug2");
         EnrichedAccountInfo accountInfo = new EnrichedAccountInfo.Builder("success")
+                .accountId("accountId")
                 .ban("test-ban")
                 .billingCycleDay(22)
                 .childServiceProviderId("test-childServiceProviderId")
-                .isPrepay(false)
+                .customerType("PRE")
                 .serviceProviderId("test-serviceProviderId")
                 .serviceProviderType("test-serviceProviderType")
                 .usergroups(usergroups)
@@ -27,11 +28,12 @@ public class EnrichedAccountInfoTest {
                 .errorId("test-errorId")
                 .build();
 
+        assertThat(accountInfo.getAccountId()).isEqualTo("accountId");
         assertThat(accountInfo.getValidationStatus()).isEqualTo("success");
         assertThat(accountInfo.getBan()).isEqualTo("test-ban");
         assertThat(accountInfo.getBillingCycleDay()).isEqualTo(22);
         assertThat(accountInfo.getChildServiceProviderId()).isEqualTo("test-childServiceProviderId");
-        assertThat(accountInfo.isPrepay()).isEqualTo(false);
+        assertThat(accountInfo.getCustomerType()).isEqualTo("PRE");
         assertThat(accountInfo.getServiceProviderId()).isEqualTo("test-serviceProviderId");
         assertThat(accountInfo.getServiceProviderType()).isEqualTo("test-serviceProviderType");
         assertThat(accountInfo.getUsergroups()).isEqualTo(usergroups);

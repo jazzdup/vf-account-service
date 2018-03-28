@@ -1,9 +1,16 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.domain.enums.ERIFRequestTarget;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT;
 import static com.vodafone.charging.accountservice.domain.enums.PackageType.EVENT_CALENDAR_PACKAGE_TYPE;
 import static com.vodafone.charging.data.builder.ChargingIdDataBuilder.aChargingId;
@@ -41,8 +48,10 @@ public class ContextDataTest {
                 .clientId("clientId")
                 .serviceId("serviceId")
                 .vendorId("vendor")
+                .partnerId("partner")
                 .packageType(EVENT_CALENDAR_PACKAGE_TYPE)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
                 .build();
 
         assertThat(contextData.getContextName()).isEqualTo("test-context-name");
@@ -53,7 +62,8 @@ public class ContextDataTest {
         assertThat(contextData.getVendorId()).isEqualTo("vendor");
         assertThat(contextData.getPackageType()).isEqualTo(EVENT_CALENDAR_PACKAGE_TYPE);
         assertThat(contextData.isKycCheck()).isEqualTo(false);
-
+        assertThat(contextData.getTarget()).isEqualTo(ERIFRequestTarget.GLOBAL);
+        assertThat(contextData.getPartnerId()).isEqualTo("partner");
     }
 
     @Test
@@ -65,6 +75,8 @@ public class ContextDataTest {
                 .vendorId("test-vendor")
                 .packageType(EVENT)
                 .kycCheck(false)
+                .target(ERIFRequestTarget.GLOBAL)
+                .partnerId("partnerId")
                 .build();
 
         final String contextDataStr = contextData.toString();
@@ -76,6 +88,34 @@ public class ContextDataTest {
         assertThat(contextDataStr).contains("test-vendor");
         assertThat(contextDataStr).contains(EVENT.toString());
         assertThat(contextDataStr).contains("kycCheck=false");
+        assertThat(contextDataStr).contains(ERIFRequestTarget.GLOBAL.toString());
+        assertThat(contextDataStr).contains("partnerId");
+    }
+
+    @Test
+    public void shouldGetObjectAsMap() throws Exception {
+        ContextData contextData = aContextData("test-context-name", Locale.UK, aChargingId());
+        Map<String, Object> values = contextData.asMap();
+        //check that the key/values are correct
+
+        List<Field> fieldArr = newArrayList(contextData.getClass().getDeclaredFields());
+        Set<String> valuesSet = values.keySet();
+        List<Method> methods = newArrayList(ContextData.class.getMethods());
+
+        //check all the fields
+        for (Field field : fieldArr) {
+            assertThat(valuesSet).contains(field.getName());
+
+            //check all methods are there
+            for (Method method : methods) {
+
+                if (method.getName().equals("get" + field)) {
+                    System.out.println("Method: " + method.getName());
+                    assertThat(values.get(field.getName())).isEqualTo(method.invoke(contextData));
+                    break;
+                }
+            }
+        }
     }
 
 }

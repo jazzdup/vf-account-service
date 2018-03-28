@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{MM:dd HH:mm:ss.SSS}] [%level] [%logger{36}] - %msg%n"/>
+        </Console>
+        <!--<File name="File" fileName="logs/vf-account-service.log" immediateFlush="false" append="false">-->
+            <!--<PatternLayout pattern="[%d{MM:dd HH:mm:ss.SSS}] [%level] [%logger{36}] - %msg%n"/>-->
+        <!--</File>-->
+        <RollingFile name="vf-account-service" fileName="logs/vf-account-service.log" filePattern="logs/vf-account-service.log_%d{yyyyMMdd_HH}" append="true">
+            <ThreadContextMapFilter onMatch="ACCEPT" onMismatch="ACCEPT">
+                <KeyValuePair key="LOCALE" value=""/>
+            </ThreadContextMapFilter>
+            <PatternLayout>
+                <Pattern>%d{dd.MM.yyyy HH:mm:ss}|%t|%p|%c:%L|%M|%X{MSISDN}|%m | %n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        
+        <RollingFile name="ultimate-log" fileName="logs/ultimate.log" filePattern="logs/ultimate.log_%d{yyyyMMdd_HH}" append="true">
+            <PatternLayout>
+                <Pattern>%m %n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="ultimate-log-without-payload" fileName="logs/ulf-log-without-payload.log" filePattern="logs/ulf-log-without-payload.log_%d{yyyyMMdd_HH}" append="true">
+            <PatternLayout>
+                <Pattern>%m %n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="com.vodafone" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="vf-account-service"/>
+        </Logger>
+        <Logger name="com.vodafone.ulf.with.payload" additivity="false" level="INFO">
+            <AppenderRef ref="ultimate-log"/>
+        </Logger>
+        <Logger name="com.vodafone.ulf.without.payload" additivity="false" level="INFO">
+            <AppenderRef ref="ultimate-log-without-payload"/>
+        </Logger>
+        <!--<Logger name="com.vodafone.global.er.util.FrameworkUtil.UltimateLog" additivity="false" level="ERROR">-->
+            <!--<AppenderRef ref="ultimate-log"/>-->
+        <!--</Logger>-->
+        <!--<Logger name="com.vodafone.charging.ulf.UlfLogInterceptor" additivity="false" level="DEBUG">-->
+            <!--<AppenderRef ref="Console"/>-->
+            <!--<AppenderRef ref="ultimate-log"/>-->
+        <!--</Logger>-->
+    </Loggers>
+</Configuration>

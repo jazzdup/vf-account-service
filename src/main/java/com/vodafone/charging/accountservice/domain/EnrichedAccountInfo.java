@@ -1,30 +1,79 @@
 package com.vodafone.charging.accountservice.domain;
 
+import com.vodafone.charging.accountservice.dto.json.ERIFResponse;
+import com.vodafone.charging.accountservice.dto.xml.Response;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.vodafone.charging.accountservice.service.ERDateCalculator.isValidBillingCycleDay;
 
 /**
  * Represents the response to the client after external calls have completed
  */
 @Component
 public class EnrichedAccountInfo {
-
+    private String accountId;
     private String validationStatus;
     private String ban;
     private List<String> usergroups;
-    private int billingCycleDay;
+    private Integer billingCycleDay;
     private String serviceProviderId;
     private String childServiceProviderId;
     private String serviceProviderType;
-    private boolean isPrepay;
+    private String customerType;// is the PRE/POST string for prepay type
     private String errorId;
     private String errorDescription;
 
     public EnrichedAccountInfo() {
     }
 
+    public EnrichedAccountInfo(@NonNull ERIFResponse erifResponse, String accountId){
+        this.accountId = accountId;
+        validationStatus = erifResponse.getStatus();
+        ban = erifResponse.getBan();
+        usergroups = erifResponse.getUserGroups();
+        if(isValidBillingCycleDay(erifResponse.getBillingCycleDay())) {
+            billingCycleDay = erifResponse.getBillingCycleDay();
+        }
+        serviceProviderId = erifResponse.getSpId();
+        childServiceProviderId = erifResponse.getChildSpId();
+        serviceProviderType = erifResponse.getSpType();
+        serviceProviderId = erifResponse.getSpId();
+        customerType = erifResponse.getIsPrepay();
+        errorId = erifResponse.getErrId();
+        errorDescription = erifResponse.getErrDescription();
+    }
+
+    /**
+     * for not-quite-soap version
+     * @param response
+     */
+    public EnrichedAccountInfo(@NonNull Response response, String accountId){
+        this.accountId = accountId;
+        validationStatus = response.getStatus();
+        ban = response.getBan();
+        Response.UserGroups userGroups = response.getUserGroups();
+        if (userGroups != null && userGroups.getItem() != null) {
+            usergroups = new ArrayList<>();
+            for (String item : userGroups.getItem()) {
+                usergroups.add(item);
+            }
+        }
+        billingCycleDay = response.getBillingCycleDay();
+        serviceProviderId = response.getSpId();
+        childServiceProviderId = response.getChildSpId();
+        serviceProviderType = response.getSpType();
+        serviceProviderId = response.getSpId();
+        customerType = response.getIsPrepay();
+        errorId = response.getErrId();
+        errorDescription = response.getErrDescription();
+    }
+
     private EnrichedAccountInfo(final Builder builder) {
+        this.accountId = builder.accountId;
         this.validationStatus = builder.validationStatus;
         this.ban = builder.ban;
         this.usergroups = builder.usergroups;
@@ -32,11 +81,12 @@ public class EnrichedAccountInfo {
         this.serviceProviderId = builder.serviceProviderId;
         this.childServiceProviderId = builder.childServiceProviderId;
         this.serviceProviderType = builder.serviceProviderType;
-        this.isPrepay = builder.isPrepay;
+        this.customerType = builder.customerType;
         this.errorId = builder.errorId;
         this.errorDescription = builder.errorDescription;
     }
 
+    public String getAccountId(){return accountId;}
     public String getValidationStatus() {
         return validationStatus;
     }
@@ -65,8 +115,8 @@ public class EnrichedAccountInfo {
         return serviceProviderType;
     }
 
-    public boolean isPrepay() {
-        return isPrepay;
+    public String getCustomerType() {
+        return customerType;
     }
 
     public String getErrorId() {
@@ -78,22 +128,25 @@ public class EnrichedAccountInfo {
     }
 
     public static class Builder {
-
+        private String accountId;
         private String validationStatus;
         private String ban;
         private List<String> usergroups;
-        private int billingCycleDay;
+        private Integer billingCycleDay;
         private String serviceProviderId;
         private String childServiceProviderId;
         private String serviceProviderType;
-        private boolean isPrepay;
+        private String customerType;
         private String errorId;
         private String errorDescription;
 
         public Builder(String validationStatus) {
             this.validationStatus = validationStatus;
         }
-
+        public Builder accountId(final String accountId){
+            this.accountId = accountId;
+            return this;
+        }
         public Builder ban(final String ban) {
             this.ban = ban;
             return this;
@@ -121,8 +174,8 @@ public class EnrichedAccountInfo {
             this.serviceProviderType = serviceProviderType;
             return this;
         }
-        public Builder isPrepay(final boolean isPrepay) {
-            this.isPrepay = isPrepay;
+        public Builder customerType(final String customerType) {
+            this.customerType = customerType;
             return this;
         }
         public Builder errorId(final String errorId) {
